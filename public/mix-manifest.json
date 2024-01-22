@@ -1,0 +1,13 @@
+{
+    "/lib/vue/vue-chunk.js": "/lib/vue/vue-chunk.js",
+    "/dist/runtime.js": "/dist/runtime.js",
+    "/dist/admin/app.js": "/dist/admin/app.js",
+    "/dist/properties.js": "/dist/properties.js",
+    "/dist/listings.js": "/dist/listings.js",
+    "/dist/forms.js": "/dist/forms.js",
+    "/dist/sterling/index.css": "/dist/sterling/index.css",
+    "/dist/admin/login.css": "/dist/admin/login.css",
+    "/dist/admin/index.css": "/dist/admin/index.css",
+    "/lib/bootstrap/bootstrap.min.css": "/lib/bootstrap/bootstrap.min.css",
+    "/dist/sterling/mail.css": "/dist/sterling/mail.css"
+}

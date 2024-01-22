@@ -1,0 +1,53 @@
+.admin-login {
+    display: flex;
+    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: #2E3A4C;
+    color: #ffffff;
+
+    .el-form-item {
+        margin-bottom: 30px;
+    }
+
+    .el-input {
+        background-color: #293443;
+        background-clip: padding-box;
+        border: 1px solid hsla(0, 0%, 100%, .1);
+        border-radius: 0.25rem;
+        transition: all 0.15s ease-in-out;
+
+        .el-input-group__prepend {
+            background: none;
+            border: 0;
+        }
+
+        .el-input__inner {
+            background: none;
+            border: 0;
+            padding-left: 0;
+            color: #fff;
+            font-weight: 600;
+
+            &:-webkit-autofill{
+                -webkit-background-image: none !important;
+                -webkit-text-fill-color: #ffffff !important;
+                -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+                transition: background-color 50000s ease-in-out 0s !important;
+            }
+        }
+    }
+
+    .form-wrapper {
+        width: 400px;
+        display: block;
+        margin: 0 auto;
+        padding: 100px 0;
+    }
+
+    .form-header {
+        text-align: center;
+        font-size: 32px;
+    }
+}

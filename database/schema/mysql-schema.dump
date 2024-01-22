@@ -1,0 +1,1240 @@
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `pre_ad`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_ad` (
+  `id` int(6) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `uid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
+  `title` varchar(20) DEFAULT NULL COMMENT '标题',
+  `type` enum('text','image','code') NOT NULL DEFAULT 'text' COMMENT '类型',
+  `data` mediumtext COMMENT '内容',
+  `clicks` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '点击数',
+  `available` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否可用',
+  `begin_at` date DEFAULT NULL COMMENT '生效日期',
+  `end_at` date DEFAULT NULL COMMENT '失效日期',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `uid` (`uid`) USING BTREE,
+  KEY `type` (`type`) USING BTREE,
+  KEY `available` (`available`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='广告';
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_block`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_block` (
+  `id` smallint(6) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  `description` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_block_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_block_item` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `block_id` smallint(6) unsigned NOT NULL DEFAULT '0' COMMENT '块ID',
+  `title` varchar(60) DEFAULT NULL COMMENT '标题',
+  `description` text COMMENT '副标题',
+  `image` varchar(200) DEFAULT NULL COMMENT '图片',
+  `url` varchar(200) DEFAULT NULL COMMENT '链接',
+  `field_1` varchar(100) DEFAULT NULL,
+  `field_2` varchar(100) DEFAULT NULL,
+  `field_3` varchar(100) DEFAULT NULL,
+  `sort_num` smallint(3) unsigned DEFAULT '0' COMMENT '显示顺序',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `block_id` (`block_id`) USING BTREE,
+  KEY `sort_num` (`sort_num`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_association_units`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_association_units` (
+  `Id` int(11) unsigned NOT NULL,
+  `AssociationId` int(11) unsigned NOT NULL DEFAULT '0',
+  `AssociationName` varchar(255) DEFAULT NULL,
+  `UnitNumber` varchar(40) DEFAULT NULL,
+  `UnitBedrooms` varchar(60) DEFAULT '0',
+  `UnitBathrooms` varchar(60) DEFAULT NULL,
+  `UnitSize` int(11) DEFAULT '0',
+  `Address` text,
+  `Country` varchar(100) DEFAULT NULL,
+  `State` varchar(100) DEFAULT NULL,
+  `City` varchar(100) DEFAULT NULL,
+  `AddressLine1` varchar(255) DEFAULT NULL,
+  `AddressLine2` varchar(255) DEFAULT NULL,
+  `AddressLine3` varchar(255) DEFAULT NULL,
+  `PostalCode` varchar(40) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_associations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_associations` (
+  `Id` int(11) unsigned NOT NULL,
+  `Name` varchar(255) DEFAULT NULL,
+  `IsActive` tinyint(1) unsigned DEFAULT '0',
+  `Reserve` tinyint(1) unsigned DEFAULT '0',
+  `Description` text,
+  `YearBuilt` varchar(20) DEFAULT '0',
+  `OperatingBankAccount` varchar(255) DEFAULT NULL,
+  `OperatingBankAccountId` int(11) DEFAULT '0',
+  `AssociationManager` text,
+  `FiscalYearEndDay` tinyint(4) DEFAULT '0',
+  `FiscalYearEndMonth` tinyint(4) DEFAULT '0',
+  `TaxInformation` text,
+  `Address` text,
+  `Country` varchar(100) DEFAULT NULL,
+  `State` varchar(100) DEFAULT NULL,
+  `City` varchar(100) DEFAULT NULL,
+  `AddressLine1` varchar(255) DEFAULT NULL,
+  `AddressLine2` varchar(255) DEFAULT NULL,
+  `AddressLine3` varchar(255) DEFAULT NULL,
+  `PostalCode` varchar(40) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_file_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_file_categories` (
+  `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `Name` varchar(255) DEFAULT NULL,
+  `IsEditable` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_files`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_files` (
+  `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `EntityId` int(11) unsigned NOT NULL DEFAULT '0',
+  `EntityType` varchar(100) DEFAULT NULL,
+  `Href` varchar(255) DEFAULT NULL,
+  `CategoryId` int(11) unsigned NOT NULL DEFAULT '0',
+  `Title` varchar(255) DEFAULT NULL,
+  `Description` varchar(255) DEFAULT NULL,
+  `PhysicalFileName` varchar(255) DEFAULT NULL,
+  `Size` int(11) unsigned NOT NULL DEFAULT '0',
+  `ContentType` varchar(255) DEFAULT NULL,
+  `UploadedDateTime` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_forms`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_forms` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `type` varchar(40) DEFAULT NULL,
+  `excerpt` text,
+  `attach` varchar(255) DEFAULT NULL,
+  `sort_num` smallint(11) DEFAULT '0',
+  `category_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `entity_type` varchar(60) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `type` (`type`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_rental_units`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_rental_units` (
+  `Id` int(11) unsigned NOT NULL,
+  `PropertyId` int(11) unsigned NOT NULL DEFAULT '0',
+  `BuildingName` varchar(255) DEFAULT NULL,
+  `UnitNumber` varchar(40) DEFAULT NULL,
+  `Description` text,
+  `MarketRent` int(10) unsigned DEFAULT '0',
+  `UnitBedrooms` varchar(60) DEFAULT '0',
+  `UnitBathrooms` varchar(60) DEFAULT NULL,
+  `UnitSize` int(11) DEFAULT '0',
+  `IsUnitListed` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `IsUnitOccupied` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `Address` text,
+  `Country` varchar(100) DEFAULT NULL,
+  `State` varchar(100) DEFAULT NULL,
+  `City` varchar(100) DEFAULT NULL,
+  `AddressLine1` varchar(255) DEFAULT NULL,
+  `AddressLine2` varchar(255) DEFAULT NULL,
+  `AddressLine3` varchar(255) DEFAULT NULL,
+  `PostalCode` varchar(40) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_rental_units_listings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_rental_units_listings` (
+  `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `UnitId` int(11) unsigned NOT NULL DEFAULT '0',
+  `PropertyId` int(10) unsigned NOT NULL DEFAULT '0',
+  `ListingDate` date DEFAULT NULL,
+  `Rent` float unsigned DEFAULT '0',
+  `Deposit` float unsigned DEFAULT '0',
+  `LeaseTerms` text,
+  `AvailableDate` date DEFAULT NULL,
+  `IsManagedExternally` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `RentalApplicationUrl` varchar(255) DEFAULT NULL,
+  `Contact` text,
+  `Property` text,
+  `Unit` text,
+  `lng` double(11,6) NOT NULL DEFAULT '0.000000',
+  `lat` double(11,6) NOT NULL DEFAULT '0.000000',
+  `Country` varchar(100) DEFAULT NULL,
+  `State` varchar(100) DEFAULT NULL,
+  `City` varchar(100) DEFAULT NULL,
+  `AddressLine1` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_rentals`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_rentals` (
+  `Id` int(11) unsigned NOT NULL,
+  `Name` varchar(255) DEFAULT NULL,
+  `StructureDescription` varchar(255) DEFAULT NULL,
+  `NumberUnits` varchar(40) DEFAULT NULL,
+  `IsActive` tinyint(1) unsigned DEFAULT '0',
+  `OperatingBankAccountId` int(11) unsigned DEFAULT '0',
+  `Reserve` tinyint(1) unsigned DEFAULT '0',
+  `YearBuilt` varchar(20) DEFAULT '0',
+  `RentalType` varchar(40) DEFAULT NULL,
+  `RentalSubType` varchar(60) DEFAULT NULL,
+  `RentalManager` text,
+  `Address` text,
+  `Country` varchar(100) DEFAULT NULL,
+  `State` varchar(100) DEFAULT NULL,
+  `City` varchar(100) DEFAULT NULL,
+  `AddressLine1` varchar(255) DEFAULT NULL,
+  `AddressLine2` varchar(255) DEFAULT NULL,
+  `AddressLine3` varchar(255) DEFAULT NULL,
+  `PostalCode` varchar(40) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_resources`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_resources` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `type` varchar(40) DEFAULT NULL,
+  `attach` varchar(255) DEFAULT NULL,
+  `sort_num` smallint(11) DEFAULT '0',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `type` (`type`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_uploaded`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_uploaded` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `form_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `UnitId` int(11) unsigned NOT NULL DEFAULT '0',
+  `CategoryId` int(11) unsigned NOT NULL DEFAULT '0',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_buildium_uploaded_attach`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_buildium_uploaded_attach` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `uploaded_id` int(11) DEFAULT NULL,
+  `FileName` varchar(255) DEFAULT NULL,
+  `FileUrl` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `uploaded_id` (`uploaded_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_category` (
+  `cate_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '分类ID',
+  `parent_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '父级分类',
+  `name` varchar(200) DEFAULT NULL COMMENT '分类名称',
+  `slug` varchar(255) DEFAULT NULL COMMENT '别名',
+  `image` varchar(255) DEFAULT NULL COMMENT '图标',
+  `description` varchar(255) DEFAULT NULL COMMENT '描述',
+  `taxonomy` varchar(60) DEFAULT 'category' COMMENT '分类法',
+  `sort_num` int(11) unsigned DEFAULT '0' COMMENT '排序',
+  PRIMARY KEY (`cate_id`),
+  KEY `parent_id` (`parent_id`),
+  KEY `taxonomy` (`taxonomy`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_category_meta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_category_meta` (
+  `meta_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `cate_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `meta_key` varchar(255) DEFAULT NULL,
+  `meta_value` longtext,
+  PRIMARY KEY (`meta_id`),
+  KEY `cate_id` (`cate_id`),
+  KEY `meta_key` (`meta_key`(250))
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_coupon`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_coupon` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `title` varchar(11) DEFAULT NULL COMMENT '名称',
+  `type` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '类别',
+  `value` decimal(10,0) NOT NULL DEFAULT '0' COMMENT '面值',
+  `min_amount` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '最小使用金额',
+  `per_limit` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '每人限领',
+  `start_at` datetime DEFAULT NULL COMMENT '生效时间',
+  `end_at` datetime DEFAULT NULL COMMENT '失效时间',
+  `used_count` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT '已使用量',
+  `shop_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '关联店铺',
+  `state` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '是否可用',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  KEY `shop_id` (`shop_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_district`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_district` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `parent_id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT '父级ID',
+  `name` varchar(50) DEFAULT NULL COMMENT '名称',
+  `fullname` varchar(50) DEFAULT NULL COMMENT '全称',
+  `level` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT '级别',
+  `lng` double(11,6) DEFAULT '0.000000' COMMENT '经度',
+  `lat` double(11,6) DEFAULT '0.000000' COMMENT '纬度',
+  `pinyin` varchar(30) DEFAULT NULL COMMENT '拼音',
+  `letter` varchar(1) DEFAULT NULL COMMENT '首字母',
+  `zonecode` varchar(10) DEFAULT NULL COMMENT '区位代码',
+  `citycode` varchar(10) DEFAULT NULL COMMENT '区号',
+  `zipcode` varchar(6) DEFAULT NULL COMMENT '邮编',
+  `sort_num` smallint(6) NOT NULL DEFAULT '0' COMMENT '排序',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `parent_id` (`parent_id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='区域表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_express`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_express` (
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `code` varchar(10) DEFAULT NULL,
+  `regular` varchar(80) DEFAULT NULL,
+  `sort_num` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `code` (`code`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_feedback`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_feedback` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '管理用户',
+  `title` varchar(50) DEFAULT NULL COMMENT '标题',
+  `message` longtext COMMENT '内容',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `uid` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_jobs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `queue` varchar(255) NOT NULL,
+  `payload` longtext NOT NULL,
+  `attempts` tinyint(3) unsigned NOT NULL,
+  `reserved_at` int(10) unsigned DEFAULT NULL,
+  `available_at` int(10) unsigned NOT NULL,
+  `created_at` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `jobs_queue_index` (`queue`(250)) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_jpush`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_jpush` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned DEFAULT '0',
+  `client_id` char(40) DEFAULT NULL,
+  `os` char(100) DEFAULT NULL,
+  `registerid` char(100) DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `user_id` (`user_id`),
+  KEY `client_id` (`client_id`),
+  KEY `os` (`os`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_kefu`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_kefu` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `title` varchar(40) DEFAULT NULL COMMENT '标题',
+  `phone` varchar(40) DEFAULT NULL COMMENT '电话',
+  `weixin` varchar(60) DEFAULT NULL COMMENT '微信',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_link`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_link` (
+  `id` smallint(6) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `cate_id` smallint(6) unsigned NOT NULL DEFAULT '0' COMMENT '分类ID',
+  `type` enum('category','item') NOT NULL DEFAULT 'item' COMMENT '类型',
+  `title` varchar(20) DEFAULT NULL COMMENT '标题',
+  `url` varchar(100) DEFAULT NULL COMMENT '链接',
+  `image` varchar(100) DEFAULT NULL COMMENT '图片',
+  `description` varchar(50) DEFAULT NULL COMMENT '描述',
+  `sort_num` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '排序',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `cate_id` (`cate_id`) USING BTREE,
+  KEY `type` (`type`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_material`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_material` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `name` varchar(255) DEFAULT '',
+  `description` varchar(255) DEFAULT '',
+  `url` varchar(255) DEFAULT '',
+  `thumb` varchar(255) DEFAULT '',
+  `width` varchar(10) DEFAULT '',
+  `height` varchar(10) DEFAULT '',
+  `type` enum('image','voice','video','doc','file') DEFAULT 'image',
+  `extension` varchar(10) DEFAULT '' COMMENT '扩展名',
+  `size` int(10) unsigned NOT NULL DEFAULT '0',
+  `mime` varchar(40) DEFAULT NULL,
+  `views` int(11) unsigned NOT NULL DEFAULT '0',
+  `downloads` int(10) unsigned NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `user_id` (`user_id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_menu`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_menu` (
+  `id` smallint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(40) DEFAULT NULL COMMENT '名称',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_menu_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_menu_item` (
+  `id` smallint(6) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `menu_id` smallint(6) unsigned NOT NULL DEFAULT '0' COMMENT '菜单ID',
+  `parent_id` smallint(6) unsigned NOT NULL DEFAULT '0' COMMENT '父级ID',
+  `title` varchar(40) DEFAULT NULL COMMENT '名称',
+  `url` varchar(100) DEFAULT NULL COMMENT '链接',
+  `image` varchar(200) DEFAULT NULL COMMENT '图片',
+  `target` enum('_self','_blank','_top') NOT NULL DEFAULT '_self' COMMENT '目标',
+  `hide` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否隐藏',
+  `sort_num` smallint(3) unsigned NOT NULL DEFAULT '0' COMMENT '显示序号',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `menu_id` (`menu_id`) USING BTREE,
+  KEY `parent_id` (`parent_id`) USING BTREE,
+  KEY `hide` (`hide`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_migrations` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_notifications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_notifications` (
+  `id` char(36) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `notifiable_type` varchar(255) NOT NULL,
+  `notifiable_id` bigint(20) unsigned NOT NULL,
+  `data` text NOT NULL,
+  `read_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `notifiable_id` (`notifiable_id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_oauth_access_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_oauth_access_tokens` (
+  `id` varchar(100) NOT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `client_id` bigint(20) unsigned NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `scopes` text,
+  `revoked` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `oauth_access_tokens_user_id_index` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_oauth_auth_codes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_oauth_auth_codes` (
+  `id` varchar(100) NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `client_id` bigint(20) unsigned NOT NULL,
+  `scopes` text,
+  `revoked` tinyint(1) NOT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `oauth_auth_codes_user_id_index` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_oauth_clients`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_oauth_clients` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `secret` varchar(100) DEFAULT NULL,
+  `provider` varchar(255) DEFAULT NULL,
+  `redirect` text NOT NULL,
+  `personal_access_client` tinyint(1) NOT NULL,
+  `password_client` tinyint(1) NOT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `oauth_clients_user_id_index` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_oauth_personal_access_clients`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_oauth_personal_access_clients` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `client_id` bigint(20) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_oauth_refresh_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_oauth_refresh_tokens` (
+  `id` varchar(100) NOT NULL,
+  `access_token_id` varchar(100) NOT NULL,
+  `revoked` tinyint(1) NOT NULL,
+  `expires_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `oauth_refresh_tokens_access_token_id_index` (`access_token_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_office`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_office` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `tel` varchar(100) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `is_head` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `sort_num` smallint(6) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `is_head` (`is_head`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_page`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_page` (
+  `id` smallint(6) unsigned NOT NULL AUTO_INCREMENT COMMENT '页面ID',
+  `user_id` int(11) DEFAULT '0' COMMENT '作者ID',
+  `title` varchar(50) DEFAULT NULL COMMENT '标题',
+  `name` varchar(50) DEFAULT NULL COMMENT '别名',
+  `image` varchar(100) DEFAULT NULL COMMENT '图片',
+  `excerpt` varchar(200) DEFAULT NULL COMMENT '摘要',
+  `content` mediumtext COMMENT '内容',
+  `sort_num` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT '显示顺序',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `updated_at` timestamp NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_page_meta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_page_meta` (
+  `meta_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `page_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `meta_key` varchar(80) DEFAULT NULL,
+  `meta_value` text,
+  PRIMARY KEY (`meta_id`),
+  KEY `page_id` (`page_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_password_resets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_password_resets` (
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  KEY `password_resets_email_index` (`email`(250)) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_post_category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_post_category` (
+  `id` smallint(6) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `post_id` int(11) unsigned DEFAULT '0' COMMENT '关联文章',
+  `post_cate_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '关联分类',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `post_id` (`post_id`,`post_cate_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_post_collect`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_post_collect` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '关联用户',
+  `post_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '关联文章',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `collect_uid` (`user_id`,`post_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_post_comment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_post_comment` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `post_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `username` varchar(30) DEFAULT NULL,
+  `reply_uid` int(10) unsigned NOT NULL DEFAULT '0',
+  `reply_name` varchar(30) DEFAULT NULL,
+  `message` mediumtext,
+  `province` varchar(20) DEFAULT NULL,
+  `city` varchar(20) DEFAULT NULL,
+  `street` varchar(100) DEFAULT NULL,
+  `likes` int(10) unsigned NOT NULL DEFAULT '0',
+  `state` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '审核状态',
+  `created_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `post_id` (`post_id`),
+  KEY `uid` (`user_id`),
+  KEY `reply_uid` (`reply_uid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_post_content`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_post_content` (
+  `post_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `content` mediumtext,
+  KEY `post_id` (`post_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_post_image`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_post_image` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `post_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `thumb` varchar(100) DEFAULT NULL,
+  `image` varchar(100) DEFAULT NULL,
+  `isremote` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `description` varchar(200) DEFAULT NULL,
+  `displayorder` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `post_id` (`post_id`),
+  KEY `isremote` (`isremote`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_post_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_post_item` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '文章ID',
+  `user_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '会员ID',
+  `author` varchar(20) DEFAULT NULL COMMENT '作者',
+  `format` enum('article','image','video','voice') DEFAULT 'article' COMMENT '文章格式',
+  `type` varchar(60) DEFAULT 'post' COMMENT '文章类型',
+  `title` varchar(100) DEFAULT NULL COMMENT '文章标题',
+  `name` varchar(100) DEFAULT NULL COMMENT '别名',
+  `excerpt` varchar(250) DEFAULT NULL COMMENT '摘要',
+  `image` varchar(160) DEFAULT NULL COMMENT '图片',
+  `tags` varchar(200) DEFAULT NULL COMMENT '标签',
+  `allow_comment` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '允许评论',
+  `comment_num` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '评论数',
+  `collect_num` int(11) unsigned NOT NULL COMMENT '被收藏数',
+  `like_num` int(11) unsigned NOT NULL COMMENT '点赞数',
+  `views` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '浏览数',
+  `from` varchar(20) DEFAULT NULL COMMENT '来源',
+  `fromurl` varchar(50) DEFAULT NULL COMMENT '来源地址',
+  `price` float(10,0) unsigned NOT NULL DEFAULT '0' COMMENT '阅读价格',
+  `click1` int(11) unsigned NOT NULL DEFAULT '0',
+  `click2` int(11) unsigned NOT NULL DEFAULT '0',
+  `click3` int(11) unsigned NOT NULL DEFAULT '0',
+  `click4` int(11) unsigned NOT NULL DEFAULT '0',
+  `click5` int(11) unsigned NOT NULL DEFAULT '0',
+  `click6` int(11) unsigned NOT NULL DEFAULT '0',
+  `click7` int(11) unsigned NOT NULL DEFAULT '0',
+  `status` varchar(40) NOT NULL DEFAULT 'publish',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `uid` (`user_id`) USING BTREE,
+  KEY `format` (`format`),
+  KEY `type` (`type`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_post_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_post_log` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `post_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '文章ID',
+  `user_id` int(11) unsigned NOT NULL COMMENT '用户ID',
+  `content` varchar(100) DEFAULT NULL COMMENT '内容',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `updated_at` timestamp NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `post_id` (`post_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_post_meta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_post_meta` (
+  `meta_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `post_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `meta_key` varchar(80) NOT NULL,
+  `meta_value` text,
+  PRIMARY KEY (`meta_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_property`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_property` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '作者',
+  `title` varchar(255) DEFAULT NULL COMMENT '物业名称',
+  `image` varchar(255) DEFAULT NULL COMMENT '封面图',
+  `description` text COMMENT '摘要',
+  `price` double unsigned NOT NULL DEFAULT '0' COMMENT '价格',
+  `type` enum('for-rent','for-sale') DEFAULT 'for-sale' COMMENT '类型',
+  `country` varchar(100) DEFAULT NULL COMMENT '国家',
+  `state` varchar(255) DEFAULT NULL COMMENT '州',
+  `city` varchar(255) DEFAULT NULL COMMENT '城市',
+  `addressline` varchar(255) DEFAULT NULL COMMENT '详细地址',
+  `lng` double(11,6) NOT NULL DEFAULT '0.000000' COMMENT '经度',
+  `lat` double(11,6) NOT NULL DEFAULT '0.000000' COMMENT '纬度',
+  `property_type_id` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT '物业类型',
+  `unit_number` varchar(10) DEFAULT NULL,
+  `unit_size` float unsigned NOT NULL DEFAULT '0',
+  `bedrooms` smallint(4) unsigned NOT NULL DEFAULT '0',
+  `bathrooms` smallint(4) unsigned NOT NULL DEFAULT '0',
+  `views` int(10) unsigned NOT NULL DEFAULT '0',
+  `status` varchar(40) DEFAULT 'for-sale' COMMENT '状态',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `type` (`type`),
+  KEY `property_type_id` (`property_type_id`),
+  KEY `status` (`status`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_property_feature`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_property_feature` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `sort_num` smallint(6) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_property_image`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_property_image` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `property_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `url` varchar(255) DEFAULT NULL,
+  `sort_num` smallint(11) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `property_id` (`property_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_property_meta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_property_meta` (
+  `meta_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `property_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `meta_key` varchar(255) DEFAULT NULL,
+  `meta_value` text,
+  PRIMARY KEY (`meta_id`),
+  KEY `property_id` (`property_id`),
+  KEY `meta_key` (`meta_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_property_related_feature`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_property_related_feature` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `property_id` int(11) DEFAULT NULL,
+  `feature_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `property_id` (`property_id`),
+  KEY `feature_id` (`feature_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_property_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_property_type` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `name` varchar(255) DEFAULT NULL,
+  `slug` varchar(255) DEFAULT NULL,
+  `sort_num` smallint(11) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_property_video`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_property_video` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `property_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `url` varchar(255) DEFAULT NULL,
+  `sort_num` smallint(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `property_id` (`property_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_region`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_region` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `parent_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '上级',
+  `name` varchar(255) DEFAULT NULL COMMENT '名称',
+  `short_name` varchar(255) DEFAULT NULL COMMENT '简称',
+  `type` varchar(40) DEFAULT NULL COMMENT '类型',
+  `sort_num` smallint(6) unsigned NOT NULL DEFAULT '0' COMMENT '排序',
+  PRIMARY KEY (`id`),
+  KEY `parent_id` (`parent_id`),
+  KEY `name` (`name`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_setting`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_setting` (
+  `skey` varchar(60) NOT NULL DEFAULT '' COMMENT '标识',
+  `svalue` text COMMENT '值',
+  PRIMARY KEY (`skey`) USING BTREE,
+  UNIQUE KEY `skey` (`skey`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_shortcut`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_shortcut` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `type` varchar(40) DEFAULT NULL,
+  `content` text,
+  `sort_num` smallint(3) unsigned DEFAULT '0',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `type` (`type`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_snippet`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_snippet` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(200) DEFAULT NULL COMMENT '名称',
+  `content` text COMMENT '内容',
+  `link` varchar(255) DEFAULT NULL COMMENT '链接',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user` (
+  `uid` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `gid` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '管理权限',
+  `nickname` varchar(60) DEFAULT NULL COMMENT '昵称',
+  `phone` varchar(11) DEFAULT NULL COMMENT '手机号',
+  `email` varchar(60) DEFAULT NULL COMMENT '邮箱',
+  `avatar` varchar(200) DEFAULT NULL COMMENT '头像',
+  `credits` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '积分',
+  `password` varchar(100) DEFAULT NULL COMMENT '密码',
+  `remember_token` varchar(100) DEFAULT NULL,
+  `freeze` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '冻结',
+  `latitude` double(11,6) unsigned NOT NULL DEFAULT '0.000000' COMMENT '纬度',
+  `longitude` double(11,6) unsigned NOT NULL DEFAULT '0.000000' COMMENT '经度',
+  `email_status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '邮箱验证状态',
+  `name_status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '实名认证状态',
+  `status` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '状态',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `updated_at` timestamp NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`uid`) USING BTREE,
+  KEY `gid` (`gid`) USING BTREE,
+  KEY `freeze` (`freeze`) USING BTREE,
+  KEY `email_status` (`email_status`),
+  KEY `name_status` (`name_status`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_account`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_account` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '会员ID',
+  `password` varchar(80) DEFAULT NULL COMMENT '支付密码',
+  `balance` decimal(20,2) unsigned NOT NULL COMMENT '账户余额',
+  `freeze` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '冻结金额',
+  `total_income` decimal(20,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '累计收入',
+  `total_cost` decimal(20,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '累计支出',
+  `points` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '积分',
+  `coins` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '金币',
+  `freeze_coins` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '冻结金币',
+  `commission` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '佣金',
+  `cumulative_commission` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '累计佣金',
+  `withdrawal_commission` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '成功提现佣金',
+  `reward` float unsigned NOT NULL DEFAULT '0' COMMENT '奖励',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='用户钱包';
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_address`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_address` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
+  `tag` varchar(10) DEFAULT NULL COMMENT '标签',
+  `name` varchar(20) DEFAULT NULL COMMENT '姓名',
+  `phone` varchar(20) DEFAULT NULL COMMENT '电话',
+  `province` varchar(30) DEFAULT NULL COMMENT '省',
+  `city` varchar(30) DEFAULT NULL COMMENT '市',
+  `district` varchar(30) DEFAULT NULL COMMENT '区县',
+  `street` varchar(60) DEFAULT NULL COMMENT '详细地址',
+  `latitude` double(11,6) unsigned NOT NULL DEFAULT '0.000000' COMMENT '纬度',
+  `longitude` double(11,6) unsigned NOT NULL DEFAULT '0.000000' COMMENT '经度',
+  `postalcode` varchar(10) DEFAULT NULL COMMENT '邮编',
+  `isdefault` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否默认地址',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `isdefault` (`isdefault`) USING BTREE,
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='收货地址';
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_certify`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_certify` (
+  `user_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
+  `fullname` varchar(40) DEFAULT NULL COMMENT '姓名',
+  `id_card_no` varchar(20) DEFAULT NULL COMMENT '身份证号',
+  `id_card_front` varchar(200) DEFAULT NULL COMMENT '身份证正面',
+  `id_card_back` varchar(200) DEFAULT NULL COMMENT '身份证背面',
+  `id_card_hand` varchar(200) DEFAULT NULL COMMENT '手持身份证',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `updated_at` timestamp NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`user_id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_connect`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_connect` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
+  `appid` char(100) DEFAULT NULL COMMENT 'APPID',
+  `platform` varchar(40) DEFAULT NULL COMMENT '平台',
+  `unionid` varchar(255) DEFAULT NULL COMMENT 'UnionID',
+  `openid` varchar(255) DEFAULT NULL COMMENT '开放ID',
+  `nickname` varchar(100) DEFAULT NULL COMMENT '昵称',
+  `gender` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '性别',
+  `city` varchar(20) DEFAULT NULL COMMENT '城市',
+  `province` varchar(20) DEFAULT NULL COMMENT '省，州',
+  `country` varchar(20) DEFAULT NULL COMMENT '国籍',
+  `avatar` varchar(255) DEFAULT NULL COMMENT '头像地址',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `user_id` (`user_id`),
+  KEY `openid` (`openid`(250)),
+  KEY `unionid` (`unionid`(250))
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_coupon`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_coupon` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` int(11) DEFAULT '0' COMMENT '关联用户',
+  `coupon_id` int(11) DEFAULT '0' COMMENT '关联优惠券',
+  `code` varchar(20) DEFAULT NULL COMMENT '优惠券编码',
+  `used` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否已使用',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`),
+  KEY `uid` (`user_id`),
+  KEY `coupon_id` (`coupon_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_group` (
+  `gid` tinyint(4) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name` varchar(20) DEFAULT NULL COMMENT '名称',
+  `credits` int(11) NOT NULL DEFAULT '0' COMMENT '积分下限',
+  `memo` varchar(200) DEFAULT NULL COMMENT '备注',
+  `privileges` mediumtext COMMENT '权限',
+  PRIMARY KEY (`gid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_log` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `ip` varchar(16) DEFAULT '0',
+  `operate` varchar(20) DEFAULT NULL,
+  `address` varchar(100) DEFAULT NULL,
+  `src` varchar(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `uid` (`user_id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_meta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_meta` (
+  `meta_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `meta_key` varchar(200) DEFAULT NULL,
+  `meta_value` longtext,
+  PRIMARY KEY (`meta_id`),
+  KEY `meta_key` (`meta_key`),
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_prepay`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_prepay` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '付款人ID',
+  `payable_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '关联类型ID',
+  `out_trade_no` varchar(20) NOT NULL COMMENT '单号',
+  `prepay_id` varchar(40) DEFAULT NULL COMMENT '微信支付prepay_id',
+  `data` text COMMENT '支付数据',
+  `created_at` datetime DEFAULT NULL COMMENT '创建时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `uid` (`user_id`) USING BTREE,
+  KEY `payable_id` (`payable_id`) USING BTREE,
+  KEY `out_trade_no` (`out_trade_no`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_subscribe`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_subscribe` (
+  `subscribe_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '被关注者ID',
+  `follower_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '关注者ID',
+  `created_at` datetime DEFAULT NULL COMMENT '关注时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`subscribe_id`,`follower_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_transaction`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_transaction` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
+  `type` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '交易类型:1=收入,2=支出',
+  `account_type` tinyint(3) unsigned NOT NULL DEFAULT '2' COMMENT '财务类型',
+  `out_trade_no` varchar(32) DEFAULT NULL COMMENT '交易流水',
+  `pay_type` varchar(20) DEFAULT NULL COMMENT '支付方式',
+  `pay_state` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '支付状态,0=未支付，1=已支付',
+  `pay_at` varchar(20) DEFAULT NULL COMMENT '付款时间',
+  `detail` varchar(200) DEFAULT NULL COMMENT '交易说明',
+  `amount` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '交易金额',
+  `memo` varchar(200) DEFAULT NULL COMMENT '交易备注',
+  `data` text COMMENT '付款信息',
+  `other_account_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '对方账户ID',
+  `other_account_name` varchar(40) DEFAULT NULL COMMENT '对方账户名称',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT '交易时间',
+  `updated_at` timestamp NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `uid` (`user_id`) USING BTREE,
+  KEY `type` (`type`) USING BTREE,
+  KEY `account_type` (`account_type`) USING BTREE,
+  KEY `out_trade_no` (`out_trade_no`) USING BTREE,
+  KEY `other_account_id` (`other_account_id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_user_verify`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_user_verify` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(8) DEFAULT NULL COMMENT '验证码',
+  `phone` varchar(11) DEFAULT NULL COMMENT '手机号',
+  `email` varchar(50) DEFAULT NULL COMMENT '邮箱',
+  `used` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '已使用',
+  `created_at` datetime DEFAULT NULL COMMENT '发送时间',
+  `updated_at` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `seccode` (`code`) USING BTREE,
+  KEY `phone` (`phone`) USING BTREE,
+  KEY `used` (`used`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_wechat_login`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_wechat_login` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `uid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
+  `basestr` varchar(60) DEFAULT NULL COMMENT '秘钥',
+  `openid` varchar(40) DEFAULT NULL COMMENT 'openid',
+  `created_at` timestamp NULL DEFAULT NULL COMMENT '创建时间',
+  `updated_at` timestamp NULL DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `uid` (`uid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_wechat_menu`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_wechat_menu` (
+  `id` tinyint(4) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `parent_id` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT '父级ID',
+  `name` varchar(14) DEFAULT NULL COMMENT '菜单名称',
+  `type` varchar(20) DEFAULT NULL COMMENT '菜单类型',
+  `key` varchar(60) DEFAULT NULL COMMENT 'key',
+  `media_id` varchar(100) DEFAULT NULL COMMENT '素材ID',
+  `url` varchar(200) DEFAULT NULL COMMENT '跳转链接',
+  `appid` varchar(40) DEFAULT NULL COMMENT '小程序appid',
+  `pagepath` varchar(100) DEFAULT NULL COMMENT '小程序页面路径',
+  `sort_num` tinyint(2) unsigned NOT NULL DEFAULT '0' COMMENT '排序',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `parent_id` (`parent_id`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `pre_wechat_session`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pre_wechat_session` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `openid` varchar(100) DEFAULT NULL,
+  `unionid` varchar(100) DEFAULT NULL,
+  `session_key` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `openid` (`openid`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+INSERT INTO `pre_migrations` VALUES (1,'2016_06_01_000001_create_oauth_auth_codes_table',1);
+INSERT INTO `pre_migrations` VALUES (2,'2016_06_01_000002_create_oauth_access_tokens_table',1);
+INSERT INTO `pre_migrations` VALUES (3,'2016_06_01_000003_create_oauth_refresh_tokens_table',1);
+INSERT INTO `pre_migrations` VALUES (4,'2016_06_01_000004_create_oauth_clients_table',1);
+INSERT INTO `pre_migrations` VALUES (5,'2016_06_01_000005_create_oauth_personal_access_clients_table',1);

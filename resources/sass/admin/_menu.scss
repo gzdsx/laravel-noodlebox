@@ -1,0 +1,74 @@
+.v-common-nav {
+    color: #BFCBD9;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    a {
+        color: #BFCBD9;
+    }
+
+    .el-collapse {
+        border-top: 0;
+        border-bottom: 0;
+    }
+
+    .el-collapse-item__header {
+        background-color: transparent !important;
+        color: #BFCBD9 !important;
+        border-bottom: 0 !important;
+    }
+
+    .el-collapse-item__wrap {
+        color: #BFCBD9 !important;
+        border-bottom: #f5f2f0 !important;
+        background-color: transparent !important;
+        padding-bottom: 0 !important;
+    }
+
+    .el-collapse-item__content {
+        padding-bottom: 0 !important;
+        color: #BFCBD9;
+        background-color: #202D3D !important;
+    }
+
+    .v-nav {
+        &-item {
+            padding-left: 10px;
+            padding-right: 10px;
+            display: flex;
+            column-gap: 8px;
+        }
+
+        &-icon {
+            width: 16px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        &-link {
+            display: block;
+
+            a {
+                display: block;
+                padding: 8px 10px 8px 34px;
+
+                &:hover {
+                    background-color: #8996B2;
+                    color: #ffffff;
+                }
+
+                &.router-link-exact-active {
+                    background-color: #2270B1;
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+}
