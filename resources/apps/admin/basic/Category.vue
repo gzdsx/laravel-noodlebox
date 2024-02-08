@@ -14,7 +14,7 @@ export default {
         }
     },
     created() {
-        const {taxonomy} = this.$route.query;
+        const {taxonomy} = this.$route.params;
         if (taxonomy) {
             this.taxonomy = taxonomy;
         }

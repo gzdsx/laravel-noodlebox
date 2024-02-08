@@ -11,17 +11,19 @@
                 </router-link>
             </div>
         </div>
-        <section class="post-body">
-            <div class="post-body-main">
-                <div class="page-section">
-                    <el-form label-width="80px">
+        <el-form label-width="80px">
+            <section class="post-body">
+                <div class="post-body-main">
+                    <div class="page-section">
                         <el-form-item :label="$t('post.title')">
                             <el-input type="text" size="medium" placeholder="" v-model="post.title"/>
                         </el-form-item>
                         <el-row :gutter="20">
                             <el-col :span="12">
-                                <el-form-item :label="$t('post.name')">
-                                    <el-input type="text" size="medium" v-model="post.name"/>
+                                <el-form-item :label="$t('common.url')">
+                                    <el-input type="text" size="medium" v-model="post.slug">
+                                        <span slot="prepend">{{siteUrl}}/</span>
+                                    </el-input>
                                 </el-form-item>
                             </el-col>
                             <el-col :span="12">
@@ -37,83 +39,78 @@
                                 </el-form-item>
                             </el-col>
                             <el-col :span="12">
-                                <el-form-item :label="$t('post.tag')">
-                                    <el-input type="text" size="medium" v-model="post.tags"/>
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                        <el-row :gutter="20">
-                            <el-col :span="12">
-                                <el-form-item :label="$t('post.price')">
-                                    <el-input type="number" size="medium" v-model="post.price"/>
-                                </el-form-item>
-                            </el-col>
-                            <el-col :span="12">
-                                <el-form-item :label="$t('post.publish_at')">
+                                <el-form-item :label="$t('common.published_at')">
                                     <el-input type="text" size="medium" v-model="post.created_at"/>
                                 </el-form-item>
                             </el-col>
                         </el-row>
-                        <el-form-item :label="$t('post.excerpt')">
-                            <el-input type="textarea" rows="5" v-model="post.excerpt"/>
+                        <el-form-item :label="$t('common.keywords')">
+                            <el-input type="text" size="medium" v-model="post.keywords"/>
                         </el-form-item>
-                        <el-form-item :label="$t('post.content')">
+                        <el-form-item :label="$t('common.excerpt')">
+                            <el-input type="textarea" rows="5" v-model="post.description"/>
+                        </el-form-item>
+                        <el-form-item :label="$t('common.content')">
                             <wang-editor v-model="content.content"/>
                         </el-form-item>
-                    </el-form>
-                </div>
-            </div>
-            <div class="post-body-box">
-                <div class="post-card">
-                    <div class="post-card-header">
-                        <h2>{{ $t('post.category') }}</h2>
                     </div>
-                    <div class="post-card-body">
-                        <div class="category-box">
-                            <el-checkbox-group v-model="selectedCategories">
-                                <category-checkbox-list :categories="categories"/>
-                            </el-checkbox-group>
+                </div>
+                <div class="post-body-box">
+                    <div class="post-card">
+                        <div class="post-card-header">
+                            <h2>{{ $t('post.category') }}</h2>
+                        </div>
+                        <div class="post-card-body">
+                            <div class="category-box">
+                                <el-checkbox-group v-model="selectedCategories">
+                                    <category-checkbox-list :categories="categories"/>
+                                </el-checkbox-group>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="post-card">
-                    <div class="post-card-header">
-                        <h2>{{ $t('post.featured_image') }}</h2>
-                    </div>
-                    <div class="post-card-body">
-                        <div class="feature-image-box" @click="showMediaDialog=true">
-                            <img :src="post.image" v-if="post.image" alt="">
+                    <div class="post-card">
+                        <div class="post-card-header">
+                            <h2>{{ $t('post.featured_image') }}</h2>
+                        </div>
+                        <div class="post-card-body">
+                            <div class="feature-image-box" @click="showMediaDialog=true">
+                                <img :src="post.image" v-if="post.image" alt="">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="post-card">
-                    <div class="post-card-header">
-                        <h2>{{ $t('post.attribute') }}</h2>
-                    </div>
-                    <div class="post-card-body">
-                        <div class="form-label">{{ $t('post.format') }}</div>
-                        <el-select size="medium" class="w-100" v-model="post.format">
-                            <el-option v-for="(v,k) in formats" :value="k" :label="v" :key="k"/>
-                        </el-select>
-                        <div class="form-label">{{ $t('post.from') }}</div>
-                        <div>
-                            <el-input type="text" size="medium" class="w-100" v-model="post.from"/>
+                    <div class="post-card">
+                        <div class="post-card-header">
+                            <h2>{{ $t('post.attribute') }}</h2>
                         </div>
-                        <div class="form-label">{{ $t('post.fromurl') }}</div>
-                        <div>
-                            <el-input type="text" size="medium" class="w-100" v-model="post.fromurl"/>
+                        <div class="post-card-body">
+                            <div class="form-label">{{ $t('post.format') }}</div>
+                            <el-select size="medium" class="w-100" v-model="post.format">
+                                <el-option v-for="(v,k) in formats" :value="k" :label="v" :key="k"/>
+                            </el-select>
+                            <div class="form-label">{{ $t('post.price') }}</div>
+                            <div>
+                                <el-input type="text" size="medium" class="w-100" v-model="post.price"/>
+                            </div>
+                            <div class="form-label">{{ $t('post.from') }}</div>
+                            <div>
+                                <el-input type="text" size="medium" class="w-100" v-model="post.from"/>
+                            </div>
+                            <div class="form-label">{{ $t('post.fromurl') }}</div>
+                            <div>
+                                <el-input type="text" size="medium" class="w-100" v-model="post.fromurl"/>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </el-form>
 
         <fixed-bottom slot="footer">
-            <el-button @click="onSubmit('draft')" :disabled="disabled">{{ $t('post.save_draft') }}</el-button>
+            <el-button @click="onSubmit('draft')" :disabled="disabled">{{ $t('common.save_draft') }}</el-button>
             <el-button type="primary" @click="onSubmit('publish')" :disabled="disabled">{{
-                post.id ? $t('post.update') : $t('post.publish_now')
+                post.id ? $t('common.update') : $t('common.publish_now')
                 }}
             </el-button>
         </fixed-bottom>
@@ -140,7 +137,8 @@ export default {
             formats: [],
             selectedCategories: [],
             showMediaDialog: false,
-            disabled: false
+            disabled: false,
+            siteUrl: window.siteUrl || window.location.origin,
         }
     },
     methods: {
@@ -149,7 +147,7 @@ export default {
             PostService.get(id || 0).then(response => {
                 this.post = response.result;
                 const {content, images, media, categories} = this.post;
-                this.selectedCategories = categories.map(cate => cate.cate_id);
+                this.selectedCategories = categories.map(c => c.id);
                 if (content) this.content = content;
                 if (images) this.images = images;
             });
@@ -165,7 +163,7 @@ export default {
             });
         },
         onChooseImage(media) {
-            this.post.image = media.url;
+            this.post.image = media.src;
         },
         onSubmit(status) {
             let {post, content, images, media, selectedCategories, metas, type} = this;
@@ -184,6 +182,7 @@ export default {
             if (post.id) {
                 PostService.update(post.id, post).then(() => {
                     this.$message.success(this.$t('post.updated'));
+                    this.fetchData();
                 }).catch(reason => {
                     this.$message.error(reason.message);
                 }).finally(() => {

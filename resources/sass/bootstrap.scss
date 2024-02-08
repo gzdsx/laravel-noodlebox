@@ -2,16 +2,13 @@
 $link-color: #555;
 $font-family-sans-serif: "Calibre", arial, sans-serif, "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB";
 $theme-colors: (
-        "stone":#15293E,
-        "calypso":#416B91,
-        "blue-green":#23A1C0,
-        "tiffany-blue":#00ADB5,
-        "half-baked":#93BFCF,
-        "blak-pearl":#222831,
-        "shake-speare":#6096B4,
-        "loblolly":#BDCDD6,
-        "light-slate-gray":#788E9D
+        "safety-orange":#FF9902,
+        "crimson":#D6273F,
+        "turquoise":#45D4E3
 );
+
+$body-bg: #444444;
+$body-color: #ffffff;
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';

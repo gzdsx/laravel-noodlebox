@@ -4,7 +4,7 @@
             <h2>{{$t('settings.mail')}}</h2>
         </div>
 
-        <section class="page-section">
+        <section class="page-section setting-form-wrapper">
             <el-form label-width="160px">
                 <el-form-item :label="$t('settings.mail_from_name')">
                     <el-input class="w300" v-model="settings.mail_from_name"/>

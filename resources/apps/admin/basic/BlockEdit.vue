@@ -38,24 +38,23 @@
 
         <el-dialog :title="$t('block.edit_item')" closeable :visible.sync="showDialog" :close-on-click-modal="false"
                    :close-on-press-escape="false">
-            <el-form label-width="100px">
+            <el-form label-width="60px" size="medium">
                 <el-form-item :label="$t('common.image')">
-                    <div @click="showPicker=true">
-                        <el-image :src="item.image" fit="cover" class="w80 h80" v-if="item.image"/>
-                        <div class="w80 h80 img-placeholder" v-else></div>
+                    <div class="h80 w160" @click="showPicker=true">
+                        <featured-image :src="item.image"/>
                     </div>
                 </el-form-item>
                 <el-form-item :label="$t('common.title')">
-                    <el-input size="medium" v-model="item.title"/>
+                    <el-input v-model="item.title"/>
                 </el-form-item>
                 <el-form-item :label="$t('common.description')">
                     <el-input type="textarea" rows="5" v-model="item.description"/>
                 </el-form-item>
                 <el-form-item :label="$t('common.link')">
-                    <el-input size="medium" v-model="item.url"/>
+                    <el-input v-model="item.url"/>
                 </el-form-item>
                 <el-form-item :label="$t('common.sort')">
-                    <el-input size="medium" class="w200" v-model="item.sort_num"/>
+                    <el-input class="w200" v-model="item.sort_num"/>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" size="medium" class="w100" :disabled="submiting" @click="onSubmit">
@@ -146,7 +145,7 @@ export default {
             this.selectionIds = val;
         },
         onChooseImage(m) {
-            this.item.image = m.url;
+            this.item.image = m.src;
         },
     },
     mounted() {

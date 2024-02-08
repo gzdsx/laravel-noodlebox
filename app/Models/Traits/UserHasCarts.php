@@ -11,6 +11,6 @@ trait UserHasCarts
      */
     public function carts()
     {
-        return $this->hasMany(Cart::class, 'user_id', 'uid');
+        return $this->hasMany(Cart::class, 'user_id', 'id');
     }
 }

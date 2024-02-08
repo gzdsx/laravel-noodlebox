@@ -9,9 +9,17 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * App\Models\Shortcut
  *
+ * @property int $id
+ * @property string|null $type
+ * @property string|null $content
+ * @property int|null $sort_num
  * @method static Builder|Shortcut newModelQuery()
  * @method static Builder|Shortcut newQuery()
  * @method static Builder|Shortcut query()
+ * @method static Builder|Shortcut whereContent($value)
+ * @method static Builder|Shortcut whereId($value)
+ * @method static Builder|Shortcut whereSortNum($value)
+ * @method static Builder|Shortcut whereType($value)
  * @mixin \Eloquent
  */
 class Shortcut extends Model

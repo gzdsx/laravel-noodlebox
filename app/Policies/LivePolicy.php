@@ -42,11 +42,11 @@ class LivePolicy
             return true;
         }
 
-        if ($live->buyLogs()->where('uid', $user->uid)->first()) {
+        if ($live->buyLogs()->where('id', $user->id)->first()) {
             return true;
         }
 
-        return $user->uid == $live->uid;
+        return $user->id == $live->id;
     }
 
     /**

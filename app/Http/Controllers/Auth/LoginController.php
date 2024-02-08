@@ -54,7 +54,7 @@ class LoginController extends Controller
     {
 
         if (!$basestr = session('basestr')) {
-            $basestr = Str::uuid()->toString();
+            $basestr = Str::uid()->toString();
             session(['basestr' => $basestr]);
         }
 
@@ -71,8 +71,8 @@ class LoginController extends Controller
         if ($basestr = session('basestr')) {
             $login = WechatLogin::where('basestr', $basestr)->first();
             if ($login) {
-                if ($login->uid) {
-                    Auth::loginUsingId($login->uid);
+                if ($login->id) {
+                    Auth::loginUsingId($login->id);
                     $login->delete();
                     return json_success(['user' => Auth::user()]);
                 }

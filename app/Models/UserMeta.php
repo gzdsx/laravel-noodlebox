@@ -25,7 +25,7 @@ class UserMeta extends Model
 {
     protected $table = 'user_meta';
     protected $primaryKey = 'meta_id';
-    protected $fillable = ['uid', 'meta_key', 'meta_value'];
+    protected $fillable = ['id', 'meta_key', 'meta_value'];
 
     public $timestamps = false;
 }

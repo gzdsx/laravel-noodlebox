@@ -48,5 +48,4 @@ mix.js('resources/apps/admin/app.js', 'public/dist/admin').vue();
 mix.sass('resources/sass/bootstrap.scss', 'public/lib/bootstrap/bootstrap.min.css');
 // mix.sass('resources/sass/element-ui.scss', 'public/lib/element');
 mix.sass('resources/sass/admin/index.scss', 'public/dist/admin');
-
-
+mix.sass('resources/sass/web/index.scss', 'public/dist/web');

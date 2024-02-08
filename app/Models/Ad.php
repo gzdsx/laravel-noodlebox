@@ -49,7 +49,7 @@ class Ad extends Model
         'state_des'
     ];
     protected $fillable = [
-        'uid', 'title', 'type', 'data'
+        'id', 'title', 'type', 'data'
     ];
     protected $dates = ['begin_at', 'end_at'];
 

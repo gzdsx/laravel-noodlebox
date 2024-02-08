@@ -1,0 +1,25 @@
+.footer {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    color: #ffffff;
+
+    .social-icons {
+        display: flex;
+        column-gap: 10px;
+
+        .social-icon {
+            background-color: #37b291 !important;
+            border-radius: 3px;
+            color: #ffffff !important;
+            border: 0 #ffffff solid !important;
+            font-size: 18px;
+            padding: 9px;
+            line-height: 1 !important;
+        }
+    }
+
+    .copyright {
+        text-align: right;
+        color: #f5f5f5;
+    }
+}

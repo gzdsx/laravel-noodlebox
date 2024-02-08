@@ -149,8 +149,7 @@ export default {
             }
         },
         onChooseImage(m) {
-            let {link} = this;
-            link.image = m.url;
+            this.link.image = m.src;
         },
         onClickTab(t) {
             this.cate_id = t.name;

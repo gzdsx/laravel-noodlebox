@@ -4,14 +4,14 @@ const UserService = {
     listUsers(params) {
         return ApiService.get('/users', {params});
     },
-    getUser(uid) {
-        return ApiService.get('/users/' + uid);
+    getUser(id) {
+        return ApiService.get('/users/' + id);
     },
     storeUser(user) {
         return ApiService.post('/users', {user});
     },
-    updateUser(uid, user) {
-        return ApiService.put('/users/' + uid, {user});
+    updateUser(id, user) {
+        return ApiService.put('/users/' + id, {user});
     },
     deleteUser(ids) {
         return ApiService.delete('/users/batch', {data: {ids}});

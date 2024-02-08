@@ -5,15 +5,14 @@
 @import '~bootstrap/scss/reboot';
 @import '~bootstrap/scss/utilities';
 
+@import "layout";
 @import "common";
-@import "gap";
 @import "menu";
 @import "form";
 @import "dialog";
 @import "dashboard";
 @import "order";
 @import "post";
+@import "product";
 @import "adminlogin";
 @import "../dsxui/dsxui";
-@import "../lib/sku";
-@import "../lib/imagepicker";

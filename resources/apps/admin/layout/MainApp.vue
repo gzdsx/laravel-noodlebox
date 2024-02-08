@@ -22,7 +22,7 @@ export default {
     },
     methods: {
         loadDefaultLang() {
-            ApiService.get('/lang/messages').then(response => {
+            ApiService.get('/langs/messages').then(response => {
                 const {locale, messages} = response.result;
                 this.$i18n.setLocaleMessage('locale', messages);
                 this.$lang = locale;

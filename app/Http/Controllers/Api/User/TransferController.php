@@ -40,7 +40,7 @@ class TransferController extends BaseController
      */
     public function find(Request $request)
     {
-        $user = User::findOrFail($request->input('uid'));
+        $user = User::findOrFail($request->input('id'));
         return json_success(['user' => $user]);
     }
 }

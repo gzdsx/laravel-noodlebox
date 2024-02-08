@@ -21,7 +21,7 @@ class FeedbackController extends BaseController
         $model = new Feedback();
         $model->title = $title;
         $model->message = $message;
-        $model->uid = Auth::id();
+        $model->id = Auth::id();
         $model->save();
 
         return json_success(['id' => $model->id]);

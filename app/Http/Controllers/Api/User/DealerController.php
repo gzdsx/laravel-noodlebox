@@ -25,7 +25,7 @@ class DealerController extends BaseController
      */
     public function check()
     {
-        $check = UserDealer::where('uid', Auth::id())->exists();
+        $check = UserDealer::where('id', Auth::id())->exists();
         return json_success($check);
     }
 
@@ -35,7 +35,7 @@ class DealerController extends BaseController
      */
     public function getInfo(Request $request)
     {
-        $model = $this->repository()->where('uid', $request->input('uid', Auth::id()))->firstOrFail();
+        $model = $this->repository()->where('id', $request->input('id', Auth::id()))->firstOrFail();
         return json_success($model);
     }
 
@@ -45,7 +45,7 @@ class DealerController extends BaseController
      */
     public function poster(Request $request)
     {
-        $dealer = $this->repository()->where('uid',Auth::id())->firstOrFail();
+        $dealer = $this->repository()->where('id',Auth::id())->firstOrFail();
         if (!$dealer->poster) {
             $dealer->poster = $this->makePoster();
             $dealer->save();
@@ -75,7 +75,7 @@ class DealerController extends BaseController
             $font->file(public_path('fonts/Songti.ttc'));
         });
 
-        $url = url('h5/invite/' . $user->uid);
+        $url = url('h5/invite/' . $user->id);
         $pngCode = QrCode::format('png')->size(150)->margin(1)->generate($url);
         $qrcode = Image::make($pngCode);
         $poster->insert(

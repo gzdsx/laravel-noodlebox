@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 trait PostApis
 {
-    protected $with = ['user', 'categories'];
 
     /**
      * @return Post|Builder
@@ -31,7 +30,7 @@ trait PostApis
         $query = $this->repository()->filter($request->all());
         return json_success([
             'total' => $query->count(),
-            'items' => $query->with($this->with)->offset($offset)->limit($limit)->get()
+            'items' => $query->offset($offset)->limit($limit)->get()
         ]);
     }
 
@@ -43,7 +42,7 @@ trait PostApis
     {
         $model = $this->repository()->findOrFail($id);
         $model->incrementViews();
-        $model->load(['content', 'user', 'images', 'categories', 'metas']);
+        $model->load(['content']);
 
         return json_success($model);
     }
@@ -69,15 +68,10 @@ trait PostApis
             $content = $model->content()->firstOrNew();
             $content->fill($newContent)->save();
 
-            if (!$model->excerpt) {
-                $model->excerpt = mbsubstr(strip_html($content->content), 200);
+            if (!$model->description) {
+                $model->description = mbsubstr(strip_html($content->content), 300, '...');
                 $model->save();
             }
-        }
-
-        if ($newPost->has('media')) {
-            $media = $model->media()->firstOrNew();
-            $media->fill($newPost->get('media', []))->save();
         }
 
         if ($newPost->has('images')) {
@@ -101,7 +95,7 @@ trait PostApis
             }
         }
 
-        return json_success(['id' => $model->id]);
+        return json_success($model);
     }
 
     /**
@@ -109,7 +103,7 @@ trait PostApis
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function delete($id)
+    public function destroy($id)
     {
         $this->repository()->whereKey($id)->get()->each->delete();
         return json_success();
@@ -119,7 +113,7 @@ trait PostApis
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function batchDelete(Request $request)
+    public function batchDestroy(Request $request)
     {
         $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
         return json_success();

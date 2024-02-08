@@ -180,7 +180,7 @@ trait MaterialApis
         $material->width = $image->width();
         $material->height = $image->height();
         $material->thumb = $filePath . '/' . $thumbName;
-        $material->url = $filePath . '/' . $imageName;
+        $material->src = $filePath . '/' . $imageName;
         $material->save();
 
         return $material;
@@ -215,7 +215,7 @@ trait MaterialApis
 
         $sourcePath = $material->type . '/' . date('Y') . '/' . date('m');
         Storage::makeDirectory($sourcePath);
-        $material->url = $file->store($sourcePath);
+        $material->src = $file->store($sourcePath);
         $material->save();
 
         return $material;
@@ -269,7 +269,7 @@ trait MaterialApis
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function delete($id)
+    public function destroy($id)
     {
         if ($model = $this->repository()->find($id)) {
             $model->delete();

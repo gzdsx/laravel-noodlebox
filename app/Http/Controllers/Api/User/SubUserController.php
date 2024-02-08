@@ -29,7 +29,7 @@ class SubUserController extends BaseController
             'items' => $query->with(['member'])
                 ->offset($request->input('offset', 0))
                 ->take($request->input('count', 10))
-                ->orderByDesc('uid')->get()
+                ->orderByDesc('id')->get()
         ]);
     }
 }

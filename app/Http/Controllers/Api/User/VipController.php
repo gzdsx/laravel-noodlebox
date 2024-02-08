@@ -44,7 +44,7 @@ class VipController extends BaseController
         $res = new UnifiedOrderResponse($this->payment()->order->unify($unifiedOrder->getBizContent()));
         if ($res->tradeSuccess()) {
             $prepay = WechatPrePay::firstOrNew(['out_trade_no' => $unifiedOrder->getOutTradeNo()]);
-            $prepay->uid = Auth::id();
+            $prepay->id = Auth::id();
             $prepay->username = Auth::user()->username;
             $prepay->prepay_id = $res->prepayId();
             $prepay->data = $unifiedOrder->all();

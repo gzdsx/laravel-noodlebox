@@ -15,7 +15,7 @@ class UserInfoController extends BaseController
     {
         $user = Auth::user();
         return json_success([
-            'uid' => $user->uid,
+            'id' => $user->id,
             'nickname' => $user->nickname,
             'avatar' => $user->avatar,
             'phone' => $user->phone,

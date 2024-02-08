@@ -4,7 +4,6 @@ namespace App\Traits\RestApis;
 
 use App\Models\Page;
 use Illuminate\Http\Request;
-use Overtrue\LaravelPinyin\Facades\Pinyin;
 
 trait PageApis
 {
@@ -48,9 +47,6 @@ trait PageApis
     {
         $model = $this->repository()->findOrNew($id);
         $model->fill($request->input('page', []));
-        if (!$model->name) {
-            $model->name = strtolower(Pinyin::permalink($model->title));
-        }
         $model->save();
         return json_success($model);
     }

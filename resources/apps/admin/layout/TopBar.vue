@@ -70,7 +70,7 @@ export default {
             this.$router.replace('/login');
         },
         selectLang(lang) {
-            ApiService.get('/lang/messages/' + lang).then(response => {
+            ApiService.get('/langs/messages/' + lang).then(response => {
                 const {locale, messages} = response.result;
                 this.$i18n.setLocaleMessage('locale', messages);
                 this.curLang = this.languages[lang];
@@ -85,7 +85,7 @@ export default {
             });
         }
 
-        ApiService.get('/lang/locale').then(response => {
+        ApiService.get('/langs/locale').then(response => {
             this.$lang = response.result;
             this.curLang = this.languages[this.$lang];
         });

@@ -16,7 +16,7 @@ class UserNameController extends BaseController
     public function update(Request $request)
     {
         $username = $request->input('username');
-        if (User::where('uid', '<>', Auth::id())->where('username', $username)->exists()) {
+        if (User::where('id', '<>', Auth::id())->where('username', $username)->exists()) {
             abort(500, trans('user.username has been taken'));
         }
 

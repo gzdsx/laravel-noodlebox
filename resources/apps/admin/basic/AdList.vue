@@ -164,7 +164,7 @@ export default {
             this.showDialog = true;
         },
         onChooseImage(m) {
-            this.ad.data.image = m.url;
+            this.ad.data.image = m.src;
         },
         onBatchUpdate(data) {
             let ids = this.selectionIds.map((d) => d.id);

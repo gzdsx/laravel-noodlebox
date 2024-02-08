@@ -1,8 +1,8 @@
 <template>
     <ul class="category-checkbox-list">
-        <li v-for="(category,index) in categories" :key="category.cate_id">
+        <li v-for="(category,index) in categories" :key="category.id">
             <label>
-                <el-checkbox :label="category.cate_id">{{ category.name }}</el-checkbox>
+                <el-checkbox :label="category.id">{{ category.name }}</el-checkbox>
             </label>
             <category-checkbox-list :categories="category.children"/>
         </li>

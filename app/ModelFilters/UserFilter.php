@@ -13,9 +13,9 @@ class UserFilter extends ModelFilter
      */
     public $relations = [];
 
-    public function uid($uid)
+    public function id($id)
     {
-        return $this->where('uid', '=', $uid);
+        return $this->where('id', '=', $id);
     }
 
     public function nickname($name)

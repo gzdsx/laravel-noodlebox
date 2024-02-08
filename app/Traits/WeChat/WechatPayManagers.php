@@ -74,7 +74,7 @@ trait WechatPayManagers
         }
         if ($res->tradeSuccess()) {
             $prepay = WechatPrePay::firstOrNew(['out_trade_no' => $unifiedOrder->getOutTradeNo()]);
-            $prepay->uid = Auth::id();
+            $prepay->id = Auth::id();
             $prepay->order_id = $order->order_id;
             $prepay->prepay_id = $res->prepayId();
             $prepay->data = $unifiedOrder->all();

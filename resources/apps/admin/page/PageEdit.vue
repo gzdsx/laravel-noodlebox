@@ -17,15 +17,20 @@
         <div class="post-body">
             <div class="post-body-main">
                 <div class="page-section">
-                    <el-form label-width="60px">
+                    <el-form label-width="100px">
                         <el-form-item :label="$t('common.title')">
                             <el-input size="medium" class="w-100" v-model="page.title"/>
                         </el-form-item>
-                        <el-form-item :label="$t('common.alias')">
-                            <el-input size="medium" class="w-100" v-model="page.name"/>
+                        <el-form-item :label="$t('common.url')">
+                            <el-input size="medium" class="w-100" v-model="page.slug">
+                                <span slot="prepend">{{siteUrl}}/</span>
+                            </el-input>
                         </el-form-item>
-                        <el-form-item :label="$t('common.excerpt')">
-                            <el-input type="textarea" rows="5" class="w-100" v-model="page.excerpt"/>
+                        <el-form-item :label="$t('common.keywords')">
+                            <el-input size="medium" class="w-100" v-model="page.keywords"/>
+                        </el-form-item>
+                        <el-form-item :label="$t('common.description')">
+                            <el-input type="textarea" rows="5" class="w-100" v-model="page.description"/>
                         </el-form-item>
                         <el-form-item :label="$t('common.content')">
                             <wang-editor v-model="page.content"/>
@@ -66,14 +71,18 @@ export default {
         return {
             page: {},
             disabled: false,
-            showMediaDialog: false
+            showMediaDialog: false,
+            siteUrl: window.siteUrl || window.location.origin,
         }
     },
     methods: {
         fetchData() {
             let {id} = this.$route.params;
+            if (!id) return;
             ApiService.get('/pages/' + id).then(response => {
                 this.page = response.result;
+            }).catch(reason => {
+                this.$message.error(reason.message);
             });
         },
         onSubmit() {
@@ -88,6 +97,7 @@ export default {
             if (page.id) {
                 ApiService.put('/pages/' + page.id, {page}).then(() => {
                     this.$message.success(this.$t('page.updated'));
+                    this.fetchData();
                 }).finally(() => {
                     this.disabled = false;
                 });
@@ -109,7 +119,7 @@ export default {
             };
         },
         onChooseImage(m) {
-            this.page.image = m.url;
+            this.page.image = m.src;
         },
     },
     mounted() {

@@ -27,7 +27,7 @@ class OrderPolicy
      */
     public function buyer(User $user, Order $order)
     {
-        return $user->uid == $order->buyer_uid;
+        return $user->id == $order->buyer_id;
     }
 
     /**
@@ -37,7 +37,7 @@ class OrderPolicy
      */
     public function seller(User $user, Order $order)
     {
-        return $user->uid == $order->seller_uid;
+        return $user->id == $order->seller_id;
     }
 
     /**
@@ -47,6 +47,6 @@ class OrderPolicy
      */
     public function applyRefund(User $user, Order $order)
     {
-        return $user->uid == $order->buyer_uid;
+        return $user->id == $order->buyer_id;
     }
 }

@@ -14,10 +14,10 @@ const ProductService = {
         return ApiService.put('/products/' + id, {product});
     },
     deleteProducts(ids) {
-        return ApiService.post('/products/batch-delete', {ids});
+        return ApiService.delete('/products/batch', {data:{ids}});
     },
     batchUpdate(ids, data) {
-        return ApiService.post('/products/batch-update', {ids, data});
+        return ApiService.post('/products/batch', {ids, data});
     }
 }
 

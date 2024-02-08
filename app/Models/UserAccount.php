@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Services\Contracts\AccountServiceInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -69,7 +68,7 @@ class UserAccount extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'uid');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     /**

@@ -107,7 +107,7 @@ class UserTransaction extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'uid');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     /**
@@ -115,7 +115,7 @@ class UserTransaction extends Model
      */
     public function otherAccount()
     {
-        return $this->belongsTo(User::class, 'other_account_id', 'uid');
+        return $this->belongsTo(User::class, 'other_account_id', 'id');
     }
 
     /**

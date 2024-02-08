@@ -65,7 +65,7 @@
                             <span>|</span>
                             <a @click="deleteRecords([scope.row.id])">{{ $t('common.delete_forever') }}</a>
                             <span>|</span>
-                            <a v-clipboard:copy="scope.row.url"
+                            <a v-clipboard:copy="scope.row.src"
                                v-clipboard:success="onCopy">{{ $t('common.copy_url') }}</a>
                         </div>
                     </template>

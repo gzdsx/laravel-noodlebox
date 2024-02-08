@@ -42,7 +42,7 @@ class UserGroup extends Model
      */
     public function users()
     {
-        return $this->hasMany(User::class, 'uid', 'uid');
+        return $this->hasMany(User::class, 'id', 'id');
     }
 
     /**

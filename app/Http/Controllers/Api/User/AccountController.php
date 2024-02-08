@@ -49,7 +49,7 @@ class AccountController extends BaseController
     public function transfer(Request $request)
     {
         $fromUser = Auth::user();
-        $toUser = User::findOrFail($request->input('uid'));
+        $toUser = User::findOrFail($request->input('id'));
         $amount = $request->input('amount', 0);
         $remark = $request->input('remark', '');
         $password = $request->input('password', '');
@@ -64,7 +64,7 @@ class AccountController extends BaseController
                 abort(500, trans('user.password incorrect'));
             }
 
-            if ($fromUser->uid == $toUser->uid) {
+            if ($fromUser->id == $toUser->id) {
                 abort(500, '不能给自己转账');
             }
 
@@ -76,7 +76,7 @@ class AccountController extends BaseController
             $transaction->type = 2;
             $transaction->account_type = 3;
             $transaction->user()->associate($fromUser);
-            $transaction->other_account_id = $toUser->uid;
+            $transaction->other_account_id = $toUser->id;
             $transaction->other_account_name = $toUser->username;
             $transaction->detail = '转账-转给' . $toUser->username;
             $transaction->remark = $remark;
@@ -92,7 +92,7 @@ class AccountController extends BaseController
             $transaction->type = 1;
             $transaction->account_type = 3;
             $transaction->user()->associate($toUser);
-            $transaction->other_account_id = $fromUser->uid;
+            $transaction->other_account_id = $fromUser->id;
             $transaction->other_account_name = $fromUser->username;
             $transaction->detail = '转账-来自' . $fromUser->username;
             $transaction->remark = $remark;
@@ -100,8 +100,8 @@ class AccountController extends BaseController
             $transaction->markAsPaid();
 
             UserTransferCommonly::firstOrCreate([
-                'uid' => $fromUser->uid,
-                'payee_id' => $toUser->uid
+                'id' => $fromUser->id,
+                'payee_id' => $toUser->id
             ]);
 
             return json_success();

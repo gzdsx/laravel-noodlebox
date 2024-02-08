@@ -25,7 +25,7 @@ class PostController extends BaseController
     {
 
         $category = Category::findOrNew($cate);
-        $items = $this->repository()->filter(['cate' => $cate, 'sort' => 'time-desc'])->paginate();
+        $items = $this->repository()->filter(['category' => $cate, 'sort' => 'time-desc'])->paginate();
 
         return view('web.post-home', compact('items', 'category'));
     }
@@ -40,7 +40,7 @@ class PostController extends BaseController
         if (preg_match('/^[0-9]+$/', $id)) {
             $post = $this->repository()->withoutGlobalScopes()->find($id);
         } else {
-            $post = $this->repository()->withoutGlobalScopes()->where('name', 'like', "%$id%")->first();
+            $post = $this->repository()->withoutGlobalScopes()->where('slug', "%$id%")->first();
         }
 
         if (!$post) {
@@ -48,7 +48,7 @@ class PostController extends BaseController
         }
 
         $post->incrementViews();
-        $tags = preg_split('/\s/', $post->tags);
+        $tags = preg_split('/\s/', $post->keywords);
 
         $view = 'web.single-' . $post->type;
         if (!view()->exists($view)) {

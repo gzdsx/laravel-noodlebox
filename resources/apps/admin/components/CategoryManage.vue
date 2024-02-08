@@ -156,8 +156,8 @@ export default {
                 return false;
             }
             category.taxonomy = this.taxonomy;
-            if (category.cate_id) {
-                CategoryService.update(category.cate_id, category).then(() => {
+            if (category.id) {
+                CategoryService.update(category.id, category).then(() => {
                     this.fetchList();
                     this.showDialog = false;
                     this.$message.success(this.$t('category.updated'));
@@ -171,7 +171,7 @@ export default {
             }
         },
         onChooseImage(media) {
-            this.category.image = media.url;
+            this.category.image = media.src;
         },
     },
     mounted() {

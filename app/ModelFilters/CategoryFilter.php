@@ -28,4 +28,34 @@ class CategoryFilter extends ModelFilter
     {
         return $this->with($relations);
     }
+
+    /**
+     * @param $exclude
+     * @return CategoryFilter
+     */
+    public function excludes($exclude)
+    {
+        if (is_array($exclude)) {
+            $excludes = $exclude;
+        } else {
+            $excludes = explode(',', $exclude);
+        }
+
+        return $this->whereNotIn('id', $excludes);
+    }
+
+    /**
+     * @param $include
+     * @return CategoryFilter
+     */
+    public function includes($include)
+    {
+        if (is_array($include)){
+            $includes = $include;
+        } else {
+            $includes = explode(',', $include);
+        }
+
+        return $this->whereIn('id', $includes);
+    }
 }

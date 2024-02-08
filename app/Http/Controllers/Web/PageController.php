@@ -12,17 +12,17 @@ class PageController extends BaseController
      * @param $name
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function show(Request $request, $name)
+    public function show(Request $request, $slug)
     {
-        $page = Page::whereName($name)->first();
+        $page = Page::whereSlug($slug)->first();
 
         if (!$page) {
             abort(404);
         }
 
         $view = 'web.page';
-        if (view()->exists('web.page-' . $name)) {
-            $view = 'web.page-' . $name;
+        if (view()->exists('web.page-' . $slug)) {
+            $view = 'web.page-' . $slug;
         }
 
         if (view()->exists('web.page-' . $page->id)) {

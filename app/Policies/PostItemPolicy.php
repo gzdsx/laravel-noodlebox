@@ -52,7 +52,7 @@ class PostItemPolicy
         if ($user->isAdmin()) {
             return true;
         }
-        return $user->uid == $postItem->uid;
+        return $user->id == $postItem->id;
     }
 
     /**
@@ -67,7 +67,7 @@ class PostItemPolicy
         if ($user->isAdmin()) {
             return true;
         }
-        return $user->uid == $postItem->uid;
+        return $user->id == $postItem->id;
     }
 
     /**
@@ -82,7 +82,7 @@ class PostItemPolicy
         if ($user->isAdmin()) {
             return true;
         }
-        return $user->uid == $postItem->uid;
+        return $user->id == $postItem->id;
     }
 
     /**
@@ -97,7 +97,7 @@ class PostItemPolicy
         if ($user->isAdmin()) {
             return true;
         }
-        return $user->uid == $postItem->uid;
+        return $user->id == $postItem->id;
     }
 
     /**
@@ -107,7 +107,7 @@ class PostItemPolicy
      */
     public function own(User $user, Post $postItem)
     {
-        return $user->uid == $postItem->uid;
+        return $user->id == $postItem->id;
     }
 
     /**
@@ -124,6 +124,6 @@ class PostItemPolicy
         if ($user->isAdmin()) {
             return true;
         }
-        return $user->uid == $postItem->uid;
+        return $user->id == $postItem->id;
     }
 }

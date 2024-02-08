@@ -96,7 +96,7 @@ export default {
             }
         },
         onChooseImage(m) {
-            this.user.avatar = m.url;
+            this.user.avatar = m.src;
         }
     },
     mounted() {

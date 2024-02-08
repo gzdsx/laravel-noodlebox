@@ -23,7 +23,7 @@ trait UserHasPosts
      */
     public function posts()
     {
-        return $this->hasMany(Post::class, 'uid', 'uid');
+        return $this->hasMany(Post::class, 'id', 'id');
     }
 
     /**
@@ -36,7 +36,7 @@ trait UserHasPosts
             'post_collect',
             'user_id',
             'post_id',
-            'uid',
+            'id',
             'id'
         )->as('subscribe')->withTimestamps()->orderBy('post_collect.created_at', 'desc');
     }

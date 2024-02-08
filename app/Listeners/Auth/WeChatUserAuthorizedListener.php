@@ -63,6 +63,6 @@ class WeChatUserAuthorizedListener
             'city' => $userInfo['city'] ?? '',
             'avatar' => $userInfo['headimgurl'] ?? '',
         ]);
-        Auth::loginUsingId($user->uid);
+        Auth::loginUsingId($user->id);
     }
 }

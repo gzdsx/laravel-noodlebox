@@ -21,7 +21,7 @@
             </el-table>
             <div class="table-edit-footer">
                 <el-button size="small" type="primary" :disabled="selectionIds.length===0" @click="onDelete">
-                    {{ $t('batch_delete') }}
+                    {{ $t('common.batch_delete') }}
                 </el-button>
             </div>
         </section>

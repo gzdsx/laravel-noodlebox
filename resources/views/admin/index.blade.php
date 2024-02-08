@@ -15,10 +15,8 @@
     <script src="{{asset('lib/vue/vue-chunk.js?v='.appversion())}}" type="text/javascript"></script>
     <script src="{{asset('lib/vue/vue-router.min.js?v='.appversion())}}" type="text/javascript"></script>
     <script src="{{asset('lib/element/element-ui.js?v='.appversion())}}" type="text/javascript"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?v=weekly&libraries=places&language=en&key={{settings('google_apikey')}}"></script>
-    <script src="//unpkg.com/element-ui/lib/umd/locale/en.js"></script>
-    <script type="text/javascript">
-        ELEMENT.locale(ELEMENT.lang.en)
+    <script>
+        window.siteUrl = "{{env('APP_URL')}}";
     </script>
 </head>
 <body>

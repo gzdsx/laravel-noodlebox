@@ -14,7 +14,7 @@ trait UserHasShop
      */
     public function shop()
     {
-        return $this->hasOne(Shop::class, 'seller_id', 'uid');
+        return $this->hasOne(Shop::class, 'seller_id', 'id');
     }
 
     /**
@@ -27,7 +27,7 @@ trait UserHasShop
             'shop_subscribe',
             'user_id',
             'shop_id',
-            'uid',
+            'id',
             'shop_id'
         )->as('subscribes')->withTimestamps();
     }

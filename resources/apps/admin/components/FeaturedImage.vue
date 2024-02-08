@@ -16,7 +16,7 @@ export default {
         },
         fit: {
             type: String,
-            default: ''
+            default: 'cover'
         }
     }
 }

@@ -26,7 +26,7 @@ const CategoryService = {
         function t(a) {
             return a.map(function (c) {
                 var obj = {
-                    value: c.cate_id,
+                    value: c.id,
                     label: c.name,
                 };
                 if (c.children.length > 0) {

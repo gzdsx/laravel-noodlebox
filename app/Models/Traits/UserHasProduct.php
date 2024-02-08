@@ -15,7 +15,7 @@ namespace App\Models\Traits;
 
 
 use App\Models\Cart;
-use App\Models\ProductItem;
+use App\Models\Product;
 use App\Models\Shop;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,24 +24,24 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 trait UserHasProduct
 {
     /**
-     * @return HasMany|ProductItem
+     * @return HasMany|Product
      */
     public function products()
     {
-        return $this->hasMany(ProductItem::class, 'seller_id', 'uid');
+        return $this->hasMany(Product::class, 'seller_id', 'id');
     }
 
     /**
-     * @return BelongsToMany|ProductItem
+     * @return BelongsToMany|Product
      */
     public function collectedProducts()
     {
         return $this->belongsToMany(
-            ProductItem::class,
+            Product::class,
             'product_collect',
             'user_id',
             'product_id',
-            'uid',
+            'id',
             'id'
         )->as('collect')->withTimestamps()->orderBy('product_collect.created_at', 'desc');
     }

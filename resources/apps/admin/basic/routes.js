@@ -12,7 +12,7 @@ import KefuList from "./KefuList";
 import SnippetList from "./SnippetList";
 
 module.exports = [
-    {path: '/categories', component: Category, meta: {title: '快递管理'}},
+    {path: '/category/:taxonomy?', component: Category, meta: {title: '分类管理'}},
     {path: '/express/list', component: ExpressList, meta: {title: '快递管理'}},
     {path: '/block/list', component: BlockList, meta: {title: '模块管理'}},
     {path: '/block/new', component: BlockEdit, meta: {title: '添加模块'}},

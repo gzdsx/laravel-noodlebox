@@ -180,7 +180,7 @@ class MiniProgramController extends BaseController
             'nickname' => $userInfo['nickName'] ?? '',
             'appid' => $app->config->get('app_id')
         ]);
-        return json_success(['access_token' => $user->createToken($user->uid)->accessToken]);
+        return json_success(['access_token' => $user->createToken($user->id)->accessToken]);
     }
 
     /**

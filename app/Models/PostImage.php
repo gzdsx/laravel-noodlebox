@@ -16,16 +16,16 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $image
  * @property int $isremote
  * @property string|null $description
- * @property int $displayorder
+ * @property int $sort_num
  * @method static \Illuminate\Database\Eloquent\Builder|PostImage newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PostImage newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PostImage query()
  * @method static \Illuminate\Database\Eloquent\Builder|PostImage whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|PostImage whereDisplayorder($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PostImage whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PostImage whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PostImage whereIsremote($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PostImage wherePostId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PostImage whereSortNum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PostImage whereThumb($value)
  * @mixin \Eloquent
  */

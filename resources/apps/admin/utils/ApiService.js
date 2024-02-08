@@ -4,7 +4,7 @@ import AuthService from "./AuthService";
 const ApiService = axios.create({
     baseURL: "/admin", // url = base url + request url
     // withCredentials: true, // send cookies when cross-domain requests
-    timeout: 20000, // request timeout
+    timeout: 0, // request timeout
 });
 
 // request interceptor

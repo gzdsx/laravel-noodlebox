@@ -16,7 +16,7 @@ export default [
         children: [
             {
                 name: 'sidebar.settings_general',
-                path: '/settings/basic',
+                path: '/settings/general',
                 isLink: false
             },
             {
@@ -37,11 +37,6 @@ export default [
             {
                 name: 'sidebar.settings_mail',
                 path: '/settings/mail',
-                isLink: false
-            },
-            {
-                name: 'sidebar.settings_sterling',
-                path: '/settings/sterling',
                 isLink: false
             },
         ]
@@ -102,110 +97,40 @@ export default [
             },
             {
                 name: 'sidebar.post_category',
-                path: '/categories',
+                path: '/category',
                 isLink: false
             }
         ]
     },
     {
-        name: 'Services',
-        icon: 'telegram',
+        name: '电商',
+        icon: 'bag',
         children: [
             {
-                name: 'sidebar.post_addnew',
-                path: '/post/new?type=service',
+                name: '添加产品',
+                path: '/product/new',
                 isLink: false
             },
             {
-                name: 'sidebar.post_manage',
-                path: '/post/list?type=service',
+                name: '产品管理',
+                path: '/product/list',
                 isLink: false
             },
             {
-                name: 'sidebar.post_category',
-                path: '/categories?taxonomy=service',
+                name: '分类管理',
+                path: '/category/product',
+                isLink: false
+            },
+            {
+                name: '产品变量',
+                path: '/product/variations',
+                isLink: false
+            },
+            {
+                name: '门店管理',
+                path: '/shop/list',
                 isLink: false
             }
-        ]
-    },
-    {
-        name: 'Buildium',
-        icon: 'house-door',
-        children: [
-            {
-                name: 'Forms',
-                path: '/buildium/form-list'
-            },
-            {
-                name: 'Resources',
-                path: '/buildium/resource-list'
-            },
-            {
-                name: 'Rental Properties',
-                path: '/buildium/rental-properties'
-            },
-            {
-                name: 'Rental Units',
-                path: '/buildium/rental-units'
-            },
-            {
-                name: 'Rental Listings',
-                path: '/buildium/rental-listings'
-            },
-            {
-                name: 'Associations',
-                path: '/buildium/associations'
-            },
-            {
-                name: 'Association Units',
-                path: '/buildium/association-units'
-            }
-        ]
-    },
-    {
-        name: 'Real Estate',
-        icon: 'lightbulb',
-        children: [
-            {
-                name: 'All Properties',
-                path: '/realestate/property-list'
-            },
-            {
-                name: 'New Property',
-                path: '/realestate/property-new'
-            },
-            {
-                name: 'Features',
-                path: '/realestate/features'
-            },
-            {
-                name: 'Property Types',
-                path: '/realestate/property-types'
-            },
-            {
-                name: 'Building Types',
-                path: '/realestate/building-types'
-            },
-            {
-                name: 'Parking Types',
-                path: '/realestate/parking-types'
-            },
-            {
-                name: 'Property Titles',
-                path: '/realestate/titles'
-            },
-            {
-                name: 'Cities',
-                path: '/realestate/cities'
-            },
-            {
-                name: 'Agents',
-                path: '/realestate/agents'
-            },
-            {
-                name: 'Offices',
-                path: '/offices'
-            },
         ]
     },
     {

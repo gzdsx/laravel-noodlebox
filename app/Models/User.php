@@ -14,18 +14,15 @@ use Laravel\Passport\HasApiTokens;
 /**
  * App\Models\User
  *
- * @property int $uid 主键
+ * @property int $id 主键
  * @property int $gid 管理权限
  * @property string|null $nickname 昵称
  * @property string|null $phone 手机号
  * @property string|null $email 邮箱
  * @property string|null $avatar 头像
- * @property int $credits 积分
  * @property string|null $password 密码
  * @property string|null $remember_token
  * @property int $freeze 冻结
- * @property float $latitude 纬度
- * @property float $longitude 经度
  * @property int $email_status 邮箱验证状态
  * @property int $name_status 实名认证状态
  * @property int $status 状态
@@ -41,6 +38,7 @@ use Laravel\Passport\HasApiTokens;
  * @property-read int|null $collected_posts_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserConnect> $connects
  * @property-read int|null $connects_count
+ * @property-read \Illuminate\Support\Collection $meta_data
  * @property-read array|string|null $status_des
  * @property-read \App\Models\UserGroup|null $group
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserLog> $logs
@@ -66,22 +64,19 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereBeginsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereCredits($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereEndsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|User whereFreeze($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereGid($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereLatitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereLike(string $column, string $value, string $boolean = 'and')
- * @method static \Illuminate\Database\Eloquent\Builder|User whereLongitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNameStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereUid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @mixin \Eloquent
  */
@@ -91,10 +86,10 @@ class User extends Authenticatable
     use UserHasPosts;
 
     protected $table = 'user';
-    protected $primaryKey = 'uid';
+    protected $primaryKey = 'id';
     protected $fillable = [
-        'uid', 'gid', 'nickname', 'phone', 'email', 'password', 'remember_token',
-        'avatar', 'email_status', 'name_status', 'freeze', 'credits', 'status'
+        'id', 'gid', 'nickname', 'phone', 'email', 'password', 'remember_token',
+        'avatar', 'email_status', 'name_status', 'freeze', 'status'
     ];
     protected $hidden = ['password', 'remember_token'];
     protected $appends = [
@@ -179,7 +174,7 @@ class User extends Authenticatable
      */
     public function connects()
     {
-        return $this->hasMany(UserConnect::class, 'user_id', 'uid');
+        return $this->hasMany(UserConnect::class, 'user_id', 'id');
     }
 
     /**
@@ -187,7 +182,7 @@ class User extends Authenticatable
      */
     public function certify()
     {
-        return $this->hasOne(UserCertify::class, 'user_id', 'uid');
+        return $this->hasOne(UserCertify::class, 'user_id', 'id');
     }
 
     /**
@@ -195,7 +190,7 @@ class User extends Authenticatable
      */
     public function logs()
     {
-        return $this->hasMany(UserLog::class, 'user_id', 'uid');
+        return $this->hasMany(UserLog::class, 'user_id', 'id');
     }
 
     /**
@@ -203,7 +198,7 @@ class User extends Authenticatable
      */
     public function account()
     {
-        return $this->hasOne(UserAccount::class, 'user_id', 'uid');
+        return $this->hasOne(UserAccount::class, 'user_id', 'id');
     }
 
     /**
@@ -211,7 +206,7 @@ class User extends Authenticatable
      */
     public function materials()
     {
-        return $this->hasMany(Material::class, 'user_id', 'uid');
+        return $this->hasMany(Material::class, 'user_id', 'id');
     }
 
     /**
@@ -219,7 +214,7 @@ class User extends Authenticatable
      */
     public function addresses()
     {
-        return $this->hasMany(UserAddress::class, 'user_id', 'uid');
+        return $this->hasMany(UserAddress::class, 'user_id', 'id');
     }
 
 
@@ -228,7 +223,7 @@ class User extends Authenticatable
      */
     public function transactions()
     {
-        return $this->hasMany(UserTransaction::class, 'user_id', 'uid');
+        return $this->hasMany(UserTransaction::class, 'user_id', 'id');
     }
 
     /**
@@ -244,7 +239,7 @@ class User extends Authenticatable
      */
     public function metas()
     {
-        return $this->hasMany(UserMeta::class, 'user_id', 'uid');
+        return $this->hasMany(UserMeta::class, 'user_id', 'id');
     }
 
     /**

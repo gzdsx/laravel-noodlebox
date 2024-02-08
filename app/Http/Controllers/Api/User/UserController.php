@@ -22,7 +22,7 @@ class UserController extends BaseController
     {
         $user = Auth::user();
         return json_success([
-            'uid' => $user->uid,
+            'id' => $user->id,
             'nickname' => $user->nickname,
             'avatar' => $user->avatar,
             'phone' => $user->phone,
@@ -46,7 +46,7 @@ class UserController extends BaseController
     public function follow(Request $request)
     {
         $fans = UserFans::firstOrCreate([
-            'uid' => $request->input('uid'),
+            'id' => $request->input('id'),
             'fans_id' => Auth::id()
         ]);
 
@@ -60,7 +60,7 @@ class UserController extends BaseController
     public function unfollow(Request $request)
     {
         $fans = UserFans::where([
-            'uid' => $request->input('uid'),
+            'id' => $request->input('id'),
             'fans_id' => Auth::id()
         ])->first();
 

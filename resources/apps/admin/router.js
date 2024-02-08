@@ -26,6 +26,12 @@ router.addRoutes(PageRoutes);
 const PostRoutes = require('./post/routes');
 router.addRoutes(PostRoutes);
 
+const ProductRoutes = require('./product/routes');
+router.addRoutes(ProductRoutes);
+
+const ShopRoutes = require('./shop/routes');
+router.addRoutes(ShopRoutes);
+
 router.addRoutes([
     {
         path: '*',

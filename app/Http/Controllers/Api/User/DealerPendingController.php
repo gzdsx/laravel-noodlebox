@@ -23,7 +23,7 @@ class DealerPendingController extends BaseController
      */
     public function create(Request $request)
     {
-        $model = $this->repository()->where('uid', Auth::id())->firstOrNew();
+        $model = $this->repository()->where('id', Auth::id())->firstOrNew();
         $model->user()->associate(Auth::id());
         $model->save();
 

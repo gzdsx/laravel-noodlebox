@@ -23,8 +23,8 @@ class WechatLoginController extends Controller
         $basestr = session('basestr');
         $wxlogin = WechatLogin::where('basestr', $basestr)->first();
         if ($wxlogin) {
-            if ($wxlogin->uid && $wxlogin->openid) {
-                Auth::loginUsingId($wxlogin->uid);
+            if ($wxlogin->id && $wxlogin->openid) {
+                Auth::loginUsingId($wxlogin->id);
                 session(['openid'=>$wxlogin->openid]);
                 $wxlogin->delete();
                 return json_success();
@@ -42,7 +42,7 @@ class WechatLoginController extends Controller
     {
         $basestr = session('basestr');
         if (!$basestr) {
-            $basestr = Str::uuid()->toString();
+            $basestr = Str::uid()->toString();
             session(['basestr' => $basestr]);
             WechatLogin::create(['basestr' => $basestr]);
         }

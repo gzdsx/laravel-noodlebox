@@ -1,12 +1,12 @@
 <template>
     <el-dialog
             :title="$t('material.dialog_title')"
-            class="media-dialog"
+            custom-class="media-dialog"
             @close="onClose"
-            :visible="visible"
+            :visible="value"
             :close-on-click-modal="false"
             :close-on-press-escape="false"
-            :modal="false"
+            append-to-body
     >
         <el-tabs v-model="tab">
             <el-tab-pane name="uploader" :label="$t('material.upload')">
@@ -101,28 +101,28 @@
                             <p><strong>{{ currentMedia.name }}</strong></p>
                             <p>{{ currentMedia.created_at }}</p>
                             <p>{{ currentMedia.formated_size }}</p>
-                            <p>{{ currentMedia.url }}</p>
+                            <p>{{ currentMedia.src }}</p>
 
                             <el-button
                                     size="small"
-                                    v-clipboard:copy="currentMedia.url"
+                                    v-clipboard:copy="currentMedia.src"
                                     v-clipboard:success="onCopy"
                             >{{ $t('common.copy_url') }}
                             </el-button>
                         </div>
                     </div>
                 </div>
-                <div class="action-bar">
-                    <el-button
-                            type="primary"
-                            size="small"
-                            :disabled="selectedFiles.length===0||tab==='uploader'"
-                            @click="onConfirm"
-                    >{{ $t('material.use_selected') }}
-                    </el-button>
-                </div>
             </el-tab-pane>
         </el-tabs>
+        <el-button
+            type="primary"
+            size="small"
+            :disabled="selectedFiles.length===0||tab==='uploader'"
+            @click="onConfirm"
+            slot="footer"
+            v-if="tab==='media'"
+        >{{ $t('material.use_selected') }}
+        </el-button>
     </el-dialog>
 </template>
 
@@ -131,12 +131,8 @@ import MaterialService from "../utils/MaterialService";
 
 export default {
     name: "MediaDialog",
-    model: {
-        prop: 'visible',//指向props的参数名
-        event: 'change'//事件名称
-    },
     props: {
-        visible: {
+        value: {
             type: Boolean,
             default: false
         },
@@ -184,15 +180,6 @@ export default {
     watch: {
         options(val, oldVal) {
             this.params = Object.assign({}, this.params, val);
-        },
-        visible(val) {
-            if (val) {
-                this.offset = 0;
-                this.loading = true;
-                this.dataList = [];
-                this.uploadFileList = [];
-                this.fetchList();
-            }
         }
     },
     methods: {
@@ -222,7 +209,7 @@ export default {
             });
         },
         onClose() {
-            this.$emit('change', false);
+            this.$emit('input', false);
         },
         onUploadChange() {
             this.tab = "media";
@@ -290,7 +277,7 @@ export default {
                 this.selectedFiles = [file];
             }
 
-            var len = this.selectedFiles.length;
+            let len = this.selectedFiles.length;
             if (len > 0) {
                 this.currentMedia = this.selectedFiles[len - 1];
             } else {
@@ -332,7 +319,7 @@ export default {
     },
     mounted() {
         this.fetchTypes();
-        //this.fetchList();
+        this.fetchList();
     },
 }
 </script>

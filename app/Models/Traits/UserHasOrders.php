@@ -23,7 +23,7 @@ trait UserHasOrders
      */
     public function boughts()
     {
-        return $this->hasMany(Order::class, 'buyer_id', 'uid');
+        return $this->hasMany(Order::class, 'buyer_id', 'id');
     }
 
     /**
@@ -31,6 +31,6 @@ trait UserHasOrders
      */
     public function solds()
     {
-        return $this->hasMany(Order::class, 'seller_id', 'uid');
+        return $this->hasMany(Order::class, 'seller_id', 'id');
     }
 }

@@ -1,0 +1,57 @@
+@for $i from 1 through 10 {
+    .max-width-#{$i} {
+        max-width: #{$i*5%};
+    }
+}
+
+@for $i from 1 through 10 {
+    .min-width-#{$i} {
+        min-width: #{$i*5%};
+    }
+}
+
+@for $i from 1 through 50 {
+    .w#{$i*10} {
+        width: #{$i*10}px;
+        max-width: #{$i*10}px;
+    }
+}
+
+@for $i from 1 through 20 {
+    .w-#{$i*5} {
+        width: #{$i*5%};
+        max-width: #{$i*5%};
+    }
+}
+
+@for $i from 1 through 50 {
+    .h#{$i*10} {
+        height: #{$i*10}px;
+        max-height: #{$i*10}px;
+    }
+}
+
+@for $i from 1 through 20 {
+    .h-#{$i*5} {
+        height: #{$i*5%};
+        max-height: #{$i*5%};
+    }
+}
+
+@for $i from 1 through 10 {
+    .gap-#{$i*5} {
+        gap: #{$i*5}px;
+    }
+}
+
+@for $i from 1 through 10 {
+    .column-gap-#{$i*5} {
+        column-gap: #{$i*5}px;
+    }
+}
+
+@for $i from 1 through 10 {
+    .row-gap-#{$i*5} {
+        column-gap: #{$i*5}px;
+    }
+}

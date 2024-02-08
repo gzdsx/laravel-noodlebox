@@ -1,0 +1,14 @@
+html, body {
+    overflow-x: hidden;
+    font-family: Montserrat, sans-serif !important;
+}
+
+@media (min-width: 1200px) {
+    .container-1400 {
+        max-width: 1400px !important;
+    }
+}
+
+img, video {
+    object-fit: cover;
+}

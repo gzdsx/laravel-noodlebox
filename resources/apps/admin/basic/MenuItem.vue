@@ -224,7 +224,7 @@ export default {
             this.$forceUpdate();
         },
         onChooseImage(m) {
-            this.item.image = m.url;
+            this.item.image = m.src;
         },
         onToggle(item) {
             let {id} = item;

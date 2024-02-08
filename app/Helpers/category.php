@@ -2,9 +2,9 @@
 
 use App\Models\Category;
 
-function get_category($cate)
+function get_category($id)
 {
-    return Category::find($cate);
+    return Category::find($id);
 }
 
 function get_categories($options = [])

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\Link
  *
  * @property int $id 主键
- * @property int $cate_id 分类ID
+ * @property int $category_id 分类ID
  * @property string $type 类型
  * @property string|null $title 标题
  * @property string|null $url 链接
@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder|Link onlyCategory()
  * @method static Builder|Link onlyLink()
  * @method static Builder|Link query()
- * @method static Builder|Link whereCateId($value)
+ * @method static Builder|Link whereCategoryId($value)
  * @method static Builder|Link whereDescription($value)
  * @method static Builder|Link whereId($value)
  * @method static Builder|Link whereImage($value)

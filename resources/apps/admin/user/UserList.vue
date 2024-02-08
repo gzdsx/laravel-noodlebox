@@ -4,9 +4,9 @@
         <section class="page-section">
             <div class="form-inline">
                 <div class="form-item">
-                    <div class="form-item-label">UID</div>
+                    <div class="form-item-label">ID</div>
                     <div class="form-item-input">
-                        <el-input size="medium" class="w200" clearable v-model="params.uid"/>
+                        <el-input size="medium" class="w200" clearable v-model="params.id"/>
                     </div>
                 </div>
                 <div class="form-item">
@@ -43,7 +43,7 @@
             </div>
             <el-table :data="dataList" v-loading="loading" @selection-change="onSelectionChange">
                 <el-table-column width="40" type="selection"/>
-                <el-table-column prop="uid" width="80" label="UID"/>
+                <el-table-column prop="id" width="80" label="ID"/>
                 <el-table-column :label="$t('user.avatar')" width="70">
                     <template slot-scope="scope">
                         <el-image :src="scope.row.avatar" class="img-40" fit="cover"></el-image>
@@ -51,7 +51,6 @@
                 </el-table-column>
                 <el-table-column prop="nickname" :label="$t('user.nickname')"/>
                 <el-table-column prop="phone" :label="$t('user.phone')"/>
-                <el-table-column prop="group.name" width="120" :label="$t('user.group')"/>
                 <el-table-column prop="created_at" width="170" :label="$t('user.regtime')"/>
                 <el-table-column width="100px" :label="$t('common.option')" align="right">
                     <template slot-scope="scope">
@@ -97,7 +96,7 @@ export default {
     data() {
         return {
             params: {
-                uid: '',
+                id: '',
                 nickname: '',
                 status: '',
                 email: '',
@@ -116,11 +115,10 @@ export default {
             return this.params;
         },
         onDelete() {
-            let ids = this.selectionIds.map((d) => d.uid);
+            let ids = this.selectionIds.map((d) => d.id);
             this.$confirm(this.$t('user.delete_tips'), this.$t('common.delete_confirm'), {
                 type: 'warning'
             }).then(() => {
-                console.log(ids);
                 UserService.deleteUser(ids).then(() => {
                     this.fetchList();
                 });
@@ -131,7 +129,7 @@ export default {
             this.onSearch();
         },
         onBatchUpdate(data) {
-            let ids = this.selectionIds.map((d) => d.uid);
+            let ids = this.selectionIds.map((d) => d.id);
             UserService.batchUpdate(ids, data).then(() => {
                 this.fetchList();
             });

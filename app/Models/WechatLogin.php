@@ -29,13 +29,13 @@ class WechatLogin extends Model
 {
     protected $table = 'wechat_login';
     protected $primaryKey = 'id';
-    protected $fillable = ['uid', 'basestr', 'openid'];
+    protected $fillable = ['id', 'basestr', 'openid'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'uid', 'uid');
+        return $this->belongsTo(User::class, 'id', 'id');
     }
 }

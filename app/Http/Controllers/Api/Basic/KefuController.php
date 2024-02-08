@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers\Api\Basic;
 
-use App\Http\Controllers\Api\BaseController;
+use App\Http\Controllers\Admin\BaseController;
 use App\Models\Kefu;
 use Illuminate\Http\Request;
 
 class KefuController extends BaseController
 {
-    /**
-     * @return Kefu|\Illuminate\Database\Eloquent\Builder
-     */
     protected function repository()
     {
         return Kefu::query();
@@ -20,44 +17,37 @@ class KefuController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getInfo(Request $request)
-    {
-        $kefu = $this->repository()->find($request->input('id'));
-        return json_success($kefu);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getList(Request $request)
+    public function index(Request $request)
     {
         $query = $this->repository();
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 15);
         return json_success([
             'total' => $query->count(),
-            'items' => $query->get()
+            'items' => $query->offset($offset)->limit($limit)->get()
         ]);
     }
 
     /**
      * @param Request $request
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function save(Request $request)
+    public function store(Request $request, $id = 0)
     {
-        $kefu = $this->repository()->findOrNew($request->input('id'));
-        $kefu->fill($request->input('kefu', []))->save();
+        $model = $this->repository()->findOrNew($id);
+        $model->fill($request->input('kefu', []))->save();
 
-        return json_success($kefu);
+        return json_success($model);
     }
 
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function batchDelete(Request $request)
+    public function batchDestroy(Request $request)
     {
-        $this->repository()->whereKey($request->input('items', []))->delete();
+        $this->repository()->whereKey($request->input('ids', []))->delete();
         return json_success();
     }
 }

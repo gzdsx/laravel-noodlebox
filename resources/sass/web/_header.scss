@@ -1,0 +1,49 @@
+.header {
+    display: flex;
+    padding: 15px 30px;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    z-index: 99;
+    transition: all 0.3s;
+
+    .logo {
+        height: 64px;
+        width: auto;
+        display: inline-block;
+
+        &-wrapper {
+            flex: 1;
+        }
+    }
+
+    .menus {
+        .menu {
+            &-list {
+                display: flex;
+                align-items: center;
+                column-gap: 2rem;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            &-item {
+                display: inline-block;
+                color: #ffffff;
+                font-weight: 300;
+
+                a {
+                    color: #ffffff;
+
+                    &:hover {
+                        color: var(--info);
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+    }
+}

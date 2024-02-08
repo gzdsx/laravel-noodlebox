@@ -1,0 +1,10 @@
+.page{
+    &-section{
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+    }
+
+    &-shop{
+        background-image: url("#{$image-path}/noodlebox/shop-bg.png");
+    }
+}

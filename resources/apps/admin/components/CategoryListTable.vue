@@ -3,9 +3,9 @@
         <template v-for="category in categories">
             <table class="dsxui-listtable">
                 <tr>
-                    <td width="50">{{ category.cate_id }}</td>
+                    <td width="50">{{ category.id }}</td>
                     <td width="50">
-                        <img :src="category.image" class="img-30 img-cover" v-if="category.image"/>
+                        <img :src="category.image" class="img-30 img-cover" alt="" v-if="category.image"/>
                         <div class="img-30 img-placeholder" v-else></div>
                     </td>
                     <td>
@@ -13,16 +13,16 @@
                         <span class="font-weight-bold">{{ category.name }}</span>
                     </td>
                     <td width="100">
-                        <span class="el-icon-top sort-icon" @click="doIncrease(category.cate_id)"></span>
-                        <span class="el-icon-bottom sort-icon" @click="doDecrease(category.cate_id)"></span>
+                        <span class="el-icon-top sort-icon" @click="doIncrease(category.id)"></span>
+                        <span class="el-icon-bottom sort-icon" @click="doDecrease(category.id)"></span>
                     </td>
                     <td width="200" class="text-right">
                         <div class="action-links">
-                            <a @click="onAddChild(category.cate_id)">{{ $t('category.addchild')}}</a>
+                            <a @click="onAddChild(category.id)">{{ $t('category.addchild')}}</a>
                             <span>|</span>
                             <a @click="showEdit(category)">{{$t('common.edit')}}</a>
                             <span>|</span>
-                            <a @click="showDelete(category.cate_id)">{{$t('common.delete')}}</a>
+                            <a @click="showDelete(category.id)">{{$t('common.delete')}}</a>
                         </div>
                     </td>
                 </tr>

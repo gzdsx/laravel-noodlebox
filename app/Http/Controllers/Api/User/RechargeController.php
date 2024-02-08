@@ -49,7 +49,7 @@ class RechargeController extends BaseController
         if ($res->tradeSuccess()) {
             $prePay = new WechatPrePay();
             $prePay->out_trade_no = $out_trade_no;
-            $prePay->uid = Auth::id();
+            $prePay->id = Auth::id();
             $prePay->prepay_id = $res->prepayId();
             $prePay->data = $unifiedOrder->all();
             $prePay->save();

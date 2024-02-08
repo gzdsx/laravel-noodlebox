@@ -16,9 +16,10 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @property int $id 页面ID
  * @property int|null $user_id 作者ID
  * @property string|null $title 标题
- * @property string|null $name 别名
+ * @property string|null $slug 别名
  * @property string $image 图片
- * @property string|null $excerpt 摘要
+ * @property string|null $keywords
+ * @property string|null $description 摘要
  * @property string|null $content 内容
  * @property int $sort_num 显示顺序
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
@@ -32,10 +33,11 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @method static Builder|Page query()
  * @method static Builder|Page whereContent($value)
  * @method static Builder|Page whereCreatedAt($value)
- * @method static Builder|Page whereExcerpt($value)
+ * @method static Builder|Page whereDescription($value)
  * @method static Builder|Page whereId($value)
  * @method static Builder|Page whereImage($value)
- * @method static Builder|Page whereName($value)
+ * @method static Builder|Page whereKeywords($value)
+ * @method static Builder|Page whereSlug($value)
  * @method static Builder|Page whereSortNum($value)
  * @method static Builder|Page whereTitle($value)
  * @method static Builder|Page whereUpdatedAt($value)
@@ -48,12 +50,9 @@ class Page extends Model
 
     protected $table = 'page';
     protected $primaryKey = 'id';
-    protected $fillable = [
-        'user_id', 'title', 'name', 'image', 'excerpt', 'content', 'sort_num'
-    ];
+    protected $fillable = ['user_id', 'title', 'slug', 'image', 'keywords', 'description', 'content', 'sort_num'];
     protected $appends = ['url'];
     protected $with = ['user'];
-    protected $_metas = [];
 
     public static function boot()
     {
@@ -63,12 +62,12 @@ class Page extends Model
         });
 
         static::saving(function (Page $page) {
-            if (!$page->name) {
-                $page->name = Pinyin::permalink($page->title);
+            if (!$page->slug) {
+                $page->slug = strtolower(Pinyin::permalink($page->title));
             }
 
             if (!$page->user_id) {
-                $page->user_id = Auth::id();
+                $page->user()->associate(Auth::user());
             }
         });
     }
@@ -78,7 +77,7 @@ class Page extends Model
      */
     public function getUrlAttribute()
     {
-        return url($this->name);
+        return url($this->slug);
     }
 
 
@@ -87,7 +86,7 @@ class Page extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'uid');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function metas()

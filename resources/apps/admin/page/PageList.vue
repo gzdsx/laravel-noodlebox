@@ -19,7 +19,6 @@
                         <a :href="scope.row.url" target="_blank">{{ scope.row.title }}</a>
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" :label="$t('common.alias')"/>
                 <el-table-column prop="user.nickname" width="170" :label="$t('common.author')"/>
                 <el-table-column prop="created_at" width="170" :label="$t('common.published_at')"/>
                 <el-table-column width="100" align="right" :label="$t('common.option')">

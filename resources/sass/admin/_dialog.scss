@@ -1,39 +1,45 @@
 .media-dialog {
-    line-height: 1.5;
-
-    .el-dialog {
-        left: 40px;
-        top: 40px;
-        right: 40px;
-        width: auto;
-        position: absolute;
-        margin: 0 !important;
-        display: flex;
-        flex-direction: column;
-    }
+    left: 40px;
+    top: 40px;
+    right: 40px;
+    bottom: 40px;
+    width: auto;
+    position: absolute;
+    margin: 0 !important;
+    display: flex;
+    flex-direction: column;
 
     .el-dialog__body {
         flex: 1;
-        padding-top: 0;
-        padding-bottom: 0;
+        padding: 0 !important;
+        overflow-y: hidden;
+
+        .el-tabs {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .el-tabs__header {
+            margin-bottom: 0;
+        }
+
+        .el-tabs__nav-wrap{
+            padding-left: 20px;
+        }
+
+        .el-tabs__content {
+            height: 100%;
+            flex: 1;
+        }
+
+        .el-tab-pane{
+            height: 100%;
+        }
     }
 
-    .el-tabs__content {
-        height: 100%;
-    }
-
-    .el-tabs__header {
-        margin-bottom: 0;
-    }
-
-    .el-tabs__item {
-        padding: 0 10px;
-    }
-
-    .action-bar {
+    .el-dialog__footer{
         border-top: 1px solid #CCCCCC;
-        padding: 15px 0;
-        text-align: right;
     }
 
     .media {
@@ -55,17 +61,16 @@
 
         &-flexbox {
             display: flex;
+            height: 100%;
         }
 
         &-container {
             flex: 1;
+            height: 100%;
             display: block;
-            min-height: 400px;
-            max-height: 500px;
             overflow-y: auto;
             overflow-x: hidden;
-            padding-right: 10px;
-            padding-top: 10px;
+            padding: 15px;
         }
 
         &-search-input {
@@ -184,8 +189,10 @@
 
             .media {
                 &-preview {
-                    width: 140px;
-                    height: 140px;
+                    width: 100%;
+                    max-width: 100%;
+                    height: auto;
+                    max-height: 300px;
                     object-fit: cover;
                     display: block;
                     margin-bottom: 5px;

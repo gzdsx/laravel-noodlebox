@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\ProductItem;
+use App\Models\Product;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ProductItemPolicy
@@ -19,10 +19,10 @@ class ProductItemPolicy
      * Determine whether the user can view the item.
      *
      * @param \App\Models\User $user
-     * @param \App\Models\ProductItem $productItem
+     * @param \App\Models\Product $productItem
      * @return mixed
      */
-    public function view(User $user, ProductItem $productItem)
+    public function view(User $user, Product $productItem)
     {
         if ($user->isAdmin()) {
             return true;
@@ -32,7 +32,7 @@ class ProductItemPolicy
             return true;
         }
 
-        return $user->uid == $productItem->uid;
+        return $user->id == $productItem->id;
     }
 
     /**
@@ -50,38 +50,38 @@ class ProductItemPolicy
      * Determine whether the user can update the item.
      *
      * @param \App\Models\User $user
-     * @param \App\Models\ProductItem $productItem
+     * @param \App\Models\Product $productItem
      * @return mixed
      */
-    public function update(User $user, ProductItem $productItem)
+    public function update(User $user, Product $productItem)
     {
-        return $user->uid == $productItem->uid;
+        return $user->id == $productItem->id;
     }
 
     /**
      * Determine whether the user can delete the item.
      *
      * @param \App\Models\User $user
-     * @param \App\Models\ProductItem $productItem
+     * @param \App\Models\Product $productItem
      * @return mixed
      */
-    public function delete(User $user, ProductItem $productItem)
+    public function delete(User $user, Product $productItem)
     {
         if ($user->isAdmin()) {
             return true;
         }
 
-        return $user->uid == $productItem->uid;
+        return $user->id == $productItem->id;
     }
 
     /**
      * @param User $user
-     * @param ProductItem $productItem
+     * @param Product $productItem
      * @return bool
      */
-    public function buy(User $user, ProductItem $productItem)
+    public function buy(User $user, Product $productItem)
     {
-        if ($user->uid == $productItem->uid) {
+        if ($user->id == $productItem->id) {
             return false;
         }
 
