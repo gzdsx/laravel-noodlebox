@@ -122,7 +122,7 @@ export default [
                 isLink: false
             },
             {
-                name: '产品变量',
+                name: '常用变量',
                 path: '/product/variations',
                 isLink: false
             },
@@ -130,7 +130,27 @@ export default [
                 name: '门店管理',
                 path: '/shop/list',
                 isLink: false
-            }
+            },
+            {
+                name: '配送区域',
+                path: '/shipping-zone/list',
+                isLink: false
+            },
+            {
+                name: '订单管理',
+                path: '/order/list',
+                isLink: false
+            },
+            {
+                name: '配送员管理',
+                path: '/deliveryers',
+                isLink: false
+            },
+            {
+                name: '照片墙',
+                path: '/photo-wall',
+                isLink: false
+            },
         ]
     },
     {

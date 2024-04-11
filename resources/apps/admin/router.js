@@ -26,11 +26,11 @@ router.addRoutes(PageRoutes);
 const PostRoutes = require('./post/routes');
 router.addRoutes(PostRoutes);
 
-const ProductRoutes = require('./product/routes');
-router.addRoutes(ProductRoutes);
+const EcommerceRoutes = require('./ecommerce/routes');
+router.addRoutes(EcommerceRoutes);
 
-const ShopRoutes = require('./shop/routes');
-router.addRoutes(ShopRoutes);
+const TradeRoutes = require('./trade/routes');
+router.addRoutes(TradeRoutes);
 
 router.addRoutes([
     {

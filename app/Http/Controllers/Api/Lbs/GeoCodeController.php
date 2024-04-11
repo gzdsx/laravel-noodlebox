@@ -23,7 +23,7 @@ class GeoCodeController extends BaseController
             return json_success($result['geocodes'] ?? []);
         }
 
-        return json_fail($result['info'], $result['infocode'] ?? 500);
+        return json_error($result['info'], $result['infocode'] ?? 500);
     }
 
     /**
@@ -50,6 +50,6 @@ class GeoCodeController extends BaseController
             return json_success($result['regeocode'] ?? []);
         }
 
-        return json_fail($result['info'], $result['infocode'] ?? 500);
+        return json_error($result['info'], $result['infocode'] ?? 500);
     }
 }

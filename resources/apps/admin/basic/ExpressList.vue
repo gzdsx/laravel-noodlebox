@@ -61,7 +61,7 @@ export default {
     methods: {
         fetchList() {
             ApiService.get('/expresses').then(response => {
-                this.dataList = response.result.items;
+                this.dataList = response.data.items;
             });
         },
         onDelete() {

@@ -86,7 +86,7 @@ export default {
         fetchData() {
             let {id} = this.$route.params;
             ApiService.get('/blocks/' + id).then(response => {
-                this.block = response.result;
+                this.block = response.data;
             }).catch(reason => {
                 this.$message.error(reason.message);
             });

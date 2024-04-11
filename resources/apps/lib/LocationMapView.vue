@@ -82,9 +82,9 @@
             },
             getLocation(params) {
                 this.$get('/lbs/geocoder', params).then(response => {
-                    let {address_component} = response.result;
-                    let {adcode} = response.result.ad_info;
-                    let {lat, lng} = response.result.location;
+                    let {address_component} = response.data;
+                    let {adcode} = response.data.ad_info;
+                    let {lat, lng} = response.data.location;
                     let {province, city, district, street_number} = address_component;
                     this.value = province + city + district + street_number;
                     this.position = {

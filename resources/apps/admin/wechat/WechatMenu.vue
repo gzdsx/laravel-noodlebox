@@ -192,12 +192,12 @@ export default {
     methods: {
         fetchList() {
             this.$get('/wechat/menus').then(response => {
-                this.items = response.result.items;
+                this.items = response.data.items;
             });
         },
         fetchTypes() {
             this.$get('/wechat/menu/types').then(response => {
-                this.types = response.result.items;
+                this.types = response.data.items;
             });
         },
         onSubmit() {
@@ -252,8 +252,8 @@ export default {
                 type: 'warning'
             }).then(() => {
                 this.$post('/wechat/menu/apply').then(response => {
-                    if (response.result.errcode) {
-                        this.$message.error(response.result.errmsg);
+                    if (response.data.errcode) {
+                        this.$message.error(response.data.errmsg);
                     } else {
                         this.$message.success('菜单应用成功');
                     }

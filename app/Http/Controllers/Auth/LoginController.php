@@ -43,7 +43,7 @@ class LoginController extends Controller
     public function index(Request $request)
     {
         session(['redirect' => $request->input('redirect', url()->previous())]);
-        return $this->view('auth.login');
+        return view('auth.login');
     }
 
     /**

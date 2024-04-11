@@ -25,7 +25,7 @@ trait UserRegister
 
     protected function redirectTo()
     {
-        return '/user';
+        return '/home';
     }
 
     /**
@@ -37,8 +37,8 @@ trait UserRegister
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'phone' => 'bail|required|string|phone|unique:user',
             'nickname' => 'bail|required|string|nickname',
+            'email' => 'bail|required|string|email|unique:user',
             'password' => 'bail|required|string|pwd',
         ]);
     }

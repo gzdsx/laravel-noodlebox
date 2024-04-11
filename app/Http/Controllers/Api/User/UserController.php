@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\User;
 
 
 use App\Http\Controllers\Api\BaseController;
-use App\Models\UserFans;
 use App\Traits\RestApis\UserApis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

@@ -118,6 +118,8 @@
 </template>
 
 <script>
+    import ApiService from "../utils/ApiService";
+
     export default {
         name: "AdminIndex",
         data() {
@@ -134,18 +136,18 @@
             }
         },
         mounted() {
-            this.$get('/dashboard/posts').then(response => {
-                this.postList = response.result.items;
+            ApiService.get('/posts?limit=5').then(response => {
+                this.postList = response.data.items;
             });
 
-            this.$get('/dashboard/users').then(response => {
-                this.userList = response.result.items;
+            ApiService.get('/users?limit=10').then(response => {
+                this.userList = response.data.items;
             });
 
             this.$get('/dashboard/stats').then(response => {
                 this.stats = {
                     ...this.stats,
-                    ...response.result
+                    ...response.data
                 };
             });
         },

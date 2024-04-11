@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Basic;
 
-use App\Http\Controllers\Admin\BaseController;
+use App\Http\Controllers\Api\BaseController;
 use App\Models\Kefu;
 use Illuminate\Http\Request;
 

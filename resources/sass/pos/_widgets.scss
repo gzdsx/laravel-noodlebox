@@ -1,0 +1,16 @@
+@keyframes spinner-rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.gzdsx-pos-spinner{
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    vertical-align: -.125em;
+    border: 3px solid #999;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: .75s linear infinite spinner-rotate;
+}

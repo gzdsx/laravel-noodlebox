@@ -70,8 +70,8 @@ export default {
             this.$router.replace('/login');
         },
         selectLang(lang) {
-            ApiService.get('/langs/messages/' + lang).then(response => {
-                const {locale, messages} = response.result;
+            ApiService.get('/locale/messages/' + lang).then(response => {
+                const {locale, messages} = response.data;
                 this.$i18n.setLocaleMessage('locale', messages);
                 this.curLang = this.languages[lang];
             });
@@ -81,12 +81,12 @@ export default {
         this.curLang = this.languages[this.$lang];
         if (AuthService.getToken()) {
             ApiService.get('/user/info').then(response => {
-                this.$store.commit('signin', response.result);
+                this.$store.commit('signin', response.data);
             });
         }
 
-        ApiService.get('/langs/locale').then(response => {
-            this.$lang = response.result;
+        ApiService.get('/locale').then(response => {
+            this.$lang = response.data;
             this.curLang = this.languages[this.$lang];
         });
     }

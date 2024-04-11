@@ -26,4 +26,6 @@ class ProductMeta extends Model
     protected $table = 'product_meta';
     protected $primaryKey = 'meta_id';
     protected $fillable = ['product_id', 'meta_key', 'meta_value'];
+
+    public $timestamps = false;
 }

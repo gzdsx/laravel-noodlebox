@@ -93,12 +93,12 @@ export default {
         fetchList() {
             let {cate_id} = this;
             ApiService.get('/links?cate_id=' + cate_id).then(response => {
-                this.dataList = response.result.items;
+                this.dataList = response.data.items;
             });
         },
         fetchCategoryList() {
             ApiService.get('/links?type=category').then(response => {
-                this.categoryList = this.categoryList.concat(response.result.items);
+                this.categoryList = this.categoryList.concat(response.data.items);
             });
         },
         onSelectionChange(val) {

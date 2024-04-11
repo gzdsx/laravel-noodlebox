@@ -63,13 +63,13 @@ export default {
             let {uid} = this.$route.params;
             if (uid) {
                 UserService.getUser(uid).then(response => {
-                    this.user = response.result;
+                    this.user = response.data;
                 });
             }
         },
         fetchGroupList() {
             UserService.listGroups().then(response => {
-                this.groupList = response.result.items;
+                this.groupList = response.data.items;
             });
         },
         onSubmit() {
@@ -79,9 +79,8 @@ export default {
                 return false;
             }
 
-            let {uid} = user;
-            if (uid) {
-                UserService.updateUser(uid, user).then(() => {
+            if (user.id) {
+                UserService.updateUser(user.id, user).then(() => {
                     this.$message.success(this.$t('user.updated'));
                 }).catch(reason => {
                     this.$message.error(reason.message);
@@ -89,7 +88,7 @@ export default {
             } else {
                 UserService.storeUser(user).then(res => {
                     this.$message.success(this.$t('user.saved'));
-                    this.$router.replace('/user/edit/' + res.result.uid);
+                    this.$router.replace('/user/edit/' + res.data.uid);
                 }).catch(reason => {
                     this.$message.error(reason.message);
                 });

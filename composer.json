@@ -1,5 +1,5 @@
 {
-    "name": "gzdsx/laravel-sterling",
+    "name": "gzdsx/laravel-noodlebox",
     "description": "The Shop With Laravel Framework.",
     "keywords": [
         "framework",
@@ -12,6 +12,7 @@
         "ext-bcmath": "*",
         "ext-curl": "*",
         "ext-exif": "*",
+        "ext-fileinfo": "*",
         "ext-gd": "*",
         "ext-json": "*",
         "ext-libxml": "*",
@@ -28,7 +29,9 @@
         "jpush/jpush": "^3.6",
         "laravel/framework": "^8.6",
         "laravel/passport": "^10.0",
+        "laravel/sanctum": "^2.15",
         "laravel/scout": "^9.8",
+        "laravel/socialite": "^5.12",
         "laravel/tinker": "^2.0",
         "lcobucci/jwt": "3.3.3",
         "maatwebsite/excel": "^3.0",
@@ -39,8 +42,7 @@
         "predis/predis": "^1.1",
         "simplesoftwareio/simple-qrcode": "^2.0",
         "tanmuhittin/laravel-google-translate": "^2.2",
-        "tucker-eric/eloquentfilter": "^2.2",
-        "ext-fileinfo": "*"
+        "tucker-eric/eloquentfilter": "^2.2"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.7",
@@ -92,14 +94,13 @@
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "easywechat-composer/easywechat-composer": true
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "repositories": {
-        "packagist": {
-            "type": "composer",
-            "url": "https://mirrors.aliyun.com/composer/"
-        }
     }
 }

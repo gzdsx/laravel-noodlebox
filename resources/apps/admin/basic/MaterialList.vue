@@ -174,7 +174,7 @@ export default {
         },
         fetchTypes() {
             MaterialService.get('types').then(res => {
-                this.types = res.result;
+                this.types = res.data;
             });
         }
     },

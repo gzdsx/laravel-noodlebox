@@ -739,7 +739,7 @@ return (function( root, factory ) {
             reset: 'reset'
         }, function( fn, command ) {
             Uploader.prototype[ fn ] = function() {
-                return this.request( command, arguments );
+                return this.httpClient( command, arguments );
             };
         });
     
@@ -1450,7 +1450,7 @@ return (function( root, factory ) {
             init: function( opts ) {
     
                 if ( !opts.dnd ||
-                        this.request('predict-runtime-type') !== 'html5' ) {
+                        this.httpClient('predict-runtime-type') !== 'html5' ) {
                     return;
                 }
     
@@ -1542,7 +1542,7 @@ return (function( root, factory ) {
             init: function( opts ) {
     
                 if ( !opts.paste ||
-                        this.request('predict-runtime-type') !== 'html5' ) {
+                        this.httpClient('predict-runtime-type') !== 'html5' ) {
                     return;
                 }
     
@@ -2190,7 +2190,7 @@ return (function( root, factory ) {
             makeThumb: function( file, cb, width, height ) {
                 var opts, image;
     
-                file = this.request( 'get-file', file );
+                file = this.httpClient( 'get-file', file );
     
                 // 只预览图片格式。
                 if ( !file.type.match( /^image/ ) ) {
@@ -2253,7 +2253,7 @@ return (function( root, factory ) {
                     noCompressIfLarger = opts && opts.noCompressIfLarger || false,
                     image, deferred;
     
-                file = this.request( 'get-file', file );
+                file = this.httpClient( 'get-file', file );
     
                 // 只压缩 jpeg 图片格式。
                 // gif 可能会丢失针
@@ -2812,7 +2812,7 @@ return (function( root, factory ) {
     
                 // 如果当前不是html5运行时，那就算了。
                 // 不执行后续操作
-                if ( this.request('predict-runtime-type') !== 'html5' ) {
+                if ( this.httpClient('predict-runtime-type') !== 'html5' ) {
                     return;
                 }
     
@@ -2971,7 +2971,7 @@ return (function( root, factory ) {
     
                 file = file.id ? file : me.queue.getFile( file );
     
-                this.request( 'cancel-file', file );
+                this.httpClient( 'cancel-file', file );
     
                 if ( remove ) {
                     this.queue.removeFile( file );
@@ -3439,7 +3439,7 @@ return (function( root, factory ) {
             },
     
             reset: function() {
-                this.request( 'stop-upload', true );
+                this.httpClient( 'stop-upload', true );
                 this.runing = false;
                 this.pool = [];
                 this.stack = [];
@@ -3614,7 +3614,7 @@ return (function( root, factory ) {
              * })
              */
             cancelFile: function( file ) {
-                file = file.id ? file : this.request( 'get-file', file );
+                file = file.id ? file : this.httpClient( 'get-file', file );
     
                 // 如果正在上传。
                 file.blocks && $.each( file.blocks, function( _, v ) {
@@ -3642,7 +3642,7 @@ return (function( root, factory ) {
             },
     
             _getStats: function() {
-                return this.request('get-stats');
+                return this.httpClient('get-stats');
             },
     
             /**
@@ -3652,7 +3652,7 @@ return (function( root, factory ) {
              * @for  Uploader
              */
             skipFile: function( file, status ) {
-                file = file.id ? file : this.request( 'get-file', file );
+                file = file.id ? file : this.httpClient( 'get-file', file );
     
                 file.setStatus( status || Status.COMPLETE );
                 file.skipped = true;
@@ -4413,7 +4413,7 @@ return (function( root, factory ) {
                 var md5 = new Md5(),
                     deferred = Base.Deferred(),
                     blob = (file instanceof Blob) ? file :
-                        this.request( 'get-file', file ).source;
+                        this.httpClient( 'get-file', file ).source;
     
                 md5.on( 'progress load', function( e ) {
                     e = e || {};

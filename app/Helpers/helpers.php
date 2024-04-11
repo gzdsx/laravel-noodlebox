@@ -224,30 +224,34 @@ function is_wechat()
 }
 
 /**
- * @param array $result
- * @param string $description
+ * @param $data
+ * @param $options
  * @return \Illuminate\Http\JsonResponse
  */
-function json_success($result = [], $description = '')
+function json_success($data = [], $options = 0)
 {
     return response()->json([
-        'result' => $result,
-        'status' => [
-            'code' => 0,
-            'message' => 'ok',
-            'description' => $description
-        ]
-    ]);
+        'code' => 0,
+        'data' => $data
+    ], 200, [], $options);
 }
 
-function json_fail($message, $code = 500, $errors = null)
+/**
+ * @param $message
+ * @param $code
+ * @param $errors
+ * @return \Illuminate\Http\JsonResponse
+ */
+function json_error($message, $code = 500, $errors = null)
 {
-    $result = [
+    $response = [
         'code' => $code,
-        'message' => $message
+        'message' => $message,
     ];
-    if ($errors) $result['errors'] = $errors;
-    return response()->json($result);
+    if ($errors) {
+        $response['errors'] = $errors;
+    }
+    return response()->json($response, $code, [], JSON_UNESCAPED_UNICODE);
 }
 
 require __DIR__ . '/hooks.php';

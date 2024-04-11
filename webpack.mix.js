@@ -38,14 +38,22 @@ mix.vue({version: 2});
  */
 
 mix.js('resources/js/vue.js', 'public/lib/vue/vue-chunk.js');
-mix.js('resources/js/runtime.js', 'public/dist');
-
 //h5
-// mix.js('resources/apps/h5/index.js', 'public/dist/h5');
+mix.js('resources/apps/h5/index.js', 'public/dist/h5');
 //后台
 mix.js('resources/apps/admin/app.js', 'public/dist/admin').vue();
+mix.js('resources/apps/home/app.js', 'public/dist/home').vue();
+mix.js('resources/apps/web/runtime.js', 'public/dist/web').vue();
+mix.js('resources/apps/web/cart.js', 'public/dist/web').vue();
+mix.js('resources/apps/web/metabox.js', 'public/dist/web').vue();
+mix.js('resources/apps/web/orders.js', 'public/dist/web').vue();
+mix.js('resources/apps/web/checkout.js', 'public/dist/web').vue();
+mix.js('resources/apps/pos/index.js', 'public/dist/pos').vue();
 //sass
 mix.sass('resources/sass/bootstrap.scss', 'public/lib/bootstrap/bootstrap.min.css');
 // mix.sass('resources/sass/element-ui.scss', 'public/lib/element');
 mix.sass('resources/sass/admin/index.scss', 'public/dist/admin');
 mix.sass('resources/sass/web/index.scss', 'public/dist/web');
+mix.sass('resources/sass/home/index.scss', 'public/dist/home');
+mix.sass('resources/sass/h5/index.scss', 'public/dist/h5');
+mix.sass('resources/sass/pos/index.scss', 'public/dist/pos');

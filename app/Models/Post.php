@@ -43,7 +43,6 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PostComment> $comments
  * @property-read int|null $comments_count
  * @property-read \App\Models\PostContent|null $content
- * @property-read mixed $format_des
  * @property-read \Illuminate\Support\Collection $meta_data
  * @property-read mixed $status_des
  * @property-read \Illuminate\Contracts\Routing\UrlGenerator|string $url

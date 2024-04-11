@@ -1,99 +1,65 @@
-@extends('layouts.auth')
+@extends('layouts.default')
+
+@section('body-class','auth')
+@section('title', trans('Login'))
 
 @section('content')
-    <div class="login-wrapper">
-        <div class="area align-center">
-            <div class="login-form">
-                <div class="login-form-inner">
-                    <div class="login-tabs" id="login-tabs">
-                        <div class="login-tab-item login-tab-active">账号登录</div>
-                        <div class="login-tab-item">扫码登录</div>
-                    </div>
-                    <div id="login-contents">
-                        <div class="login-type">
-                            <form method="post">
-                                @csrf
-                                <div class="login-form-group">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <div class="btn btn-default">
-                                                <div class="iconfont icon-people"></div>
-                                            </div>
-                                        </div>
-                                        <input type="text" name="account"
-                                               class="form-control textinput{{$errors->has('account') ? ' is-invalid' : ''}}"
-                                               placeholder="手机号/邮箱" required="required">
-                                        @if ($errors->has('account'))
-                                            <div class="invalid-feedback show"
-                                                 role="alert">{{$errors->first('account')}}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="login-form-group">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <div class="btn btn-default">
-                                                <div class="iconfont icon-lock"></div>
-                                            </div>
-                                        </div>
-                                        <input type="password" name="password"
-                                               class="form-control textinput{{$errors->has('password') ? ' is-invalid' : ''}}"
-                                               placeholder="登录密码" required="required">
-                                        @if ($errors->has('password'))
-                                            <div class="invalid-feedback show"
-                                                 role="alert">{{$errors->first('password')}}</div>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="login-form-group">
-                                    <button type="submit" class="btn btn-danger btn-login">登录</button>
-                                </div>
-                                <div class="login-form-links">
-                                    <div class="float-right"><a href="{{route('register')}}">注册账号</a></div>
-                                    <div class="float-left"><a href="{{route('password.request')}}">忘记密码?</a></div>
-                                </div>
-                            </form>
+    <section class="page-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col col-md-4">
+                    <h1 class="text-center auth-form-header">{{__('Welcome back')}}</h1>
+                    <form method="post" class="auth-form">
+                        @csrf
+                        <div class="form-group">
+                            <input type="text" name="account"
+                                   class="form-control form-control-lg{{$errors->has('account') ? ' is-invalid' : ''}}"
+                                   placeholder="{{__('Account')}}" required="required">
+                            @if ($errors->has('account'))
+                                <div class="invalid-feedback show"
+                                     role="alert">{{$errors->first('account')}}</div>
+                            @endif
                         </div>
+                        <div class="form-group">
+                            <input type="password" name="password"
+                                   class="form-control form-control-lg{{$errors->has('password') ? ' is-invalid' : ''}}"
+                                   placeholder="{{__('Password')}}" required="required">
+                            @if ($errors->has('password'))
+                                <div class="invalid-feedback show"
+                                     role="alert">{{$errors->first('password')}}</div>
+                            @endif
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-danger btn-lg btn-block">{{__('Login')}}</button>
+                        </div>
+                        <div class="auth-form-links">
+                            <a href="{{route('password.request')}}">{{__('Forget password')}}?</a>
+                            <span>or</span>
+                            <a href="{{route('register')}}">{{__('Registration')}}</a>
+                        </div>
+                    </form>
 
-                        <div class="login-type" style="display: none;">
-                            <img src="{{url('login/appcode')}}" alt=""/>
-                        </div>
+                    <div class="blank-1"></div>
+                    <div class="auth-or">
+                        <span>OR</span>
                     </div>
 
+                    <div class="auth-socials">
+                        <a href="{{url('auth/google')}}">
+                            <i class="bi bi-google"></i>
+                        </a>
+                        <a href="{{url('auth/facebook')}}">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="{{url('auth/github')}}">
+                            <i class="bi bi-github"></i>
+                        </a>
+                        <a href="{{url('auth/twitter')}}">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-@stop
-
-@section('foot')
-    <script type="text/javascript">
-        var timer = null;
-
-        function polling() {
-            $.ajax({
-                url: '/login/chklogin',
-                dataType: 'json',
-                success: function (res) {
-                    if (res.result.user) {
-                        clearTimeout(timer);
-                        window.location.href = '/biz';
-                    } else {
-                        timer = setTimeout(polling, 1000);
-                    }
-                }
-            });
-        }
-
-        $("#login-tabs>.login-tab-item").click(function () {
-            $(this).addClass('login-tab-active').siblings().removeClass('login-tab-active');
-            $("#login-contents>div").eq($(this).index()).show().siblings().hide();
-
-            if ($(this).index() === 1) {
-                polling();
-            } else {
-
-            }
-        });
-    </script>
+    </section>
 @stop

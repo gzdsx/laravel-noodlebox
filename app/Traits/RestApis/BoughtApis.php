@@ -1,0 +1,143 @@
+<?php
+/**
+ * ============================================================================
+ * Copyright (c) 2015-2019 贵州大师兄信息技术有限公司 All rights reserved.
+ * siteַ: http://www.dsxcms.com
+ * ============================================================================
+ * @author:     David Song<songdewei@163.com>
+ * @version:    v1.0.0
+ * ---------------------------------------------
+ * Date: 2019-06-23
+ * Time: 13:57
+ */
+
+namespace App\Traits\RestApis;
+
+
+use App\Models\Order;
+use App\Models\OrderItem;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+trait BoughtApis
+{
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|Order
+     */
+    protected function repository()
+    {
+        return Auth::user()->boughts()->withGlobalScope('avalaible', function (Builder $builder) {
+            return $builder->where('buyer_deleted', 0);
+        });
+    }
+
+    /**
+     * 批量获取订单信息
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index(Request $request)
+    {
+        $query = $this->repository()->filter($request->all());
+        $total = $query->count();
+        $items = $query->with(['items'])->offset($request->input('offset', 0))
+            ->limit($request->input('limit', 10))->orderByDesc('order_id')->get();
+
+        return json_success([
+            'total' => $total,
+            'items' => $items
+        ]);
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show($id)
+    {
+        $model = $this->repository()->findOrFail($id);
+        $model->load(['items', 'shipping', 'seller', 'transaction', 'discounts']);
+
+        return json_success($model);
+    }
+
+    /**
+     * 取消订单
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cancel(Request $request)
+    {
+        $order = $this->repository()->findOrFail($request->input('order_id'));
+        $order->fill(['cancel_reason' => $request->input('reason')])->markAsCancelled();
+        event(new OrderCancelled($order));
+
+        return json_success();
+    }
+
+    /**
+     * 提醒卖家发货
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function notice(Request $request)
+    {
+        $order = $this->repository()->findOrFail($request->input('order_id'));
+
+        return json_success();
+    }
+
+    /**
+     * 确认订单
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function confirm(Request $request)
+    {
+        $order = $this->repository()->findOrFail($request->input('order_id'));
+        //if ($order->isShipped()) {
+        $order->markAsReceived();
+        event(new OrderConfirmed($order));
+        //}
+
+        return json_success();
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function delete(Request $request)
+    {
+        $order = $this->repository()->findOrFail($request->input('order_id'));
+        $order->buyer_deleted = 1;
+        $order->save();
+
+        return json_success();
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getTradeDetail(Request $request)
+    {
+        $trade = OrderItem::find($request->input('trade_id'));
+
+        return json_success($trade);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getTradeList(Request $request)
+    {
+        $order = $this->repository()->findOrFail($request->input('order_id'));
+
+        return json_success([
+            'total' => $order->items()->count(),
+            'items' => $order->items
+        ]);
+    }
+}

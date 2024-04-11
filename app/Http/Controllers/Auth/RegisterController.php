@@ -26,7 +26,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/user';
+    protected $redirectTo = '/home';
 
     /**
      * Create a new controller instance.
@@ -41,6 +41,6 @@ class RegisterController extends Controller
 
     public function index()
     {
-        return $this->view('auth.register');
+        return view('auth.register');
     }
 }

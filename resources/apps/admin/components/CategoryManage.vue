@@ -103,7 +103,7 @@ export default {
         fetchList() {
             let {taxonomy} = this;
             CategoryService.list({taxonomy}).then(response => {
-                this.categories = response.result.items;
+                this.categories = response.data.items;
                 this.cascaderOptions = CategoryService.generateCascaderOptions(this.categories);
             });
         },

@@ -1,14 +1,29 @@
 html, body {
-    overflow-x: hidden;
+    overflow-x: hidden !important;
     font-family: Montserrat, sans-serif !important;
 }
 
-@media (min-width: 1200px) {
-    .container-1400 {
-        max-width: 1400px !important;
-    }
+a{
+    cursor: pointer;
 }
 
 img, video {
     object-fit: cover;
+}
+
+.main{
+    min-height: 500px;
+    overflow-x: hidden;
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1400px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .side-right{
+        display: none !important;
+    }
 }

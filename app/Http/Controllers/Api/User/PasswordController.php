@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use function App\Http\Controllers\Api\User\jsonError;
 
 class PasswordController extends BaseController
 {
@@ -21,7 +20,7 @@ class PasswordController extends BaseController
         $newpassword = $request->input('newpassword');
         $user = Auth::user();
         if (!Hash::check($oldpassword, $user->getAuthPassword())) {
-            return jsonError(600, trans('user.old password input incorrect'));
+            return json_error(trans('user.old password input incorrect'));
         }
         $user->password = bcrypt($newpassword);
         $user->save();

@@ -14,8 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id 用户ID
  * @property string|null $appid APPID
  * @property string|null $platform 平台
- * @property string|null $unionid UnionID
  * @property string|null $openid 开放ID
+ * @property string|null $unionid UnionID
  * @property string|null $nickname 昵称
  * @property int $gender 性别
  * @property string|null $city 城市

@@ -68,8 +68,8 @@
                     type: this.type,
                     offset: this.offset
                 }).then(response => {
-                    this.items = response.result.items;
-                    this.total = response.result.total;
+                    this.items = response.data.items;
+                    this.total = response.data.total;
                 });
             },
             handleSelectionChange (val) {

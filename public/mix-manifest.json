@@ -1,8 +1,18 @@
 {
     "/lib/vue/vue-chunk.js": "/lib/vue/vue-chunk.js",
-    "/dist/runtime.js": "/dist/runtime.js",
+    "/dist/h5/index.js": "/dist/h5/index.js",
     "/dist/admin/app.js": "/dist/admin/app.js",
+    "/dist/home/app.js": "/dist/home/app.js",
+    "/dist/web/runtime.js": "/dist/web/runtime.js",
+    "/dist/web/cart.js": "/dist/web/cart.js",
+    "/dist/web/metabox.js": "/dist/web/metabox.js",
+    "/dist/web/orders.js": "/dist/web/orders.js",
+    "/dist/web/checkout.js": "/dist/web/checkout.js",
+    "/dist/pos/index.js": "/dist/pos/index.js",
+    "/dist/home/index.css": "/dist/home/index.css",
     "/dist/web/index.css": "/dist/web/index.css",
     "/dist/admin/index.css": "/dist/admin/index.css",
-    "/lib/bootstrap/bootstrap.min.css": "/lib/bootstrap/bootstrap.min.css"
+    "/lib/bootstrap/bootstrap.min.css": "/lib/bootstrap/bootstrap.min.css",
+    "/dist/pos/index.css": "/dist/pos/index.css",
+    "/dist/h5/index.css": "/dist/h5/index.css"
 }

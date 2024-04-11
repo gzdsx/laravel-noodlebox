@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Wechat;
 
-use App\Http\Controllers\Admin\BaseController;
+use App\Http\Controllers\Api\BaseController;
 use App\Traits\WeChat\WechatDefaultConfig;
 use Illuminate\Http\Request;
 

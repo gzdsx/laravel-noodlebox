@@ -179,7 +179,7 @@ export default {
         fetchList() {
             let {menu_id} = this.$route.params;
             ApiService.get('/menus/' + menu_id).then(response => {
-                let {menu, items} = response.result;
+                let {menu, items} = response.data;
                 this.menu = menu;
                 this.dataList = items;
             });

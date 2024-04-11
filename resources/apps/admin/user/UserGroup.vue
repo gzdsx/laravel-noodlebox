@@ -70,7 +70,7 @@ export default {
         fetchList() {
             this.loading = true;
             UserService.listGroups().then((response) => {
-                this.dataList = response.result.items;
+                this.dataList = response.data.items;
                 this.loading = false;
             });
         },

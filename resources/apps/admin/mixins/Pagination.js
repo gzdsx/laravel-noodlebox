@@ -28,7 +28,7 @@ export default {
                     limit: pageSize
                 }
             }).then(response => {
-                let {total, items} = response.result;
+                let {total, items} = response.data;
                 this.total = total;
                 this.dataList = items;
                 this.onFinish(response);

@@ -14,14 +14,16 @@
                 <h3 class="font-weight-bold text-center text-safety-orange">
                     Choose The Shop Closest To You
                 </h3>
-                <a href="{{url('shop')}}" class="home-btn">
-                    <i class="bi bi-basket"></i>
-                    <span>DROGHEDA SHOP</span>
-                </a>
-                <a href="{{url('points-mall')}}" class="home-btn btn-points-mall">
-                    <i class="bi bi-gift"></i>
-                    <span>POINTS MALL</span>
-                </a>
+                <div class="col col-md-6">
+                    <a href="{{url('shop')}}" class="home-btn">
+                        <i class="bi bi-basket"></i>
+                        <span>DROGHEDA SHOP</span>
+                    </a>
+                    <a href="{{url('points-mall')}}" class="home-btn btn-points-mall">
+                        <i class="bi bi-gift"></i>
+                        <span>POINTS MALL</span>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -31,11 +33,13 @@
                     class="absolute-fill" frameborder="0" style="border: 0; pointer-events: none;" allowfullscreen=""
                     aria-hidden="false" tabindex="0"></iframe>
         </div>
-        <div class="action-buttons">
-            <a href="" class="home-btn">
-                <i class="bi bi-hand-index"></i>
-                <span> Order From DROGHEDA SHOP</span>
-            </a>
+        <div class="col col-md-6">
+            <div class="action-buttons">
+                <a href="{{url('/')}}" class="home-btn">
+                    <i class="bi bi-hand-index"></i>
+                    <span> Order From DROGHEDA SHOP</span>
+                </a>
+            </div>
         </div>
     </section>
 @endsection

@@ -59,6 +59,15 @@ class ProductFilter extends ModelFilter
     }
 
     /**
+     * @param $tag
+     * @return ProductFilter
+     */
+    public function tag($tag)
+    {
+        return $this->where('keywords', 'like', "%$tag%");
+    }
+
+    /**
      * @param $uid
      * @return ProductFilter
      */

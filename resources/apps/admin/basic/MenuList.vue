@@ -56,7 +56,7 @@ export default {
     methods: {
         fetchList() {
             ApiService.get('/menus').then(response => {
-                this.dataList = response.result.items;
+                this.dataList = response.data.items;
             });
         },
         resetData() {

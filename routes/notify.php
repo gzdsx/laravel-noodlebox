@@ -12,7 +12,5 @@
  */
 
 Route::group(['namespace' => 'Notify'], function () {
-    Route::namespace('Buildium')->prefix('buildium')->group(function () {
-        Route::any('webhooks', 'WebhooksController@index');
-    });
+    Route::any('paypal/webhooks', 'PaypalController@webhooks');
 });

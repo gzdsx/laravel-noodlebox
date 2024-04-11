@@ -41,7 +41,6 @@
     </script>
 
     @php
-        $categories = get_categories(['taxonomy'=>'product','excludes'=>[15]]);
         $products = cache()->rememberForever('front-products',function (){
             return get_products(['status'=>'onsale','limit'=>1000])->groupBy(function ($item,$key){
                 if ($item->categories->count() > 0){
@@ -54,14 +53,17 @@
     @endphp
     <section class="page-section">
         <div class="container-fluid">
-            <h5 class="text-center text-white">What happens when fresh ingredients meet the fiery theatre of the
-                wok?</h5>
             <h5 class="text-center text-turquoise font-weight-bold">What happens when fresh ingredients meet the fiery
                 theatre of the wok?</h5>
             <div class="product-category-circles">
                 @foreach($categories as $category)
                     <div class="category-item">
-                        <img src="{{$category->image}}" alt="">
+                        <div class="category-item__icon">
+                            <a href="{{$category->url}}">
+                                <img src="{{$category->image}}" alt="">
+                            </a>
+                        </div>
+                        <div class="category-item__title">{{$category->name}}</div>
                     </div>
                 @endforeach
             </div>
@@ -82,7 +84,7 @@
                                     <div class="product-item">
                                         <div class="product-item__image">
                                             <a href="{{$product->url}}">
-                                                <img src="{{$product->image}}" class="absolute-fill" alt="">
+                                                <img src="{{asset('images/noodlebox/placeholder.png')}}" data-src="{{$product->image}}" class="absolute-fill" alt="">
                                             </a>
                                         </div>
                                         <div class="product-item__ctx">
@@ -92,7 +94,7 @@
                                                 {{$product->price}}
                                             </div>
                                             <div>
-                                                <a class="btn btn-danger">Add Order</a>
+                                                <a class="btn btn-danger add-to-cart" data-id="{{$product->id}}">Add Order</a>
                                             </div>
                                         </div>
                                     </div>

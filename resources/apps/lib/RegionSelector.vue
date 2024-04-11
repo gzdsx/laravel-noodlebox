@@ -29,7 +29,7 @@
                         const {level} = node;
                         const fid = node.root ? 0 : node.data.id;
                         self.$get('/district/list', {fid}).then(response => {
-                            const items = response.result.items.map((o) => ({
+                            const items = response.data.items.map((o) => ({
                                 ...o,
                                 leaf: level >= 2
                             }));

@@ -3,6 +3,24 @@
     padding-bottom: 2rem;
     color: #ffffff;
 
+    &-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .our-providers {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 10px;
+
+        img {
+            height: 38px;
+            display: inline-block;
+        }
+    }
+
     .social-icons {
         display: flex;
         column-gap: 10px;
@@ -19,7 +37,14 @@
     }
 
     .copyright {
-        text-align: right;
+        text-align: center;
         color: #f5f5f5;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-row {
+        flex-direction: column;
+        row-gap: 10px;
     }
 }

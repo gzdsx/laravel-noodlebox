@@ -20,19 +20,19 @@ const UserService = {
         return ApiService.put('/users/batch', {ids, data});
     },
     listGroups(params) {
-        return ApiService.get('/user-groups', {params});
+        return ApiService.get('/users/groups', {params});
     },
     getGroup(gid) {
-        return ApiService.get('/user-groups/' + gid);
+        return ApiService.get('/users/groups/' + gid);
     },
     storeGroup(group) {
-        return ApiService.post('/user-groups', {group});
+        return ApiService.post('/users/groups', {group});
     },
     updateGroup(gid, group) {
-        return ApiService.put('/user-groups/' + gid, {group});
+        return ApiService.put('/users/groups/' + gid, {group});
     },
     deleteGroup(ids) {
-        return ApiService.delete('/user-groups/batch', {data: {ids}});
+        return ApiService.delete('/users/groups/batch', {data: {ids}});
     }
 }
 

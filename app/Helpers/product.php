@@ -1,13 +1,20 @@
 <?php
 /**
+ * @return \App\Models\Product|\Illuminate\Database\Eloquent\Builder
+ */
+function product_query()
+{
+    return \App\Models\Product::query();
+}
+
+/**
  * @param $id
  * @return \App\Models\Product|\App\Models\Product[]|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|object|null
  */
 function get_product($id)
 {
-    $query = \App\Models\Product::query();
-
-    if (preg_match('/\d+/', $id)) {
+    $query = product_query();
+    if (preg_match('/^\d+$/', $id)) {
         return $query->find($id);
     } else {
         return $query->where('slug', $id)->first();
@@ -20,9 +27,13 @@ function get_product($id)
  */
 function get_products($options = [])
 {
-    $query = \App\Models\Product::filter($options);
-    $query->offset($options['offset'] ?? 0);
-    $query->limit($options['limit'] ?? 15);
+    $filters = array_merge([
+        'status' => 'onsale'
+    ], $options);
+    $query = \App\Models\Product::filter($filters);
+    if (isset($filters['limit'])) {
+        $query->offset($filters['offset'] ?? 0)->limit($filters['limit']);
+    }
 
     $orderBy = $options['orderby'] ?? 'id';
     $order = $options['order'] ?? 'desc';

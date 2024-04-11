@@ -24,7 +24,7 @@ export default {
     },
     created() {
         ApiService.get('/settings').then(res => {
-            this.settings = res.result;
+            this.settings = res.data;
         });
     }
 }

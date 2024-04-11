@@ -70,7 +70,11 @@
 @media (max-width: 768px) {
     .banner-swiper {
         .slide-image:before {
-            padding-bottom: 40%;
+            padding-bottom: 50%;
+        }
+
+        .swiper-button-prev, .swiper-button-next {
+            display: none;
         }
     }
 }

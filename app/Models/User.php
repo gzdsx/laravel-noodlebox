@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Models\Traits\HasDates;
 use App\Models\Traits\HasMetas;
+use App\Models\Traits\UserHasCarts;
+use App\Models\Traits\UserHasOrders;
 use App\Models\Traits\UserHasPosts;
 use EloquentFilter\Filterable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -31,6 +33,8 @@ use Laravel\Passport\HasApiTokens;
  * @property-read \App\Models\UserAccount|null $account
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserAddress> $addresses
  * @property-read int|null $addresses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $boughts
+ * @property-read int|null $boughts_count
  * @property-read \App\Models\UserCertify|null $certify
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
@@ -51,6 +55,8 @@ use Laravel\Passport\HasApiTokens;
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Post> $posts
  * @property-read int|null $posts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $solds
+ * @property-read int|null $solds_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Token> $tokens
  * @property-read int|null $tokens_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserTransaction> $transactions
@@ -83,7 +89,7 @@ use Laravel\Passport\HasApiTokens;
 class User extends Authenticatable
 {
     use Notifiable, Filterable, HasApiTokens, HasDates, HasMetas;
-    use UserHasPosts;
+    use UserHasPosts, UserHasOrders, UserHasCarts;
 
     protected $table = 'user';
     protected $primaryKey = 'id';

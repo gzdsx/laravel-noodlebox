@@ -1,0 +1,35 @@
+.pos-number-pad{
+    display: grid;
+    grid-template-columns: 20% 20% 20% auto;
+    grid-gap: 10px;
+
+    .number{
+        &-button{
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #d7d7d7;
+            margin: 0;
+            width: 100%;
+            height: 70px;
+            cursor: pointer;
+            background: none;
+            font-size: 18px;
+            font-weight: 600;
+            text-transform: uppercase;
+
+            &:hover{
+                border-color: var(--pos-color-info);
+            }
+
+            &__submit{
+                background-color: var(--pos-color-info);
+                border-color: var(--pos-color-info);
+                color: #ffffff;
+            }
+
+            &__back{
+                background-color: #e4e3e3;
+            }
+        }
+    }
+}

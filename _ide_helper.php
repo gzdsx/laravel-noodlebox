@@ -4,7 +4,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 8.83.25.
+ * Generated for Laravel 8.83.27.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -1239,7 +1239,7 @@
          * Call the given Closure / class@method and inject its dependencies.
          *
          * @param callable|string $callback
-         * @param \Illuminate\Container\array<string,  mixed>  $parameters
+         * @param array<string, mixed> $parameters
          * @param string|null $defaultMethod
          * @return mixed 
          * @throws \InvalidArgumentException
@@ -8681,6 +8681,83 @@
                         return $instance->setConnectionName($name);
         }
                     /**
+         * Release a reserved job back onto the queue.
+         *
+         * @param string $queue
+         * @param \Illuminate\Queue\Jobs\DatabaseJobRecord $job
+         * @param int $delay
+         * @return mixed 
+         * @static 
+         */ 
+        public static function release($queue, $job, $delay)
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        return $instance->release($queue, $job, $delay);
+        }
+                    /**
+         * Delete a reserved job from the queue.
+         *
+         * @param string $queue
+         * @param string $id
+         * @return void 
+         * @throws \Throwable
+         * @static 
+         */ 
+        public static function deleteReserved($queue, $id)
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        $instance->deleteReserved($queue, $id);
+        }
+                    /**
+         * Delete a reserved job from the reserved queue and release it.
+         *
+         * @param string $queue
+         * @param \Illuminate\Queue\Jobs\DatabaseJob $job
+         * @param int $delay
+         * @return void 
+         * @static 
+         */ 
+        public static function deleteAndRelease($queue, $job, $delay)
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        $instance->deleteAndRelease($queue, $job, $delay);
+        }
+                    /**
+         * Delete all of the jobs from the queue.
+         *
+         * @param string $queue
+         * @return int 
+         * @static 
+         */ 
+        public static function clear($queue)
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        return $instance->clear($queue);
+        }
+                    /**
+         * Get the queue or return the default.
+         *
+         * @param string|null $queue
+         * @return string 
+         * @static 
+         */ 
+        public static function getQueue($queue)
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        return $instance->getQueue($queue);
+        }
+                    /**
+         * Get the underlying database instance.
+         *
+         * @return \Illuminate\Database\Connection 
+         * @static 
+         */ 
+        public static function getDatabase()
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        return $instance->getDatabase();
+        }
+                    /**
          * Get the backoff for an object-based queue handler.
          *
          * @param mixed $job
@@ -8689,7 +8766,7 @@
          */ 
         public static function getJobBackoff($job)
         {            //Method inherited from \Illuminate\Queue\Queue         
-                        /** @var \Illuminate\Queue\SyncQueue $instance */
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
                         return $instance->getJobBackoff($job);
         }
                     /**
@@ -8701,7 +8778,7 @@
          */ 
         public static function getJobExpiration($job)
         {            //Method inherited from \Illuminate\Queue\Queue         
-                        /** @var \Illuminate\Queue\SyncQueue $instance */
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
                         return $instance->getJobExpiration($job);
         }
                     /**
@@ -8713,7 +8790,7 @@
          */ 
         public static function createPayloadUsing($callback)
         {            //Method inherited from \Illuminate\Queue\Queue         
-                        \Illuminate\Queue\SyncQueue::createPayloadUsing($callback);
+                        \Illuminate\Queue\DatabaseQueue::createPayloadUsing($callback);
         }
                     /**
          * Get the container instance being used by the connection.
@@ -8723,7 +8800,7 @@
          */ 
         public static function getContainer()
         {            //Method inherited from \Illuminate\Queue\Queue         
-                        /** @var \Illuminate\Queue\SyncQueue $instance */
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
                         return $instance->getContainer();
         }
                     /**
@@ -8735,7 +8812,7 @@
          */ 
         public static function setContainer($container)
         {            //Method inherited from \Illuminate\Queue\Queue         
-                        /** @var \Illuminate\Queue\SyncQueue $instance */
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
                         $instance->setContainer($container);
         }
          
@@ -9006,6 +9083,10 @@
             /**
      * 
      *
+     * @method static \Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder funnel(string $name)
+     * @method static \Illuminate\Redis\Limiters\DurationLimiterBuilder throttle(string $name)
+     * @see \Illuminate\Redis\RedisManager
+     * @see \Illuminate\Contracts\Redis\Factory
      */ 
         class Redis {
                     /**
@@ -9451,12 +9532,12 @@
          * Clones a request and overrides some of its parameters.
          *
          * @return static 
-         * @param array $query The GET parameters
-         * @param array $request The POST parameters
-         * @param array $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-         * @param array $cookies The COOKIE parameters
-         * @param array $files The FILES parameters
-         * @param array $server The SERVER parameters
+         * @param array|null $query The GET parameters
+         * @param array|null $request The POST parameters
+         * @param array|null $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+         * @param array|null $cookies The COOKIE parameters
+         * @param array|null $files The FILES parameters
+         * @param array|null $server The SERVER parameters
          * @return static 
          * @static 
          */ 
@@ -11450,6 +11531,17 @@
             /**
      * 
      *
+     * @method static \Illuminate\Routing\RouteRegistrar as(string $value)
+     * @method static \Illuminate\Routing\RouteRegistrar controller(string $controller)
+     * @method static \Illuminate\Routing\RouteRegistrar domain(string $value)
+     * @method static \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
+     * @method static \Illuminate\Routing\RouteRegistrar name(string $value)
+     * @method static \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
+     * @method static \Illuminate\Routing\RouteRegistrar prefix(string $prefix)
+     * @method static \Illuminate\Routing\RouteRegistrar scopeBindings()
+     * @method static \Illuminate\Routing\RouteRegistrar where(array $where)
+     * @method static \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
+     * @see \Illuminate\Routing\Router
      */ 
         class Route {
                     /**
@@ -16247,7 +16339,7 @@
          *
          * @param string $header The name of the header to retrieve. Can be HTTP compliant such as
          *                       "User-Agent" or "X-Device-User-Agent" or can be php-esque with the
-         *                       all-caps, HTTP_ prefixed, underscore seperated awesomeness.
+         *                       all-caps, HTTP_ prefixed, underscore separated awesomeness.
          * @return string|null The value of the header.
          * @static 
          */ 
@@ -16923,139 +17015,6 @@
      * 
      *
      */ 
-        class SnappyImage {
-                    /**
-         * Get the Snappy instance.
-         *
-         * @return \Knp\Snappy\Image 
-         * @static 
-         */ 
-        public static function snappy()
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->snappy();
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */ 
-        public static function setOption($name, $value)
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->setOption($name, $value);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */ 
-        public static function setOptions($options)
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->setOptions($options);
-        }
-                    /**
-         * Load a HTML string
-         *
-         * @param string $string
-         * @return static 
-         * @static 
-         */ 
-        public static function loadHTML($string)
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->loadHTML($string);
-        }
-                    /**
-         * Load a HTML file
-         *
-         * @param string $file
-         * @return static 
-         * @static 
-         */ 
-        public static function loadFile($file)
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->loadFile($file);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */ 
-        public static function loadView($view, $data = [], $mergeData = [])
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->loadView($view, $data, $mergeData);
-        }
-                    /**
-         * Output the PDF as a string.
-         *
-         * @return string The rendered PDF as string
-         * @throws \InvalidArgumentException
-         * @static 
-         */ 
-        public static function output()
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->output();
-        }
-                    /**
-         * Save the image to a file
-         *
-         * @param $filename
-         * @return static 
-         * @static 
-         */ 
-        public static function save($filename, $overwrite = false)
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->save($filename, $overwrite);
-        }
-                    /**
-         * Make the image downloadable by the user
-         *
-         * @param string $filename
-         * @return \Symfony\Component\HttpFoundation\Response 
-         * @static 
-         */ 
-        public static function download($filename = 'image.jpg')
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->download($filename);
-        }
-                    /**
-         * Return a response with the image to show in the browser
-         *
-         * @param string $filename
-         * @return \Illuminate\Http\Response 
-         * @static 
-         */ 
-        public static function inline($filename = 'image.jpg')
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->inline($filename);
-        }
-                    /**
-         * Return a response with the image to show in the browser
-         *
-         * @deprecated Use inline() instead
-         * @param string $filename
-         * @return \Symfony\Component\HttpFoundation\Response 
-         * @static 
-         */ 
-        public static function stream($filename = 'image.jpg')
-        {
-                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
-                        return $instance->stream($filename);
-        }
-         
-    }
-            /**
-     * 
-     *
-     */ 
         class SnappyPdf {
                     /**
          * Get the Snappy instance.
@@ -17347,6 +17306,139 @@
         {
                         /** @var \Barryvdh\Snappy\PdfFaker $instance */
                         return $instance->assertFileNameIs($value);
+        }
+         
+    }
+            /**
+     * 
+     *
+     */ 
+        class SnappyImage {
+                    /**
+         * Get the Snappy instance.
+         *
+         * @return \Knp\Snappy\Image 
+         * @static 
+         */ 
+        public static function snappy()
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->snappy();
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function setOption($name, $value)
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->setOption($name, $value);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function setOptions($options)
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->setOptions($options);
+        }
+                    /**
+         * Load a HTML string
+         *
+         * @param string $string
+         * @return static 
+         * @static 
+         */ 
+        public static function loadHTML($string)
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->loadHTML($string);
+        }
+                    /**
+         * Load a HTML file
+         *
+         * @param string $file
+         * @return static 
+         * @static 
+         */ 
+        public static function loadFile($file)
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->loadFile($file);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function loadView($view, $data = [], $mergeData = [])
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->loadView($view, $data, $mergeData);
+        }
+                    /**
+         * Output the PDF as a string.
+         *
+         * @return string The rendered PDF as string
+         * @throws \InvalidArgumentException
+         * @static 
+         */ 
+        public static function output()
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->output();
+        }
+                    /**
+         * Save the image to a file
+         *
+         * @param $filename
+         * @return static 
+         * @static 
+         */ 
+        public static function save($filename, $overwrite = false)
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->save($filename, $overwrite);
+        }
+                    /**
+         * Make the image downloadable by the user
+         *
+         * @param string $filename
+         * @return \Symfony\Component\HttpFoundation\Response 
+         * @static 
+         */ 
+        public static function download($filename = 'image.jpg')
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->download($filename);
+        }
+                    /**
+         * Return a response with the image to show in the browser
+         *
+         * @param string $filename
+         * @return \Illuminate\Http\Response 
+         * @static 
+         */ 
+        public static function inline($filename = 'image.jpg')
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->inline($filename);
+        }
+                    /**
+         * Return a response with the image to show in the browser
+         *
+         * @deprecated Use inline() instead
+         * @param string $filename
+         * @return \Symfony\Component\HttpFoundation\Response 
+         * @static 
+         */ 
+        public static function stream($filename = 'image.jpg')
+        {
+                        /** @var \Barryvdh\Snappy\ImageWrapper $instance */
+                        return $instance->stream($filename);
         }
          
     }
@@ -17655,6 +17747,138 @@
      
 }
 
+    namespace Laravel\Socialite\Facades { 
+            /**
+     * 
+     *
+     * @see \Laravel\Socialite\SocialiteManager
+     */ 
+        class Socialite {
+                    /**
+         * Get a driver instance.
+         *
+         * @param string $driver
+         * @return mixed 
+         * @static 
+         */ 
+        public static function with($driver)
+        {
+                        /** @var \Laravel\Socialite\SocialiteManager $instance */
+                        return $instance->with($driver);
+        }
+                    /**
+         * Build an OAuth 2 provider instance.
+         *
+         * @param string $provider
+         * @param array $config
+         * @return \Laravel\Socialite\Two\AbstractProvider 
+         * @static 
+         */ 
+        public static function buildProvider($provider, $config)
+        {
+                        /** @var \Laravel\Socialite\SocialiteManager $instance */
+                        return $instance->buildProvider($provider, $config);
+        }
+                    /**
+         * Format the server configuration.
+         *
+         * @param array $config
+         * @return array 
+         * @static 
+         */ 
+        public static function formatConfig($config)
+        {
+                        /** @var \Laravel\Socialite\SocialiteManager $instance */
+                        return $instance->formatConfig($config);
+        }
+                    /**
+         * Forget all of the resolved driver instances.
+         *
+         * @return \Laravel\Socialite\SocialiteManager 
+         * @static 
+         */ 
+        public static function forgetDrivers()
+        {
+                        /** @var \Laravel\Socialite\SocialiteManager $instance */
+                        return $instance->forgetDrivers();
+        }
+                    /**
+         * Set the container instance used by the manager.
+         *
+         * @param \Illuminate\Contracts\Container\Container $container
+         * @return \Laravel\Socialite\SocialiteManager 
+         * @static 
+         */ 
+        public static function setContainer($container)
+        {
+                        /** @var \Laravel\Socialite\SocialiteManager $instance */
+                        return $instance->setContainer($container);
+        }
+                    /**
+         * Get the default driver name.
+         *
+         * @return string 
+         * @throws \InvalidArgumentException
+         * @static 
+         */ 
+        public static function getDefaultDriver()
+        {
+                        /** @var \Laravel\Socialite\SocialiteManager $instance */
+                        return $instance->getDefaultDriver();
+        }
+                    /**
+         * Get a driver instance.
+         *
+         * @param string|null $driver
+         * @return mixed 
+         * @throws \InvalidArgumentException
+         * @static 
+         */ 
+        public static function driver($driver = null)
+        {            //Method inherited from \Illuminate\Support\Manager         
+                        /** @var \Laravel\Socialite\SocialiteManager $instance */
+                        return $instance->driver($driver);
+        }
+                    /**
+         * Register a custom driver creator Closure.
+         *
+         * @param string $driver
+         * @param \Closure $callback
+         * @return \Laravel\Socialite\SocialiteManager 
+         * @static 
+         */ 
+        public static function extend($driver, $callback)
+        {            //Method inherited from \Illuminate\Support\Manager         
+                        /** @var \Laravel\Socialite\SocialiteManager $instance */
+                        return $instance->extend($driver, $callback);
+        }
+                    /**
+         * Get all of the created "drivers".
+         *
+         * @return array 
+         * @static 
+         */ 
+        public static function getDrivers()
+        {            //Method inherited from \Illuminate\Support\Manager         
+                        /** @var \Laravel\Socialite\SocialiteManager $instance */
+                        return $instance->getDrivers();
+        }
+                    /**
+         * Get the container instance used by the manager.
+         *
+         * @return \Illuminate\Contracts\Container\Container 
+         * @static 
+         */ 
+        public static function getContainer()
+        {            //Method inherited from \Illuminate\Support\Manager         
+                        /** @var \Laravel\Socialite\SocialiteManager $instance */
+                        return $instance->getContainer();
+        }
+         
+    }
+     
+}
+
     namespace Overtrue\LaravelPinyin\Facades { 
             /**
      * 
@@ -17784,7 +18008,73 @@
      
 }
 
+    namespace Srmklive\PayPal\Facades { 
+            /**
+     * 
+     *
+     */ 
+        class PayPal {
+                    /**
+         * Get specific PayPal API provider object to use.
+         *
+         * @throws Exception
+         * @return \Srmklive\PayPal\Services\PayPal 
+         * @static 
+         */ 
+        public static function getProvider()
+        {
+                        return \Srmklive\PayPal\PayPalFacadeAccessor::getProvider();
+        }
+                    /**
+         * Set PayPal API Client to use.
+         *
+         * @throws \Exception
+         * @return \Srmklive\PayPal\Services\PayPal 
+         * @static 
+         */ 
+        public static function setProvider()
+        {
+                        return \Srmklive\PayPal\PayPalFacadeAccessor::setProvider();
+        }
+         
+    }
+     
+}
+
     namespace Illuminate\Support { 
+            /**
+     * 
+     *
+     */ 
+        class Str {
+                    /**
+         * 
+         *
+         * @see \Tanmuhittin\LaravelGoogleTranslate\LaravelGoogleTranslateServiceProvider::register()
+         * @param string $text
+         * @param string $locale
+         * @param string|null $base_locale
+         * @static 
+         */ 
+        public static function apiTranslate($text, $locale, $base_locale = null)
+        {
+                        return \Illuminate\Support\Str::apiTranslate($text, $locale, $base_locale);
+        }
+                    /**
+         * 
+         *
+         * @see \Tanmuhittin\LaravelGoogleTranslate\LaravelGoogleTranslateServiceProvider::register()
+         * @param string $text
+         * @param string $locale
+         * @param string|null $base_locale
+         * @static 
+         */ 
+        public static function apiTranslateWithAttributes($text, $locale, $base_locale = null)
+        {
+                        return \Illuminate\Support\Str::apiTranslateWithAttributes($text, $locale, $base_locale);
+        }
+         
+    }
             /**
      * 
      *
@@ -17927,6 +18217,38 @@
         public static function emailVerification()
         {
                         return \Illuminate\Routing\Router::emailVerification();
+        }
+         
+    }
+     
+}
+
+    namespace Illuminate\Database\Eloquent\Relations { 
+            /**
+     * 
+     *
+     * @mixin \Illuminate\Database\Eloquent\Builder
+     */ 
+        class Relation {
+                    /**
+         * 
+         *
+         * @see \EloquentFilter\ModelFilter::registerMacros()
+         * @static 
+         */ 
+        public static function paginateFilter()
+        {
+                        return \Illuminate\Database\Eloquent\Relations\Relation::paginateFilter();
+        }
+                    /**
+         * 
+         *
+         * @see \EloquentFilter\ModelFilter::registerMacros()
+         * @static 
+         */ 
+        public static function simplePaginateFilter()
+        {
+                        return \Illuminate\Database\Eloquent\Relations\Relation::simplePaginateFilter();
         }
          
     }
@@ -21412,10 +21734,12 @@ namespace  {
             class Agent extends \Jenssegers\Agent\Facades\Agent {}
             class QrCode extends \SimpleSoftwareIO\QrCode\Facades\QrCode {}
             class EasyWeChat extends \Overtrue\LaravelWeChat\Facade {}
-            class SnappyImage extends \Barryvdh\Snappy\Facades\SnappyImage {}
             class PDF extends \Barryvdh\Snappy\Facades\SnappyPdf {}
+            class SnappyImage extends \Barryvdh\Snappy\Facades\SnappyImage {}
             class Flare extends \Facade\Ignition\Facades\Flare {}
+            class Socialite extends \Laravel\Socialite\Facades\Socialite {}
             class Pinyin extends \Overtrue\LaravelPinyin\Facades\Pinyin {}
+            class PayPal extends \Srmklive\PayPal\Facades\PayPal {}
      
 }
 

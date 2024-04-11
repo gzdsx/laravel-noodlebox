@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Wechat;
 
-use App\Http\Controllers\Admin\BaseController;
+use App\Http\Controllers\Api\BaseController;
 use App\Models\WechatMenu;
 use App\Traits\WeChat\WechatDefaultConfig;
 use Illuminate\Http\Request;
@@ -158,10 +158,10 @@ class MenuController extends BaseController
                 $res = $this->officialAccount()->menu->create($buttons);
                 return json_success($res);
             } catch (\GuzzleHttp\Exception\GuzzleException $exception) {
-                return json_fail($exception->getMessage());
+                return json_error($exception->getMessage());
             }
         } else {
-            return json_fail('not found', 404);
+            return json_error('not found', 404);
         }
     }
 }

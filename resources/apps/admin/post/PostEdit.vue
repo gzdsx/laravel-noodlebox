@@ -145,7 +145,7 @@ export default {
         fetchData() {
             let {id} = this.$route.params;
             PostService.get(id || 0).then(response => {
-                this.post = response.result;
+                this.post = response.data;
                 const {content, images, media, categories} = this.post;
                 this.selectedCategories = categories.map(c => c.id);
                 if (content) this.content = content;
@@ -154,12 +154,12 @@ export default {
         },
         fetchFormats() {
             PostService.get('formats').then(response => {
-                this.formats = response.result;
+                this.formats = response.data;
             });
         },
         fetchCategories() {
             CategoryService.list({taxonomy: this.type}).then(response => {
-                this.categories = response.result.items;
+                this.categories = response.data.items;
             });
         },
         onChooseImage(media) {
@@ -192,7 +192,7 @@ export default {
                 post.type = type;
                 PostService.store(post).then(res => {
                     this.$message.success(this.$t('post.saved'));
-                    this.$router.replace('/post/edit/' + res.result.id);
+                    this.$router.replace('/post/edit/' + res.data.id);
                 }).catch(reason => {
                     this.$message.error(reason.message);
                 }).finally(() => {

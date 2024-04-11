@@ -16,8 +16,6 @@
                         multiple
                         action="/"
                         :show-file-list="false"
-                        :on-success="onUploadSuccess"
-                        :on-error="onUploadError"
                         :on-change="onUploadChange"
                         :http-request="onUpload"
                 >
@@ -54,20 +52,22 @@
                         </div>
                         <ul class="media-list">
                             <li v-for="(media,index) in uploadFileList" :key="index">
-                                <div class="thumbnail" @click="onChooseMedia(media)" v-if="media.id">
+                                <div class="thumbnail" @click="onChooseMedia(media)">
                                     <img :src="media.thumb" alt="">
                                     <div class="name" v-if="media.type!=='image'">{{ media.name }}</div>
                                     <div class="media-mask" v-if="hasMedia(media)">
                                         <i class="el-icon-success"></i>
                                     </div>
                                 </div>
-                                <div class="thumbnail" v-else>
+                            </li>
+                            <li v-if="this.currentFile">
+                                <div class="thumbnail">
                                     <el-progress
                                             color="#409EFF"
                                             define-back-color="#ccc"
                                             :stroke-width="20"
                                             :show-text="false"
-                                            :percentage="media.percentage"/>
+                                            :percentage="percentage"/>
                                 </div>
                             </li>
                             <li v-for="media in dataList" :key="media.id">
@@ -115,12 +115,12 @@
             </el-tab-pane>
         </el-tabs>
         <el-button
-            type="primary"
-            size="small"
-            :disabled="selectedFiles.length===0||tab==='uploader'"
-            @click="onConfirm"
-            slot="footer"
-            v-if="tab==='media'"
+                type="primary"
+                size="small"
+                :disabled="selectedFiles.length===0||tab==='uploader'"
+                @click="onConfirm"
+                slot="footer"
+                v-if="tab==='media'"
         >{{ $t('material.use_selected') }}
         </el-button>
     </el-dialog>
@@ -128,6 +128,7 @@
 
 <script>
 import MaterialService from "../utils/MaterialService";
+import ApiService from "../utils/ApiService";
 
 export default {
     name: "MediaDialog",
@@ -168,7 +169,10 @@ export default {
             isLoadMore: false,
             uploadFileList: [],
             params: {type: '', q: ''},
-            types: []
+            types: [],
+            uploading: false,
+            currentFile: null,
+            percentage: 0
         }
     },
     computed: {
@@ -180,6 +184,11 @@ export default {
     watch: {
         options(val, oldVal) {
             this.params = Object.assign({}, this.params, val);
+        },
+        value(val) {
+            if (val) {
+                this.fetchList();
+            }
         }
     },
     methods: {
@@ -191,7 +200,7 @@ export default {
                 offset,
                 limit
             }).then(response => {
-                const {total, items} = response.result;
+                const {total, items} = response.data;
                 this.total = total;
                 if (this.isLoadMore) {
                     this.dataList = this.dataList.concat(items);
@@ -214,41 +223,46 @@ export default {
         onUploadChange() {
             this.tab = "media";
         },
-        onUpload(e) {
-            const file = e.file;
-            this.uploadFileList.unshift(file);
+        uploadQueue() {
+            if (this.uploading) {
+                return false;
+            }
+
+            this.currentFile = this.uploadFileList.pop();
+            if (!this.currentFile) {
+                return false;
+            }
+
+            this.percentage = 0;
             const formData = new FormData();
-            formData.append('file', e.file);
+            formData.append('file', this.currentFile);
 
             Object.keys(this.options).forEach(key => {
                 formData.append(key, this.options[key]);
             });
 
-            return this.$post('/materials/upload', formData, {
+            this.uploading = true;
+            ApiService.post('/materials/upload', formData, {
                 timeout: 0,
                 headers: {'Content-type': 'multipart/form-data'},
                 onUploadProgress: evt => {
-                    file.percentage = (evt.loaded / evt.total) * 100;
-                    this.uploadFileList.map((data, index) => {
-                        if (data.uid === file.uid) {
-                            this.uploadFileList.splice(index, 1, file);
-                        }
-                    });
+                    console.log(evt);
+                    this.percentage = (evt.loaded / evt.total) * 100;
                 }
+            }).then(response => {
+                this.currentFile = null;
+                this.dataList.unshift(response.data);
+                setTimeout(this.uploadQueue, 500);
+            }).catch(reason => {
+                this.$message.error(reason.message);
+            }).finally(() => {
+                this.uploading = false;
             });
         },
-        onUploadSuccess(response, file, fileList) {
-            //console.log('onUploadSuccess:', response);
-            if (response) {
-                this.uploadFileList.map((data, index) => {
-                    if (data.uid === file.uid) {
-                        this.uploadFileList.splice(index, 1, response.result);
-                    }
-                });
-            }
-        },
-        onUploadError(err) {
-            this.$message.error(err.message);
+        onUpload(e) {
+            this.uploadFileList.unshift(e.file);
+            this.uploadQueue();
+            return false;
         },
         onConfirm() {
             if (this.multiple) {
@@ -313,13 +327,12 @@ export default {
         },
         fetchTypes() {
             MaterialService.get('types').then(response => {
-                this.types = response.result;
+                this.types = response.data;
             });
         }
     },
     mounted() {
         this.fetchTypes();
-        this.fetchList();
     },
 }
 </script>

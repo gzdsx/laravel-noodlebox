@@ -13,7 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id 付款人ID
  * @property int $payable_id 关联类型ID
  * @property string $out_trade_no 单号
- * @property string|null $prepay_id 微信支付prepay_id
+ * @property string|null $payment_id 付款ID
+ * @property string|null $payment_type 付款方式
  * @property array|null $data 支付数据
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
@@ -37,7 +38,7 @@ class UserPrepay extends Model
 
     protected $table = 'user_prepay';
     protected $primaryKey = 'id';
-    protected $fillable = ['out_trade_no', 'user_id', 'payable_id', 'prepay_id', 'data'];
+    protected $fillable = ['out_trade_no', 'user_id', 'payable_id', 'payment_id', 'payment_type', 'data'];
     protected $casts = [
         'data' => 'array'
     ];
@@ -48,5 +49,10 @@ class UserPrepay extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function getDataAttribute($value)
+    {
+        return $value ? json_decode($value, true) : [];
     }
 }

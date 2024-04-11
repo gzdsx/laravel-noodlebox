@@ -24,6 +24,7 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $childs
  * @property-read int|null $childs_count
  * @property-read \Illuminate\Support\Collection $meta_data
+ * @property-read mixed $url
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CategoryMeta> $metas
  * @property-read int|null $metas_count
  * @property-read Category|null $parent
@@ -55,7 +56,7 @@ class Category extends Model
     protected $table = 'category';
     protected $primaryKey = 'id';
     protected $fillable = ['parent_id', 'name', 'slug', 'image', 'description', 'taxonomy', 'sort_num'];
-    protected $appends = ['meta_data'];
+    protected $appends = ['meta_data', 'url'];
 
     public $timestamps = false;
 
@@ -68,9 +69,14 @@ class Category extends Model
 
         static::saving(function (Category $category) {
             if (!$category->slug) {
-                $category->slug = strtolower(Pinyin::permalink($category->name,''));
+                $category->slug = strtolower(Pinyin::permalink($category->name, ''));
             }
         });
+    }
+
+    public function getUrlAttribute()
+    {
+        return url('category/' . $this->slug);
     }
 
     /**

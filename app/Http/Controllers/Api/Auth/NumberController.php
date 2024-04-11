@@ -48,9 +48,9 @@ class NumberController extends BaseController
                 }
             }
 
-            return json_fail($result['Message']);
+            return json_error($result['Message']);
         } catch (Exception $exception) {
-            return json_fail($exception->getMessage());
+            return json_error($exception->getMessage());
         }
     }
 }

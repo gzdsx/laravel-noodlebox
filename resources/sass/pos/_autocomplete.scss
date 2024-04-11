@@ -1,0 +1,98 @@
+.gzdsx-pos-autocomplete {
+    position: relative;
+
+    .input {
+        background: none;
+        width: 100%;
+        border: 1px solid var(--pos-color-primary);
+        padding: 10px;
+        border-radius: 1px;
+        font-size: 1.15rem;
+
+        &:focus {
+            border: 1px solid #333;
+            box-shadow: none !important;
+            appearance: none !important;
+        }
+    }
+
+    .suggestions {
+        position: absolute;
+        left: 0;
+        top: 100%;
+        right: 0;
+        border: 1px solid var(--pos-color-primary);
+        margin-top: 5px;
+        z-index: 100;
+        background-color: #ffffff;
+        max-height: 400px;
+        overflow-y: auto;
+
+        .suggestion-con {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            column-gap: 10px;
+
+            &__name {
+                flex: 1;
+                display: flex;
+                column-gap: 10px;
+                align-items: center;
+                padding-right: 10px;
+
+                span {
+                    background-color: rgba(13, 174, 171, .3);
+                    color: var(--pos-color-primary);
+                    padding: 4px 8px;
+                    text-transform: uppercase;
+                    display: none;
+                    font-size: 11px;
+                }
+            }
+
+            &__price {
+                margin-right: 10px;
+            }
+
+            &__image {
+                width: 32px;
+                height: 32px;
+            }
+
+            &__remove{
+
+                .yith-pos-icon-clear{
+                    font-size: 14px;
+                    color: $secondary;
+                    opacity: 0;
+                }
+            }
+
+            &:hover {
+                background-color: #EFEFEF;
+
+                span {
+                    display: block;
+                }
+
+                .yith-pos-icon-clear{
+                    opacity: 1 !important;
+                }
+            }
+        }
+    }
+
+    &-tips {
+        font-size: 14px;
+        margin-top: 2px;
+    }
+}

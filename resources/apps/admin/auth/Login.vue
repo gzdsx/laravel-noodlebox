@@ -52,9 +52,6 @@ export default {
             password: ''
         }
     },
-    created() {
-        //document.body.style.backgroundColor = '#2E3A4D';
-    },
     methods: {
         submit() {
             const {account, password} = this;
@@ -69,7 +66,7 @@ export default {
             }
 
             ApiService.post('/login', {account, password}).then(response => {
-                const {access_token} = response.result;
+                const {access_token} = response.data;
                 if (access_token) {
                     AuthService.updateToken(access_token);
                     this.$router.replace('/');

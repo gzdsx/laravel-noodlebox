@@ -28,4 +28,7 @@ Route::group(['namespace' => 'Auth'], function () {
     Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
     Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
     Route::post('password/reset', 'ResetPasswordController@reset');
+
+    Route::get('auth/{driver}', 'SocialiteController@index');
+    Route::get('auth/{driver}/callback', 'SocialiteController@callback');
 });

@@ -80,7 +80,7 @@ export default {
             let {id} = this.$route.params;
             if (!id) return;
             ApiService.get('/pages/' + id).then(response => {
-                this.page = response.result;
+                this.page = response.data;
             }).catch(reason => {
                 this.$message.error(reason.message);
             });
@@ -104,7 +104,7 @@ export default {
             } else {
                 ApiService.post('/pages', {page}).then(res => {
                     this.$message.success(this.$t('page.saved'));
-                    this.$router.replace('/page/edit/' + res.result.id);
+                    this.$router.replace('/page/edit/' + res.data.id);
                 }).finally(() => {
                     this.disabled = false;
                 });

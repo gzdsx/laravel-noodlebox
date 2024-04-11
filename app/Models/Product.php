@@ -31,6 +31,7 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @property int $comment_num 评论数
  * @property array|null $attr_list 产品属性
  * @property array|null $variation_list 产品变量
+ * @property array|null $additional_options 可选项目
  * @property int $is_new 是否新品
  * @property int $is_hot 是否热销
  * @property int $is_recommend 仓储推荐
@@ -66,6 +67,7 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @property-read \App\Models\Shop|null $shop
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductSku> $skus
  * @property-read int|null $skus_count
+ * @property-read \App\Models\FreightTemplate|null $template
  * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder|Product filter(array $input = [], $filter = null)
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
@@ -73,6 +75,7 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @method static \Illuminate\Database\Eloquent\Builder|Product paginateFilter($perPage = null, $columns = [], $pageName = 'page', $page = null)
  * @method static \Illuminate\Database\Eloquent\Builder|Product query()
  * @method static \Illuminate\Database\Eloquent\Builder|Product simplePaginateFilter(?int $perPage = null, ?int $columns = [], ?int $pageName = 'page', ?int $page = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereAdditionalOptions($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereAttrList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereBeginsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereBrandId($value)
@@ -123,7 +126,7 @@ class Product extends Model
     protected $primaryKey = 'id';
     protected $fillable = [
         'id', 'user_id', 'shop_id', 'title', 'slug', 'image', 'price', 'regular_price', 'purchase_limit',
-        'sold', 'stock', 'views', 'collect_num', 'comment_num', 'attr_list', 'variation_list',
+        'sold', 'stock', 'views', 'collect_num', 'comment_num', 'attr_list', 'variation_list', 'additional_options',
         'is_new', 'is_hot', 'is_recommend', 'is_promotion', 'is_top', 'free_delivery', 'template_id', '
         is_weight_template', 'has_sku_attr', 'brand_id', 'status', 'tax_status',
         'keywords', 'description', 'created_at', 'updated_at'
@@ -133,6 +136,7 @@ class Product extends Model
     protected $casts = [
         'attr_list' => 'array',
         'variation_list' => 'array',
+        'additional_options' => 'array'
     ];
     protected $with = ['shop', 'user', 'images', 'metas', 'skus', 'categories'];
 
@@ -208,6 +212,11 @@ class Product extends Model
     }
 
     public function getVariationListAttribute($value)
+    {
+        return $value ? json_decode($value, true) : [];
+    }
+
+    public function getAdditionalOptionsAttribute($value)
     {
         return $value ? json_decode($value, true) : [];
     }

@@ -22,9 +22,9 @@ trait CategoryApis
      */
     public function index(Request $request)
     {
-        $query = $this->repository()
-            ->where('taxonomy', $request->input('taxonomy', 'post'))
-            ->where('parent_id', $request->input('parent_id', 0));
+        $options = $request->all();
+        $options['parent'] = $options['parent'] ?? 0;
+        $query = $this->repository()->filter($options);
         return json_success([
             'total' => $query->count(),
             'items' => $query->with('children')->get()

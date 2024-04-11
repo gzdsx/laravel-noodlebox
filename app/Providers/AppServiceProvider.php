@@ -10,6 +10,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -30,12 +31,12 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerValidators();
         Paginator::useBootstrap();
-        view()->composer('layouts.default', function ($view) {
-            return $view->with([
-                'settings' => settings(),
-                'navName' => ''
-            ]);
-        });
+
+        $categories = get_categories(['taxonomy' => 'product', 'excludes' => [15, 221]]);
+        View::share([
+            'settings' => settings(),
+            'categories' => $categories
+        ]);
 
         //邮件配置
         Config::set('mail', [
@@ -52,8 +53,6 @@ class AppServiceProvider extends ServiceProvider
             'password' => settings('mail_password', env('MAIL_PASSWORD')),
             'sendmail' => '/usr/sbin/sendmail -bs',
         ]);
-
-        //dd(Config::get('mail'));
 
         if ($local = session('local')) {
             App::setLocale($local);

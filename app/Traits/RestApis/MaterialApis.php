@@ -237,7 +237,7 @@ trait MaterialApis
      */
     protected function uploadFail(Request $request)
     {
-        return json_fail('material upload fail');
+        return json_error('material upload fail');
     }
 
     /**

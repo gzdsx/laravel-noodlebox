@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Test;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CompressProductImage;
+use App\Jobs\DownloadProductImage;
 use App\Jobs\SyncProductSku;
 use App\Models\BuildiumUploaded;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Models\ShippingZone;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 
@@ -18,25 +23,7 @@ class IndexController extends Controller
 {
     public function index(Request $request)
     {
-        return Product::find(66678);
-
-//        try {
-//            $client = new Client();
-//            $response = $client->get('https://noodlebox.ie/wp-json/wc/v3/products/38425', [
-//                'auth' => [env('WC_CONSUMER_KEY'), env('WC_CONSUMER_SECRET')],
-//                'headers' => [
-//                    'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0',
-//                    'Accept' => 'application/json'
-//                ],
-//                'proxy' => 'socks5://127.0.0.1:1089'
-//            ]);
-//
-//            $data = json_decode($response->getBody()->getContents(), true);
-//            dispatch_sync(new SyncProductSku($data));
-//            return Product::find(38425);
-//        } catch (\Exception $exception) {
-//            return $exception->getMessage();
-//        }
+       return Auth::user()->carts;
     }
 
     public function combineAttrs($arr)

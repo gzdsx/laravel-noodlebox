@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $phone 联系电话
  * @property string|null $province 省
  * @property string|null $city 市
- * @property string|null $district 县
+ * @property string|null $county 县
  * @property string|null $street 街道
  * @property string|null $postalcode 邮编
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
@@ -29,8 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|RefundShipping newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RefundShipping query()
  * @method static \Illuminate\Database\Eloquent\Builder|RefundShipping whereCity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|RefundShipping whereCounty($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RefundShipping whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|RefundShipping whereDistrict($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RefundShipping whereExpressCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RefundShipping whereExpressName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RefundShipping whereExpressNo($value)

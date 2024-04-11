@@ -1,0 +1,73 @@
+.pos-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.pos-col {
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+@for $i from 1 through 10 {
+    .pos-col-#{$i} {
+        display: block;
+        width: #{$i*10%};
+        max-width: #{$i*10%};
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+@each $d in block, flex, grid {
+    .d-#{$d} {
+        display: #{$d} !important;
+    }
+}
+
+@for $i from 1 through 10 {
+    .flex-grow-#{$i} {
+        flex-grow: #{$i} !important;
+    }
+}
+
+@for $i from 1 through 10 {
+    .flex-flow-#{$i} {
+        flex-shrink: #{$i} !important;
+    }
+}
+
+@for $i from 1 through 10 {
+    .gap-#{$i} {
+        gap: #{$i}rem !important;
+    }
+}
+
+@for $i from 1 through 10 {
+    .column-gap-#{$i} {
+        column-gap: #{$i}rem !important;
+    }
+}
+
+@for $i from 1 through 10 {
+    .row-gap-#{$i} {
+        row-gap: #{$i}rem !important;
+    }
+}
+
+@for $i from 1 through 10 {
+    .blank-#{$i} {
+        display: block;
+        height: #{$i}rem;
+    }
+}
+
+@each $position in absolute, relative, sticky {
+    .position-#{$position} {
+        position: #{$position};
+    }
+}

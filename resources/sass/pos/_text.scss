@@ -1,0 +1,45 @@
+.text {
+    &-uppercase {
+        text-transform: uppercase;
+    }
+
+    &-capitalize {
+        text-transform: capitalize;
+    }
+
+    &-right {
+        text-align: right;
+    }
+
+    &-center {
+        text-align: center;
+    }
+
+    &-nowrap{
+        white-space: nowrap;
+    }
+}
+
+@each $color, $value in $colors {
+    .text-#{$color} {
+        color: $value;
+    }
+}
+
+@each $color, $value in $grays {
+    .text-gray-#{$color} {
+        color: $value;
+    }
+}
+
+@each $color, $value in $colors {
+    .bg-#{$color} {
+        background-color: $value;
+    }
+}
+
+@each $color, $value in $grays {
+    .bg-gray-#{$color} {
+        background-color: $value;
+    }
+}

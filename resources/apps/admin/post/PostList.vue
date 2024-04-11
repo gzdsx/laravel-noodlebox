@@ -145,7 +145,7 @@ export default {
         },
         fetchCategories() {
             CategoryService.list({taxonomy: this.type}).then(response => {
-                this.cascaderOptions = CategoryService.generateCascaderOptions(response.result.items);
+                this.cascaderOptions = CategoryService.generateCascaderOptions(response.data.items);
             });
         },
         deleteRecords(ids) {

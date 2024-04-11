@@ -62,6 +62,7 @@
 .main {
   padding: 30px 100px;
   width: 960px;
+  min-height: 500px;
   margin: 0 auto;
 }
 

@@ -35,12 +35,12 @@ class PostController extends BaseController
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $slug)
     {
-        if (preg_match('/^[0-9]+$/', $id)) {
-            $post = $this->repository()->withoutGlobalScopes()->find($id);
+        if (preg_match('/^[0-9]+$/', $slug)) {
+            $post = $this->repository()->withoutGlobalScopes()->find($slug);
         } else {
-            $post = $this->repository()->withoutGlobalScopes()->where('slug', "%$id%")->first();
+            $post = $this->repository()->withoutGlobalScopes()->where('slug', $slug)->first();
         }
 
         if (!$post) {

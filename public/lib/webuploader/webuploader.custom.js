@@ -1067,7 +1067,7 @@
             reset: 'reset'
         }, function( fn, command ) {
             Uploader.prototype[ fn ] = function() {
-                return this.request( command, arguments );
+                return this.httpClient( command, arguments );
             };
         });
     
@@ -2316,7 +2316,7 @@
             makeThumb: function( file, cb, width, height ) {
                 var opts, image;
     
-                file = this.request( 'get-file', file );
+                file = this.httpClient( 'get-file', file );
     
                 // 只预览图片格式。
                 if ( !file.type.match( /^image/ ) ) {
@@ -2379,7 +2379,7 @@
                     noCompressIfLarger = opts && opts.noCompressIfLarger || false,
                     image, deferred;
     
-                file = this.request( 'get-file', file );
+                file = this.httpClient( 'get-file', file );
     
                 // 只压缩 jpeg 图片格式。
                 // gif 可能会丢失针
@@ -2938,7 +2938,7 @@
     
                 // 如果当前不是html5运行时，那就算了。
                 // 不执行后续操作
-                if ( this.request('predict-runtime-type') !== 'html5' ) {
+                if ( this.httpClient('predict-runtime-type') !== 'html5' ) {
                     return;
                 }
     
@@ -3097,7 +3097,7 @@
     
                 file = file.id ? file : me.queue.getFile( file );
     
-                this.request( 'cancel-file', file );
+                this.httpClient( 'cancel-file', file );
     
                 if ( remove ) {
                     this.queue.removeFile( file );
@@ -3565,7 +3565,7 @@
             },
     
             reset: function() {
-                this.request( 'stop-upload', true );
+                this.httpClient( 'stop-upload', true );
                 this.runing = false;
                 this.pool = [];
                 this.stack = [];
@@ -3740,7 +3740,7 @@
              * })
              */
             cancelFile: function( file ) {
-                file = file.id ? file : this.request( 'get-file', file );
+                file = file.id ? file : this.httpClient( 'get-file', file );
     
                 // 如果正在上传。
                 file.blocks && $.each( file.blocks, function( _, v ) {
@@ -3768,7 +3768,7 @@
             },
     
             _getStats: function() {
-                return this.request('get-stats');
+                return this.httpClient('get-stats');
             },
     
             /**
@@ -3778,7 +3778,7 @@
              * @for  Uploader
              */
             skipFile: function( file, status ) {
-                file = file.id ? file : this.request( 'get-file', file );
+                file = file.id ? file : this.httpClient( 'get-file', file );
     
                 file.setStatus( status || Status.COMPLETE );
                 file.skipped = true;

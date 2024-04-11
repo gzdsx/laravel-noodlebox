@@ -103,7 +103,7 @@ export default {
             let {parent_id} = this;
             this.loading = true;
             ApiService.get('/districts?parent=' + parent_id).then(response => {
-                this.dataList = response.result.items;
+                this.dataList = response.data.items;
             }).finally(() => {
                 this.loading = false;
             });
@@ -112,8 +112,8 @@ export default {
             let {parent_id} = this;
             if (parent_id) {
                 ApiService.get('/districts/' + parent_id).then(response => {
-                    this.current = response.result;
-                    this.ancestors = this.getAncestors(response.result).reverse();
+                    this.current = response.data;
+                    this.ancestors = this.getAncestors(response.data).reverse();
                 });
             }
         },
