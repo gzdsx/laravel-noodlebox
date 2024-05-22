@@ -34,7 +34,7 @@ var _default = exports["default"] = {
       var _this = this;
       this.loading = true;
       _HttpClient["default"].get('/orders?status=' + this.status).then(function (res) {
-        _this.orders = res.result.items;
+        _this.orders = res.data.items;
       })["catch"](function (reason) {})["finally"](function () {
         _this.loading = false;
       });
@@ -292,7 +292,7 @@ function (response) {
   // if the custom code is not 20000, it is judged as an error.
   if (res.code) {
     if (res.code === 401) {
-      window.dispatchEvent(new Event('Unauthenticated'));
+      window.dispatchEvent(new Event('unauthenticated'));
     }
     //return Promise.reject(new Error(res.message || "Error"));
     return Promise.reject(res);
@@ -300,7 +300,12 @@ function (response) {
     return res;
   }
 }, function (error) {
-  //console.log('err:' , error) // for debug
+  //console.log("Response Error:", error);
+  if (error.response) {
+    if (error.response.status === 401) {
+      window.dispatchEvent(new Event('unauthenticated'));
+    }
+  }
   return Promise.reject(error);
 });
 var _default = exports["default"] = httpClient;

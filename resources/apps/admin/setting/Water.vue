@@ -3,7 +3,7 @@
         <div slot="header">
             <h2>{{ $t('settings.watermark') }}</h2>
         </div>
-        <section class="page-section setting-form-wrapper">
+        <section class="page-section setting-form-wrapper" v-loading="loading">
             <el-form label-width="160px">
                 <el-form-item :label="$t('settings.watermark_enable')">
                     <el-switch :active-value="1" :inactive-value="0" v-model="settings.water_mark"/>

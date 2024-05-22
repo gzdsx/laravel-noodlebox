@@ -14,7 +14,7 @@
                         <div class="form-group">
                             <input type="text" name="account"
                                    class="form-control form-control-lg{{$errors->has('account') ? ' is-invalid' : ''}}"
-                                   placeholder="{{__('Account')}}" required="required">
+                                   placeholder="{{__('Phone/Email')}}" required="required">
                             @if ($errors->has('account'))
                                 <div class="invalid-feedback show"
                                      role="alert">{{$errors->first('account')}}</div>

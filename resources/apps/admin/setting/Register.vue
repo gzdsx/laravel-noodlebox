@@ -3,7 +3,7 @@
         <div slot="header">
             <h2>{{ $t('settings.register') }}</h2>
         </div>
-        <section class="page-section setting-form-wrapper">
+        <section class="page-section setting-form-wrapper" v-loading="loading">
             <el-form label-width="160px">
                 <el-form-item :label="$t('settings.register_allowed')">
                     <el-switch :active-value="1" :inactive-value="0" v-model="settings.regallowed"/>

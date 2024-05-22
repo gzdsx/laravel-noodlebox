@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasMetaValueAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,7 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ShopMeta extends Model
 {
-    use HasFactory;
+    use HasFactory, HasMetaValueAttribute;
 
     protected $table = 'shop_meta';
     protected $fillable = ['shop_id', 'meta_key', 'meta_value'];

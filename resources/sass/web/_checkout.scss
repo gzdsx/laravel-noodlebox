@@ -73,7 +73,7 @@
                 }
 
                 .additional {
-                    font-weight: 600;
+                    font-weight: 400;
                     font-size: 0.9rem;
 
                     a:hover {
@@ -163,6 +163,7 @@
 
         .radio {
             opacity: 0;
+            display: none;
         }
 
         .radio:checked + .radio-box:before {

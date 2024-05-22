@@ -15,12 +15,13 @@ return [
     'order manage' => '订单管理',
     'order list' => '订单列表',
     'order_statuses' => [
-        'unpaid' => '待付款',
-        'paid' => '待发货',
-        'send' => '待收货',
-        'success' => '交易成功',
-        'refunding' => '退款中',
-        'closed' => '已取消'
+        'pending' => '待付款',
+        'processing' => '处理中',
+        'delivering' => '配送中',
+        'completed' => '已完成',
+        'canceled' => '已取消',
+        'refunded' => '已退款',
+        'failed' => '失败订单'
     ],
     'shipping type' => '配送方式',
     'shipping_types' => [

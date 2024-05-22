@@ -41,7 +41,7 @@
                             </el-form-item>
                             <el-form-item :label="$t('common.url')">
                                 <el-input size="medium" v-model="product.slug">
-                                    <span slot="prepend">{{ siteUrl }}/</span>
+                                    <span slot="prepend">{{ siteUrl }}/product/</span>
                                 </el-input>
                             </el-form-item>
                             <el-form-item label="关键词">
@@ -49,6 +49,29 @@
                             </el-form-item>
                             <el-form-item label="简短描述">
                                 <el-input type="textarea" rows="5" v-model="product.description"/>
+                            </el-form-item>
+                            <el-form-item label="徽章">
+                                <div class="badges-wrapper">
+                                    <div class="badge-item" v-for="(badge,idx) in meta_data.badges" :key="idx">
+                                        <img :src="badge.icon" alt="">
+                                        <i class="el-icon-close delete" @click="meta_data.badges.splice(idx)"></i>
+                                    </div>
+                                    <div class="badge-item addnew" @click="showBadgePanel=true">
+                                        <el-icon name="plus"/>
+                                    </div>
+                                </div>
+                            </el-form-item>
+                            <el-form-item label="新品">
+                                <el-radio-group v-model="product.is_new" inline>
+                                    <el-radio :label="1">是</el-radio>
+                                    <el-radio :label="0">否</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="热销商品">
+                                <el-radio-group v-model="product.is_hot" inline>
+                                    <el-radio :label="1">是</el-radio>
+                                    <el-radio :label="0">否</el-radio>
+                                </el-radio-group>
                             </el-form-item>
                         </div>
                     </div>
@@ -147,17 +170,38 @@
                                     :value="shop.id"
                             />
                         </el-select>
-                        <div class="form-label">运费模板</div>
-                        <el-select size="medium" class="w-100" v-model="product.template_id" placeholder="请选择">
-                            <el-option
-                                    v-for="(tpl,index) in templateList"
-                                    :label="tpl.template_name"
-                                    :value="tpl.template_id"
-                                    :key="index"
-                            />
-                        </el-select>
                         <div class="form-label">产品销量</div>
                         <el-input type="text" size="medium" v-model="product.sold" :min="0" :max="99999999"/>
+                        <div class="form-label">产品积分</div>
+                        <el-input type="text" size="medium" v-model="product.points" :min="0" :max="99999999"/>
+                        <div class="form-label">显示顺序</div>
+                        <el-input type="text" size="medium" v-model="product.sort_num" :min="0" :max="99999999"/>
+                        <div class="form-label">辣度</div>
+                        <el-select v-model="meta_data.spicy" class="w-100" size="medium" placeholder="请选择" clearable>
+                            <el-option
+                                    v-for="(item,index) in [
+                                        {label:'不辣',value:'none'},
+                                        {label:'微辣',value:'slightly'},
+                                        {label:'中辣',value:'medium'},
+                                        {label:'超级辣',value:'super'},
+                                    ]"
+                                    :key="index"
+                                    :label="item.label"
+                                    :value="item.value"
+                            />
+                        </el-select>
+                        <div class="form-label">图标</div>
+                        <el-select v-model="product.icon" class="w-100" size="medium" placeholder="请选择" clearable>
+                            <el-option
+                                    v-for="(item,index) in [
+                                        {label:'New',value:'new'},
+                                        {label:'Hot',value:'hot'},
+                                    ]"
+                                    :key="index"
+                                    :label="item.label"
+                                    :value="item.value"
+                            />
+                        </el-select>
                     </div>
                 </div>
             </div>
@@ -169,6 +213,7 @@
         </fixed-bottom>
         <media-dialog v-model="showMediaDialog" :multiple="multipleMedia" :max-count="maxImageCount"
                       @confirm="selectedMedia"/>
+        <badge-panel v-model="showBadgePanel" type="product" @confirm="onChooseBadges"/>
     </main-layout>
 </template>
 
@@ -182,6 +227,7 @@ import CategoryCheckboxList from "../components/CategoryCheckboxList.vue";
 import VariationPanel from "./VariationPanel.vue";
 import variationList from "./VariationList.vue";
 import AdditionOptionsPanel from "./AdditionOptionsPanel.vue";
+import BadgePanel from "../components/BadgePanel.vue";
 
 export default {
     name: "ProductEdit",
@@ -191,6 +237,7 @@ export default {
         }
     },
     components: {
+        BadgePanel,
         AdditionOptionsPanel,
         VariationPanel,
         CategoryCheckboxList,
@@ -213,6 +260,10 @@ export default {
             skus: [],
             images: [],
             content: {},
+            meta_data: {
+                spicy: 'none',
+                badges: []
+            },
             templateList: [],
             shopList: [],
             categories: [],
@@ -224,6 +275,7 @@ export default {
 
             },
             siteUrl: window.siteUrl || window.location.origin,
+            showBadgePanel: false
         }
     },
     methods: {
@@ -232,13 +284,21 @@ export default {
             if (!id) return;
             ProductService.getProduct(id || 0).then(response => {
                 const product = response.data;
-                const {images, skus, content, categories, metas} = product;
+                const {images, skus, content, categories, meta_data} = product;
 
                 this.product = product;
                 if (content) this.content = content;
+                if (meta_data) {
+                    this.meta_data = {
+                        ...this.meta_data,
+                        ...meta_data
+                    };
+                }
                 if (Array.isArray(skus)) this.skus = skus;
                 if (Array.isArray(images)) this.images = images;
                 if (Array.isArray(categories)) this.selectedCategories = categories.map(c => c.id);
+            }).finally(() => {
+                //this.loading = false;
             });
         },
         fetchCategories() {
@@ -288,8 +348,8 @@ export default {
             this.product.attr_list = data.attrs;
         },
         onSubmit(type) {
-            console.log(this.product.variation_list);
-            let {product, images, content, skus} = this;
+            //console.log(this.product.variation_list);
+            let {product, images, content, skus, meta_data} = this;
             let {title, price, stock} = product;
 
             if (images.length === 0) {
@@ -348,6 +408,7 @@ export default {
             product.images = images;
             product.content = content;
             product.categories = this.selectedCategories;
+            product.meta_data = meta_data;
             if (product.id) {
                 ProductService.updateProduct(product.id, product).then(() => {
                     this.$message.success('产品已更新');
@@ -366,6 +427,16 @@ export default {
                 }).finally(() => {
                     this.disabled = false;
                 });
+            }
+        },
+        onChooseBadges(badges) {
+            this.meta_data.badges = this.meta_data.badges.concat(badges);
+        },
+        getArray(arr) {
+            if (Array.isArray(arr)) {
+                return arr;
+            } else {
+                return [];
             }
         },
     },

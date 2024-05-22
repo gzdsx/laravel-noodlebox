@@ -1,4 +1,4 @@
-import NoodleCart from "./components/NoodleCart.vue";
+import NoodleCart from "./cart/NoodleCart.vue";
 
 new Vue({
     el: '#cartApp',

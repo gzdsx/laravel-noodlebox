@@ -6,12 +6,13 @@ use App\Models\Traits\HasDates;
 use EloquentFilter\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Vinkla\Hashids\Facades\Hashids;
 
 
 /**
  * App\Models\Order
  *
- * @property int $order_id 主键
+ * @property int $id 主键
  * @property string|null $order_no 订单编号
  * @property int $order_type 订单类型,1=普通订单,2=拼单,3=超市订单,4=外卖订单
  * @property int $shop_id 门店ID
@@ -26,11 +27,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $total
  * @property string $total_tax
  * @property int $prices_include_tax
- * @property int $payment_method 付款方式，1=在线支付，2=货到付款
+ * @property string $payment_method
  * @property string|null $payment_method_title
  * @property int $payment_status 支付状态，1=已支付，0=未支付
  * @property \Illuminate\Support\Carbon|null $payment_at 付款时间
- * @property int $shipping_method 配送方式
+ * @property string $shipping_method 配送方式
+ * @property int $shipping_zone_id 配送区域
  * @property string $shipping_total 配送费
  * @property string $shipping_tax
  * @property int $shipping_status 发货状态，0=未发货，1=已发货
@@ -44,10 +46,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property array|null $discount_lines 优惠列表
  * @property array|null $shipping 配送地址
  * @property array|null $billing 账单地址
+ * @property int $deliveryer_id 配送员
  * @property string $status 订单状态
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property-read \App\Models\User|null $buyer
+ * @property-read \App\Models\Deliveryer|null $deliveryer
+ * @property-read mixed $links
  * @property-read array|\Illuminate\Contracts\Translation\Translator|string|null $pay_status_des
  * @property-read mixed|null $status_des
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderItem> $items
@@ -71,13 +76,14 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder|Order whereBuyerNote($value)
  * @method static Builder|Order whereBuyerRate($value)
  * @method static Builder|Order whereCreatedAt($value)
+ * @method static Builder|Order whereDeliveryerId($value)
  * @method static Builder|Order whereDiscountLines($value)
  * @method static Builder|Order whereDiscountTax($value)
  * @method static Builder|Order whereDiscountTotal($value)
  * @method static Builder|Order whereEndsWith(string $column, string $value, string $boolean = 'and')
  * @method static Builder|Order whereFeeLines($value)
+ * @method static Builder|Order whereId($value)
  * @method static Builder|Order whereLike(string $column, string $value, string $boolean = 'and')
- * @method static Builder|Order whereOrderId($value)
  * @method static Builder|Order whereOrderNo($value)
  * @method static Builder|Order whereOrderType($value)
  * @method static Builder|Order whereOutTradeNo($value)
@@ -96,6 +102,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder|Order whereShippingStatus($value)
  * @method static Builder|Order whereShippingTax($value)
  * @method static Builder|Order whereShippingTotal($value)
+ * @method static Builder|Order whereShippingZoneId($value)
  * @method static Builder|Order whereShopId($value)
  * @method static Builder|Order whereShopName($value)
  * @method static Builder|Order whereStatus($value)
@@ -113,22 +120,23 @@ class Order extends Model
     const ORDER_STATUS_SEND = 'send'; //已发货
     const ORDER_STATUS_SUCCESS = 'success'; //交易成功
     const ORDER_STATUS_REFUNDING = 'refunding'; //退款中
-    const ORDER_STATUS_CLOSED = 'closed'; //已关闭
     const ORDER_STATUS_CANCELLED = 'cancelled'; //已取消
     const ORDER_STATUS_COMPLETED = 'completed'; //已完成
     const ORDER_STATUS_PENDING = 'pending'; //待处理
     const ORDER_STATUS_PROCESSIING = 'processing'; //处理中
     const ORDER_STATUS_DELIVERING = 'delivering'; //配送中
+    const ORDER_STATUS_FAILED = 'failed';
+    const ORDER_STATUS_REFUNDED = 'refunded';
 
     protected $table = 'order';
-    protected $primaryKey = 'order_id';
+    protected $primaryKey = 'id';
     protected $fillable = [
-        'order_id', 'order_no', 'order_type', 'shop_id', 'shop_name', 'buyer_id', 'buyer_name', 'buyer_note',
+        'id', 'order_no', 'order_type', 'shop_id', 'shop_name', 'buyer_id', 'buyer_name', 'buyer_note',
         'seller_id', 'seller_name', 'discount_total', 'discount_tax', 'total', 'total_tax', 'prices_include_tax',
-        'payment_method', 'payment_method_title', 'payment_status', 'payment_at', 'shipping_method',
+        'payment_method', 'payment_method_title', 'payment_status', 'payment_at', 'shipping_method', 'shipping_zone_id',
         'shipping_total', 'shipping_tax', 'shipping_status', 'shipping_at', 'buyer_rate', 'seller_rate',
         'buyer_deleted', 'seller_deleted', 'out_trade_no', 'fee_lines', 'discount_lines', 'shipping',
-        'billing', 'status', 'created_at', 'updated_at'
+        'billing', 'deliveryer_id', 'status', 'created_at', 'updated_at'
     ];
     protected $dates = [
         'payment_at',
@@ -136,6 +144,7 @@ class Order extends Model
     ];
     protected $appends = [
         'status_des',
+        'links'
     ];
 
     protected $casts = [
@@ -145,7 +154,7 @@ class Order extends Model
         'billing' => 'array'
     ];
 
-    protected $with = ['items', 'buyer', 'seller', 'shop', 'transaction'];
+    protected $with = ['items', 'buyer', 'seller', 'shop', 'transaction', 'deliveryer'];
 
     public static function boot()
     {
@@ -172,12 +181,19 @@ class Order extends Model
         return is_null($this->payment_status) ?: trans('trade.pay_states.' . $this->payment_status);
     }
 
+    public function getLinksAttribute()
+    {
+        return [
+            'invoice' => route('order.invoice', Hashids::encodeHex($this->id)),
+        ];
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany|OrderItem
      */
     public function items()
     {
-        return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
+        return $this->hasMany(OrderItem::class, 'order_id', 'id');
     }
 
     /**
@@ -185,7 +201,7 @@ class Order extends Model
      */
     public function notes()
     {
-        return $this->hasMany(OrderNote::class, 'order_id', 'order_id');
+        return $this->hasMany(OrderNote::class, 'order_id', 'id');
     }
 
     /**
@@ -221,6 +237,14 @@ class Order extends Model
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo|Deliveryer
+     */
+    public function deliveryer()
+    {
+        return $this->belongsTo(Deliveryer::class, 'deliveryer_id', 'id');
+    }
+
+    /**
      * @param $order_no
      * @return Builder|Model|Order|object|null
      */
@@ -232,7 +256,7 @@ class Order extends Model
     public function markAsPaid()
     {
         $this->forceFill([
-            'status' => self::ORDER_STATUS_PAID,
+            'status' => self::ORDER_STATUS_PROCESSIING,
             'payment_status' => 1,
             'payment_at' => now()
         ])->save();
@@ -242,7 +266,7 @@ class Order extends Model
     public function markAsUnPaid()
     {
         $this->forceFill([
-            'status' => self::ORDER_STATUS_UNPAID,
+            'status' => self::ORDER_STATUS_PENDING,
             'payment_status' => 0,
             'payment_at' => null
         ])->save();
@@ -267,6 +291,7 @@ class Order extends Model
     public function markAsShipped()
     {
         $this->forceFill([
+            'status' => self::ORDER_STATUS_DELIVERING,
             'shipping_status' => 1,
             'shipping_at' => now()
         ])->save();

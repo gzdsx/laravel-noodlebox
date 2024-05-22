@@ -39,7 +39,8 @@ trait SoldApis
         return json_success([
             'total' => $query->count(),
             'items' => $query->offset($request->input('offset', 0))
-                ->limit($request->input('limit', 10))->orderByDesc('order_id')->get()
+                ->limit($request->input('limit', 10))
+                ->orderByDesc('created_at')->get()
         ]);
     }
 
@@ -50,6 +51,26 @@ trait SoldApis
     public function show($id)
     {
         $model = $this->repository()->findOrFail($id);
+        return json_success($model);
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, $id)
+    {
+        $model = $this->repository()->findOrFail($id);
+        $model->fill($request->input('order', []));
+
+        if ($model->status == Order::ORDER_STATUS_PENDING) {
+            $model->payment_status = 0;
+            $model->payment_at = null;
+        }
+
+        $model->save();
+
         return json_success($model);
     }
 

@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Http\Controllers\Admin\ProductAttribute;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use Illuminate\Bus\Queueable;

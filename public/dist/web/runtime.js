@@ -62,37 +62,50 @@ var _default = exports["default"] = {
     },
     fetchList: function fetchList() {
       var _this = this;
-      this.loading = true;
       _HttpClient["default"].get('/carts').then(function (res) {
-        res.result.items.forEach(function (item) {
+        res.data.items.forEach(function (item) {
           Object.defineProperty(item, 'total', {
             get: function get() {
               return (this.price * this.quantity).toFixed(2);
             }
           });
         });
-        _this.cart_items = res.result.items;
-      })["catch"](function (reason) {})["finally"](function () {
+        _this.cart_items = res.data.items;
+      })["catch"](function (reason) {
+        console.log(reason.message);
+      })["finally"](function () {
         _this.loading = false;
       });
     },
     removeItem: function removeItem(index) {
       var _this2 = this;
       var item = this.cart_items[index];
+      this.loading = true;
       _HttpClient["default"]["delete"]("/carts/".concat(item.id)).then(function (res) {
         _this2.cart_items.splice(index, 1);
-      })["catch"](function (reason) {})["finally"](function () {});
+      })["catch"](function (reason) {})["finally"](function () {
+        _this2.loading = false;
+      });
     },
     onQuantityChange: function onQuantityChange(index) {
+      var _this3 = this;
       var item = this.cart_items[index];
       var quantity = item.quantity,
         id = item.id;
+      this.loading = true;
       _HttpClient["default"].put("/carts/".concat(id), {
         quantity: quantity
-      }).then(function (res) {})["catch"](function (reason) {})["finally"](function () {});
+      }).then(function (res) {})["catch"](function (reason) {})["finally"](function () {
+        _this3.loading = false;
+      });
     },
     onCheckout: function onCheckout() {
       window.location.href = '/checkout';
+    },
+    metaValue: function metaValue(meta_data) {
+      return meta_data.map(function (item) {
+        return item.value;
+      }).join(', ');
     }
   },
   mounted: function mounted() {
@@ -120,10 +133,12 @@ var _DialogCart = _interopRequireDefault(__webpack_require__(/*! ./DialogCart.vu
 var _ProductMetaBoxes = _interopRequireDefault(__webpack_require__(/*! ./ProductMetaBoxes.vue */ "./resources/apps/web/components/ProductMetaBoxes.vue"));
 var _NoodleDialog = _interopRequireDefault(__webpack_require__(/*! ./NoodleDialog.vue */ "./resources/apps/web/components/NoodleDialog.vue"));
 var _NoodleLoading = _interopRequireDefault(__webpack_require__(/*! ./NoodleLoading.vue */ "./resources/apps/web/components/NoodleLoading.vue"));
+var _NoodleDialogLogin = _interopRequireDefault(__webpack_require__(/*! ./NoodleDialogLogin.vue */ "./resources/apps/web/components/NoodleDialogLogin.vue"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var _default = exports["default"] = {
   name: "NoodleBoxApp",
   components: {
+    NoodleDialogLogin: _NoodleDialogLogin["default"],
     NoodleLoading: _NoodleLoading["default"],
     NoodleDialog: _NoodleDialog["default"],
     ProductMetaBoxes: _ProductMetaBoxes["default"],
@@ -134,7 +149,8 @@ var _default = exports["default"] = {
       visible: false,
       loading: false,
       product: {},
-      curImage: {}
+      curImage: {},
+      showLogin: false
     };
   },
   mounted: function mounted() {
@@ -145,19 +161,24 @@ var _default = exports["default"] = {
         var id = e.target.getAttribute('data-id');
         _this.loading = true;
         _HttpClient["default"].get("/products/".concat(id)).then(function (response) {
-          _this.product = response.result;
-          _this.curImage = response.result.images[0];
+          _this.product = response.data;
+          _this.curImage = response.data.images[0];
           _this.visible = true;
-        })["catch"](function (reason) {})["finally"](function () {
+        })["catch"](function (reason) {
+          if (reason.code === 401) {
+            window.location.href = '/login';
+          }
+        })["finally"](function () {
           _this.loading = false;
         });
       });
     });
 
     // 监听自定义事件
-    window.addEventListener('Unauthenticated', function (event) {
+    window.addEventListener('unauthenticated', function (event) {
       console.log('你尚未登录');
       //window.location.href = '/login';
+      _this.showLogin = true;
     });
   }
 };
@@ -187,6 +208,10 @@ var _default = exports["default"] = {
     title: {
       type: String,
       "default": 'Dialog'
+    },
+    customClass: {
+      type: String,
+      "default": ''
     }
   },
   data: function data() {
@@ -225,6 +250,57 @@ var _default = exports["default"] = {
   destroyed: function destroyed() {
     if (this.$el && this.$el.parentNode) {
       this.$el.parentNode.removeChild(this.$el);
+    }
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=script&lang=js":
+/*!*****************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=script&lang=js ***!
+  \*****************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+var _default = exports["default"] = {
+  name: "NoodleDialogLogin",
+  props: {
+    value: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  data: function data() {
+    return {
+      account: '',
+      password: ''
+    };
+  },
+  methods: {
+    login: function login() {
+      var _this = this;
+      var account = this.account,
+        password = this.password;
+      _HttpClient["default"].post('/login', {
+        account: account,
+        password: password
+      }).then(function (res) {
+        _this.$emit('input', false);
+      })["catch"](function (reason) {
+        console.log(reason);
+      })["finally"](function () {});
+    },
+    close: function close() {
+      this.$emit('input', false);
     }
   }
 };
@@ -335,10 +411,10 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports["default"] = void 0;
-var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
 var _NoodleNumberControl = _interopRequireDefault(__webpack_require__(/*! ./NoodleNumberControl.vue */ "./resources/apps/web/components/NoodleNumberControl.vue"));
 var _NoodleLoading = _interopRequireDefault(__webpack_require__(/*! ./NoodleLoading.vue */ "./resources/apps/web/components/NoodleLoading.vue"));
 var _DialogCart = _interopRequireDefault(__webpack_require__(/*! ./DialogCart.vue */ "./resources/apps/web/components/DialogCart.vue"));
+var _CartService = _interopRequireDefault(__webpack_require__(/*! ../CartService */ "./resources/apps/web/CartService.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var _default2 = exports["default"] = {
   name: "ProductMetaBoxes",
@@ -365,8 +441,38 @@ var _default2 = exports["default"] = {
       meta_data: [],
       quantity: 1,
       showCart: false,
-      loading: false
+      loading: false,
+      options: {},
+      additional_options: []
     };
+  },
+  computed: {
+    finalPrice: function finalPrice() {
+      var options = {},
+        additional_options = [];
+      var price = parseFloat(this.product.price);
+      if (Array.isArray(this.product.variation_list)) {
+        this.product.variation_list.map(function (item) {
+          item.options.map(function (option) {
+            if (option.selected && /\d+/.test(option.price)) {
+              price += parseFloat(option.price);
+              options[item.name] = option.title;
+            }
+          });
+        });
+      }
+      if (Array.isArray(this.product.additional_options)) {
+        this.product.additional_options.map(function (option) {
+          if (option.selected && /\d+/.test(option.price)) {
+            price += parseFloat(option.price);
+            additional_options.push(option.title);
+          }
+        });
+      }
+      this.options = options;
+      this.additional_options = additional_options;
+      return price.toFixed(2);
+    }
   },
   methods: {
     onSelectOption: function onSelectOption(v, o) {
@@ -378,58 +484,17 @@ var _default2 = exports["default"] = {
       o.selected = !o.selected;
     },
     addToCart: function addToCart() {
-      var _this = this;
       var product = this.product,
-        quantity = this.quantity;
-      var meta_data = [];
-      product.variation_list.forEach(function (item) {
-        var selected = item.options.filter(function (o) {
-          return o.selected;
-        });
-        if (selected.length > 0) {
-          var _selected$ = selected[0],
-            title = _selected$.title,
-            price = _selected$.price;
-          meta_data.push({
-            key: item.name,
-            value: title,
-            price: price
-          });
-        }
-      });
-      if (Array.isArray(product.additional_options)) {
-        var options = product.additional_options.filter(function (item) {
-          return item.selected;
-        });
-        if (options.length > 0) {
-          meta_data.push({
-            key: 'Additional Options',
-            value: options.map(function (item) {
-              return item.title;
-            }).join(','),
-            price: options.reduce(function (acc, item) {
-              return acc + Number(item.price);
-            }, 0)
-          });
-        }
-      }
-      this.loading = true;
-      _HttpClient["default"].post('/carts', {
-        product_id: product.id,
-        quantity: quantity,
-        meta_data: meta_data
-      }).then(function (res) {
-        _this.showCart = true;
-        _this.$emit('add-cart', res);
-      })["catch"](function (reason) {
-        if (reason.code === 401) {
-          window.location.href = '/login';
-        }
-      })["finally"](function () {
-        _this.loading = false;
-      });
+        finalPrice = this.finalPrice,
+        quantity = this.quantity,
+        options = this.options,
+        additional_options = this.additional_options;
+      var cart = new _CartService["default"]();
+      cart.addToCart(product, finalPrice, quantity, options, additional_options);
+      this.$showToast('Added to cart successfully!');
     }
-  }
+  },
+  mounted: function mounted() {}
 };
 
 /***/ }),
@@ -458,7 +523,11 @@ var render = exports.render = function render() {
     on: {
       close: _vm.close
     }
-  }, [!_vm.loading ? _c("div", {
+  }, [_c("noodle-container", {
+    attrs: {
+      loading: _vm.loading
+    }
+  }, [_c("div", {
     staticClass: "dialog-cart-wrapper"
   }, [_c("div", {
     staticClass: "cart-items"
@@ -489,8 +558,8 @@ var render = exports.render = function render() {
     }, [_c("div", {
       staticClass: "title"
     }, [_vm._v(_vm._s(item.title))]), _vm._v(" "), _c("div", {
-      staticClass: "options"
-    }, [_c("span", [_vm._v("Points: 9")]), _vm._v(" "), _c("a", [_vm._v("Additional options")])])]), _vm._v(" "), _c("div", {
+      staticClass: "metas"
+    }, [_vm._v(_vm._s(_vm.metaValue(item.meta_data)))])]), _vm._v(" "), _c("div", {
       staticClass: "cart-item__price text-bull-cyan"
     }, [_vm._v("€" + _vm._s(item.price))]), _vm._v(" "), _c("div", {
       staticClass: "cart-item__qty"
@@ -534,7 +603,7 @@ var render = exports.render = function render() {
     on: {
       click: _vm.close
     }
-  }, [_vm._v("Continue")])])])]) : _vm._e()]);
+  }, [_vm._v("Continue")])])])])])], 1);
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -557,7 +626,7 @@ exports.staticRenderFns = exports.render = void 0;
 var render = exports.render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("noodle-dialog", {
+  return _c("div", [_c("noodle-dialog", {
     attrs: {
       title: "Add to cart",
       visible: _vm.visible
@@ -566,6 +635,10 @@ var render = exports.render = function render() {
       close: function close($event) {
         _vm.visible = false;
       }
+    }
+  }, [_c("noodle-container", {
+    attrs: {
+      loading: _vm.loading
     }
   }, [_c("div", {
     staticClass: "dialog-metas-container"
@@ -608,7 +681,20 @@ var render = exports.render = function render() {
         _vm.visible = false;
       }
     }
-  })], 1)])]), _vm._v(" "), _vm.loading ? _c("noodle-loading") : _vm._e()], 1);
+  })], 1)])])])], 1), _vm._v(" "), _c("noodle-dialog-login", {
+    on: {
+      close: function close($event) {
+        _vm.showLogin = false;
+      }
+    },
+    model: {
+      value: _vm.showLogin,
+      callback: function callback($$v) {
+        _vm.showLogin = $$v;
+      },
+      expression: "showLogin"
+    }
+  })], 1);
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -644,6 +730,7 @@ var render = exports.render = function render() {
     }
   }, [_c("div", {
     staticClass: "noodle-dialog",
+    "class": _vm.customClass,
     on: {
       click: function click($event) {
         $event.stopPropagation();
@@ -666,6 +753,143 @@ var render = exports.render = function render() {
   }, [_vm._t("default")], 2), _vm._v(" "), _c("div", {
     staticClass: "noodle-dialog__footer"
   })])]);
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=template&id=8f7655ae&scoped=true":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=template&id=8f7655ae&scoped=true ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("noodle-dialog", {
+    attrs: {
+      title: "Login",
+      "custom-class": "auth-dialog",
+      visible: _vm.value
+    },
+    on: {
+      close: _vm.close
+    }
+  }, [_c("div", {
+    staticClass: "dialog-login-wapper"
+  }, [_c("form", {
+    staticClass: "auth-form",
+    attrs: {
+      method: "post"
+    }
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.account,
+      expression: "account"
+    }],
+    staticClass: "form-control form-control-lg",
+    attrs: {
+      type: "text",
+      placeholder: "Phone/Email",
+      required: "required"
+    },
+    domProps: {
+      value: _vm.account
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.account = $event.target.value;
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.password,
+      expression: "password"
+    }],
+    staticClass: "form-control form-control-lg",
+    attrs: {
+      type: "password",
+      placeholder: "Password",
+      required: "required"
+    },
+    domProps: {
+      value: _vm.password
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.password = $event.target.value;
+      }
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "form-group"
+  }, [_c("button", {
+    staticClass: "btn btn-danger btn-lg btn-block",
+    attrs: {
+      type: "button"
+    },
+    on: {
+      click: _vm.login
+    }
+  }, [_vm._v("Login")])]), _vm._v(" "), _c("div", {
+    staticClass: "auth-form-links"
+  }, [_c("a", {
+    attrs: {
+      href: "/"
+    }
+  }, [_vm._v("Forget password?")]), _vm._v(" "), _c("span", [_vm._v("or")]), _vm._v(" "), _c("a", {
+    attrs: {
+      href: "/register"
+    }
+  }, [_vm._v("Registration")])])]), _vm._v(" "), _c("div", {
+    staticClass: "blank-1"
+  }), _vm._v(" "), _c("div", {
+    staticClass: "auth-or"
+  }, [_c("span", [_vm._v("OR")])]), _vm._v(" "), _c("div", {
+    staticClass: "auth-socials"
+  }, [_c("a", {
+    attrs: {
+      href: "/auth/google"
+    }
+  }, [_c("i", {
+    staticClass: "bi bi-google"
+  })]), _vm._v(" "), _c("a", {
+    attrs: {
+      href: "/auth/facebook"
+    }
+  }, [_c("i", {
+    staticClass: "bi bi-facebook"
+  })]), _vm._v(" "), _c("a", {
+    attrs: {
+      href: "/auth/github"
+    }
+  }, [_c("i", {
+    staticClass: "bi bi-github"
+  })]), _vm._v(" "), _c("a", {
+    attrs: {
+      href: "/auth/bi-twitter"
+    }
+  }, [_c("i", {
+    staticClass: "bi bi-twitter"
+  })])])])]);
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -788,9 +1012,9 @@ var render = exports.render = function render() {
     staticClass: "product-metabox"
   }, [_c("h3", [_vm._v(_vm._s(_vm.product.title))]), _vm._v(" "), _c("div", {
     staticClass: "product-potins"
-  }, [_vm._v("\n        Noodle Box Earn Points : 9 Points\n    ")]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n        Noodle Box Earn Points : " + _vm._s(_vm.product.points) + " Points\n    ")]), _vm._v(" "), _c("div", {
     staticClass: "product-price text-bull-cyan"
-  }, [_vm._v("€" + _vm._s(_vm.product.price))]), _vm._v(" "), _vm.product.description ? _c("div", {
+  }, [_vm._v("€" + _vm._s(_vm.finalPrice))]), _vm._v(" "), _vm.product.description ? _c("div", {
     staticClass: "product-description text-safety-orange"
   }, [_vm._v("\n        " + _vm._s(_vm.product.description) + "\n    ")]) : _vm._e(), _vm._v(" "), Array.isArray(_vm.product.variation_list) ? _c("div", {
     staticClass: "product-variations"
@@ -869,6 +1093,96 @@ var staticRenderFns = exports.staticRenderFns = [function () {
   }), _vm._v(" "), _c("span", [_vm._v("Add Favorite")])])]);
 }];
 render._withStripped = true;
+
+/***/ }),
+
+/***/ "./resources/apps/web/CartService.js":
+/*!*******************************************!*\
+  !*** ./resources/apps/web/CartService.js ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var CartService = exports["default"] = /*#__PURE__*/function () {
+  function CartService() {
+    _classCallCheck(this, CartService);
+    this.cartItems = this.getCartItems();
+  }
+  _createClass(CartService, [{
+    key: "addToCart",
+    value: function addToCart(product, price, quantity) {
+      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+      var addtional_options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
+      this.cartItems.push({
+        product_id: product.id,
+        title: product.title,
+        image: product.image,
+        price: price,
+        quantity: quantity,
+        options: options,
+        addtional_options: addtional_options
+      });
+      this.updateStorage();
+    }
+  }, {
+    key: "removeFromCart",
+    value: function removeFromCart(id) {
+      this.cartItems = this.cartItems.filter(function (item) {
+        return item.product_id !== id;
+      });
+      this.updateStorage();
+    }
+  }, {
+    key: "getCartItems",
+    value: function getCartItems() {
+      try {
+        var cartItems = JSON.parse(localStorage.getItem('cartItems'));
+        if (Array.isArray(cartItems)) {
+          cartItems.forEach(function (item) {
+            Object.defineProperty(item, 'subtotal', {
+              get: function get() {
+                return (Number(this.price) * Number(this.quantity)).toFixed(2);
+              }
+            });
+          });
+          return cartItems;
+        }
+      } catch (e) {
+        return [];
+      }
+    }
+  }, {
+    key: "saveItems",
+    value: function saveItems(items) {
+      this.cartItems = items;
+      this.updateStorage();
+    }
+  }, {
+    key: "clearCart",
+    value: function clearCart() {
+      this.cartItems = [];
+      this.updateStorage();
+    }
+  }, {
+    key: "updateStorage",
+    value: function updateStorage() {
+      localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
+    }
+  }]);
+  return CartService;
+}();
 
 /***/ }),
 
@@ -953,7 +1267,7 @@ function (response) {
   // if the custom code is not 20000, it is judged as an error.
   if (res.code) {
     if (res.code === 401) {
-      window.dispatchEvent(new Event('Unauthenticated'));
+      window.dispatchEvent(new Event('unauthenticated'));
     }
     //return Promise.reject(new Error(res.message || "Error"));
     return Promise.reject(res);
@@ -961,7 +1275,12 @@ function (response) {
     return res;
   }
 }, function (error) {
-  //console.log('err:' , error) // for debug
+  //console.log("Response Error:", error);
+  if (error.response) {
+    if (error.response.status === 401) {
+      window.dispatchEvent(new Event('unauthenticated'));
+    }
+  }
   return Promise.reject(error);
 });
 var _default = exports["default"] = httpClient;
@@ -3160,6 +3479,46 @@ component.options.__file = "resources/apps/web/components/NoodleDialog.vue"
 
 /***/ }),
 
+/***/ "./resources/apps/web/components/NoodleDialogLogin.vue":
+/*!*************************************************************!*\
+  !*** ./resources/apps/web/components/NoodleDialogLogin.vue ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _NoodleDialogLogin_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _NoodleDialogLogin_vue_vue_type_template_id_8f7655ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./NoodleDialogLogin.vue?vue&type=template&id=8f7655ae&scoped=true */ "./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=template&id=8f7655ae&scoped=true");
+/* harmony import */ var _NoodleDialogLogin_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./NoodleDialogLogin.vue?vue&type=script&lang=js */ "./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _NoodleDialogLogin_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _NoodleDialogLogin_vue_vue_type_template_id_8f7655ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _NoodleDialogLogin_vue_vue_type_template_id_8f7655ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "8f7655ae",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/components/NoodleDialogLogin.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/apps/web/components/NoodleLoading.vue":
 /*!*********************************************************!*\
   !*** ./resources/apps/web/components/NoodleLoading.vue ***!
@@ -3331,6 +3690,23 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=script&lang=js":
+/*!*************************************************************************************!*\
+  !*** ./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=script&lang=js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleDialogLogin_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleDialogLogin_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./NoodleDialogLogin.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleDialogLogin_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/apps/web/components/NoodleLoading.vue?vue&type=script&lang=js":
 /*!*********************************************************************************!*\
   !*** ./resources/apps/web/components/NoodleLoading.vue?vue&type=script&lang=js ***!
@@ -3432,6 +3808,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleDialog_vue_vue_type_template_id_2ab7f460_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleDialog_vue_vue_type_template_id_2ab7f460_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./NoodleDialog.vue?vue&type=template&id=2ab7f460&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleDialog.vue?vue&type=template&id=2ab7f460&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=template&id=8f7655ae&scoped=true":
+/*!*******************************************************************************************************!*\
+  !*** ./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=template&id=8f7655ae&scoped=true ***!
+  \*******************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleDialogLogin_vue_vue_type_template_id_8f7655ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleDialogLogin_vue_vue_type_template_id_8f7655ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleDialogLogin_vue_vue_type_template_id_8f7655ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleDialogLogin_vue_vue_type_template_id_8f7655ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./NoodleDialogLogin.vue?vue&type=template&id=8f7655ae&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleDialogLogin.vue?vue&type=template&id=8f7655ae&scoped=true");
 
 
 /***/ }),

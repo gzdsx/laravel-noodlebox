@@ -62,7 +62,10 @@
                 <el-table-column label="产品名称">
                     <template slot-scope="scope">
                         <div class="post-column-title">
-                            <a :href="scope.row.url" target="_blank">{{ scope.row.title }}</a>
+                            <a :href="scope.row.url" target="_blank">
+                                {{ scope.row.title }}
+                                <span class="tag-top" v-if="scope.row.sticky">TOP</span>
+                            </a>
                         </div>
                         <small class="text-muted" v-if="scope.row.shop">{{ scope.row.shop.shop_name }}</small>
                         <div class="post-column-actions">
@@ -88,16 +91,21 @@
                 <el-table-column prop="created_at" width="170" label="上架时间" align="right"/>
             </el-table>
             <div class="tablenav tablenav-bottom">
-                <el-button size="small" type="primary" :disabled="selectionIds.length === 0" @click="onBatchDelete">
-                    批量删除
-                </el-button>
-                <el-button size="small" :disabled="selectionIds.length === 0"
-                           @click="onBatchUpdate({state:1})">批量上架
-                </el-button>
-                <el-button size="small" :disabled="selectionIds.length === 0"
-                           @click="onBatchUpdate({state:0})">批量下架
-                </el-button>
-                <div class="flex"></div>
+                <div class="table-actions">
+                    <el-select size="small" v-model="batchAction">
+                        <el-option label="删除" value="delete"/>
+                        <el-option label="上架" value="listing"/>
+                        <el-option label="下架" value="delist"/>
+                        <el-option label="置顶" value="top"/>
+                        <el-option label="取消置顶" value="untop"/>
+                        <el-option label="提升" value="up"/>
+                        <el-option label="下沉" value="down"/>
+                    </el-select>
+                    <el-button size="small" type="primary" :disabled="selectionIds.length === 0"
+                               @click="onBatchOperation">
+                        批量操作
+                    </el-button>
+                </div>
                 <el-pagination
                         background
                         layout="prev, pager, next,total"
@@ -130,7 +138,8 @@ export default {
         return {
             params: defaultParams,
             cascaderOptions: [],
-            category_id: 0
+            category_id: 0,
+            batchAction: ''
         }
     },
     methods: {
@@ -149,18 +158,15 @@ export default {
             this.$confirm(this.$t('common.delete_tips'), this.$t('common.delete_confirm'), {
                 type: 'warning'
             }).then(() => {
+                this.loading = true;
                 ProductService.deleteProducts(ids).then(() => {
                     this.fetchList();
                 });
             });
         },
-        onBatchDelete() {
-            let ids = this.selectionIds.map((d) => d.id);
-            this.deleteRecords(ids);
-        },
         onClickTab(tab) {
             if (tab.name === 'all') {
-                this.params = defaultParams
+                this.params.status = '';
             } else {
                 this.params.status = tab.name;
             }
@@ -168,6 +174,7 @@ export default {
         },
         onBatchUpdate(data) {
             let ids = this.selectionIds.map((d) => d.id);
+            this.loading = true;
             ProductService.batchUpdate(ids, data).then(() => {
                 this.fetchList();
             });
@@ -184,6 +191,20 @@ export default {
             this.params.category = id;
             this.onSearch();
         },
+        onBatchOperation() {
+            let ids = this.selectionIds.map((d) => d.id);
+            let {batchAction} = this;
+            if (batchAction === 'delete') {
+                this.deleteRecords(ids);
+            } else {
+                this.loading = true;
+                ProductService.batchAdjust(ids, batchAction).then(() => {
+                    this.fetchList();
+                }).finally(() => {
+                    //this.loading = false;
+                });
+            }
+        }
     },
     mounted() {
         this.fetchList();

@@ -254,8 +254,8 @@ export default {
             this.$emit('input', false);
         },
         fetchZoneMethods() {
-            this.$http.get('shipping/zones/1/methods').then(resp => {
-                this.zone_methods = resp;
+            this.$http.get('/shipping-zones').then(res => {
+                this.zone_methods = res.data.items;
                 this.renderOptions();
             }).catch(err => {
                 console.warn(err);

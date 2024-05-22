@@ -124,9 +124,9 @@ window.Vue = _vue["default"];
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-14.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-14.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css":
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css":
 /*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-14.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-14.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css ***!
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css ***!
   \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
@@ -381,6 +381,19 @@ function isIdCardNo(idCard) {
 
 /***/ }),
 
+/***/ "./resources/sass/home/index.scss":
+/*!****************************************!*\
+  !*** ./resources/sass/home/index.scss ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ }),
+
 /***/ "./resources/sass/h5/index.scss":
 /*!**************************************!*\
   !*** ./resources/sass/h5/index.scss ***!
@@ -446,10 +459,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/sass/home/index.scss":
-/*!****************************************!*\
-  !*** ./resources/sass/home/index.scss ***!
-  \****************************************/
+/***/ "./resources/sass/web/invoice.scss":
+/*!*****************************************!*\
+  !*** ./resources/sass/web/invoice.scss ***!
+  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -459,9 +472,9 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-14.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-14.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css":
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css":
 /*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-14.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-14.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css ***!
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css ***!
   \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -472,7 +485,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_14_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_14_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_toast_vue_vue_type_style_index_0_id_05b457d0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-14.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-14.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-14.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-14.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css");
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_15_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_15_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_toast_vue_vue_type_style_index_0_id_05b457d0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css");
 
             
 
@@ -481,11 +494,11 @@ var options = {};
 options.insert = "head";
 options.singleton = false;
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_14_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_14_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_toast_vue_vue_type_style_index_0_id_05b457d0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_15_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_15_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_toast_vue_vue_type_style_index_0_id_05b457d0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_14_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_14_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_toast_vue_vue_type_style_index_0_id_05b457d0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_15_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_15_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_toast_vue_vue_type_style_index_0_id_05b457d0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -929,7 +942,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_14_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_14_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_toast_vue_vue_type_style_index_0_id_05b457d0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-14.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-14.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-14.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-14.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css");
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_15_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_15_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_toast_vue_vue_type_style_index_0_id_05b457d0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/toast/toast.vue?vue&type=style&index=0&id=05b457d0&scoped=true&lang=css");
 
 
 /***/ }),
@@ -14379,12 +14392,13 @@ var index = {
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = {
 /******/ 			"/lib/vue/vue-chunk": 0,
-/******/ 			"dist/home/index": 0,
+/******/ 			"dist/web/invoice": 0,
 /******/ 			"dist/web/index": 0,
 /******/ 			"dist/admin/index": 0,
 /******/ 			"lib/bootstrap/bootstrap.min": 0,
 /******/ 			"dist/pos/index": 0,
-/******/ 			"dist/h5/index": 0
+/******/ 			"dist/h5/index": 0,
+/******/ 			"dist/home/index": 0
 /******/ 		};
 /******/ 		
 /******/ 		// no chunk on demand loading
@@ -14439,13 +14453,14 @@ var index = {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	__webpack_require__.O(undefined, ["dist/home/index","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index"], () => (__webpack_require__("./resources/js/vue.js")))
-/******/ 	__webpack_require__.O(undefined, ["dist/home/index","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index"], () => (__webpack_require__("./resources/sass/bootstrap.scss")))
-/******/ 	__webpack_require__.O(undefined, ["dist/home/index","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index"], () => (__webpack_require__("./resources/sass/admin/index.scss")))
-/******/ 	__webpack_require__.O(undefined, ["dist/home/index","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index"], () => (__webpack_require__("./resources/sass/web/index.scss")))
-/******/ 	__webpack_require__.O(undefined, ["dist/home/index","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index"], () => (__webpack_require__("./resources/sass/home/index.scss")))
-/******/ 	__webpack_require__.O(undefined, ["dist/home/index","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index"], () => (__webpack_require__("./resources/sass/h5/index.scss")))
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["dist/home/index","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index"], () => (__webpack_require__("./resources/sass/pos/index.scss")))
+/******/ 	__webpack_require__.O(undefined, ["dist/web/invoice","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index","dist/home/index"], () => (__webpack_require__("./resources/js/vue.js")))
+/******/ 	__webpack_require__.O(undefined, ["dist/web/invoice","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index","dist/home/index"], () => (__webpack_require__("./resources/sass/bootstrap.scss")))
+/******/ 	__webpack_require__.O(undefined, ["dist/web/invoice","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index","dist/home/index"], () => (__webpack_require__("./resources/sass/admin/index.scss")))
+/******/ 	__webpack_require__.O(undefined, ["dist/web/invoice","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index","dist/home/index"], () => (__webpack_require__("./resources/sass/web/index.scss")))
+/******/ 	__webpack_require__.O(undefined, ["dist/web/invoice","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index","dist/home/index"], () => (__webpack_require__("./resources/sass/web/invoice.scss")))
+/******/ 	__webpack_require__.O(undefined, ["dist/web/invoice","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index","dist/home/index"], () => (__webpack_require__("./resources/sass/home/index.scss")))
+/******/ 	__webpack_require__.O(undefined, ["dist/web/invoice","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index","dist/home/index"], () => (__webpack_require__("./resources/sass/h5/index.scss")))
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["dist/web/invoice","dist/web/index","dist/admin/index","lib/bootstrap/bootstrap.min","dist/pos/index","dist/h5/index","dist/home/index"], () => (__webpack_require__("./resources/sass/pos/index.scss")))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()

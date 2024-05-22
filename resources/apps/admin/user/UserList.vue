@@ -52,6 +52,7 @@
                 <el-table-column prop="nickname" :label="$t('user.nickname')"/>
                 <el-table-column prop="phone" :label="$t('user.phone')"/>
                 <el-table-column prop="email" :label="$t('user.email')"/>
+                <el-table-column prop="points" width="80" :label="$t('common.points')"/>
                 <el-table-column prop="created_at" width="170" :label="$t('user.regtime')"/>
                 <el-table-column width="100px" :label="$t('common.option')" align="right">
                     <template slot-scope="scope">

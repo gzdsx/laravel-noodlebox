@@ -1,63 +1,75 @@
 .auth {
-    .auth {
-        &-container {
-            padding-top: 2rem;
-            padding-bottom: 4rem;
+
+}
+
+.auth {
+    &-container {
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+    }
+
+    &-form {
+        display: flex;
+        flex-direction: column;
+
+        &-header {
+            margin-bottom: 2rem;
         }
 
-        &-form {
+        &-links {
             display: flex;
-            flex-direction: column;
-
-            &-header {
-                margin-bottom: 2rem;
-            }
-
-            &-links {
-                display: flex;
-                justify-content: center;
-                column-gap: 10px;
-
-                a {
-                    color: #10A37F;
-                }
-            }
-        }
-
-        &-or {
-            display: flex;
-            align-items: center;
-            margin: 1rem 0;
-
-            &:before, &:after {
-                content: " ";
-                display: block;
-                border-bottom: 1px solid #c2c8d0;
-                height: 1px;
-                flex: 1;
-            }
-
-            span {
-                padding: 0 1rem;
-            }
-        }
-
-        &-socials {
-            display: flex;
-            gap: 15px;
             justify-content: center;
+            column-gap: 10px;
 
-            i{
-                font-size: 40px;
-            }
-
-            a{
-                color: #ffffff;
-
-                &:hover{
-                    color: var(--safety-orange);
-                }
+            a {
+                color: #10A37F;
             }
         }
     }
+
+    &-or {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0;
+
+        &:before, &:after {
+            content: " ";
+            display: block;
+            border-bottom: 1px solid #c2c8d0;
+            height: 1px;
+            flex: 1;
+        }
+
+        span {
+            padding: 0 1rem;
+        }
+    }
+
+    &-socials {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+
+        i{
+            font-size: 40px;
+        }
+
+        a{
+            color: #ffffff;
+
+            &:hover{
+                color: var(--safety-orange);
+            }
+        }
+    }
+}
+
+.dialog-login-wapper{
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.auth-dialog{
+    max-width: 500px;
+    min-width: 500px;
 }

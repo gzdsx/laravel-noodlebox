@@ -28,7 +28,7 @@ return [
         'edit' => 'Edit',
         'publish' => 'Publish',
         'publish_now' => 'Publish Now',
-        'save_draft' =>'Save Draft',
+        'save_draft' => 'Save Draft',
         'delete' => 'Delete',
         'delete_forever' => 'Delete Permanently',
         'permanently_delete' => 'Permanently Delete',
@@ -60,7 +60,7 @@ return [
         'sort' => 'Sort',
         'icon' => 'Icon',
         'show' => 'Show',
-        'keywords'=>'Keywords',
+        'keywords' => 'Keywords',
         'description' => 'Description',
         'created_at' => ' Creation Time',
         'updated_at' => 'Update Time',
@@ -71,7 +71,8 @@ return [
         'no_access' => 'No Data',
         'activate' => 'Activation',
         'deactivate' => 'Deactivate',
-        'url'=>'URL'
+        'url' => 'URL',
+        'points' => 'Points'
     ],
     'topbar' => [
         'home' => 'Backend Management Center',
@@ -88,7 +89,7 @@ return [
         'settings_attach' => 'Attachment',
         'settings_watermark' => 'Watermark',
         'settings_mail' => 'SMTP Mail',
-        'settings_sterling' => 'Sterling',
+        'settings_theme' => 'Theme',
         'users' => 'Users',
         'user_add' => 'New User',
         'user_manage' => 'All Users',

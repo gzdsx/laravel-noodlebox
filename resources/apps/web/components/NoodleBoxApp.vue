@@ -1,31 +1,35 @@
 <template>
-    <noodle-dialog title="Add to cart" :visible="visible" @close="visible=false">
-        <div class="dialog-metas-container">
-            <div class="row flex-column flex-md-row">
-                <div class="col product-image-col">
-                    <div class="product-images-wrapper">
-                        <img :src="curImage.image" alt="">
-                        <div class="product-thumbs">
-                            <div class="product-thumb"
-                                 v-for="(image, index) in product.images"
-                                 :key="index"
-                                 @click="curImage=image"
-                            >
-                                <img :src="image.image" alt="">
+    <div>
+        <noodle-dialog title="Add to cart" :visible="visible" @close="visible=false">
+            <noodle-container :loading="loading">
+                <div class="dialog-metas-container">
+                    <div class="row flex-column flex-md-row">
+                        <div class="col product-image-col">
+                            <div class="product-images-wrapper">
+                                <img :src="curImage.image" alt="">
+                                <div class="product-thumbs">
+                                    <div class="product-thumb"
+                                         v-for="(image, index) in product.images"
+                                         :key="index"
+                                         @click="curImage=image"
+                                    >
+                                        <img :src="image.image" alt="">
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                        <div class="col">
+                            <product-meta-boxes
+                                    :product="product"
+                                    @add-cart="visible=false"
+                            />
                         </div>
                     </div>
                 </div>
-                <div class="col">
-                    <product-meta-boxes
-                            :product="product"
-                            @add-cart="visible=false"
-                    />
-                </div>
-            </div>
-        </div>
-        <noodle-loading v-if="loading"/>
-    </noodle-dialog>
+            </noodle-container>
+        </noodle-dialog>
+        <noodle-dialog-login v-model="showLogin" @close="showLogin=false"/>
+    </div>
 </template>
 
 <script>
@@ -34,16 +38,18 @@ import DialogCart from "./DialogCart.vue";
 import ProductMetaBoxes from "./ProductMetaBoxes.vue";
 import NoodleDialog from "./NoodleDialog.vue";
 import NoodleLoading from "./NoodleLoading.vue";
+import NoodleDialogLogin from "./NoodleDialogLogin.vue";
 
 export default {
     name: "NoodleBoxApp",
-    components: {NoodleLoading, NoodleDialog, ProductMetaBoxes, DialogCart},
+    components: {NoodleDialogLogin, NoodleLoading, NoodleDialog, ProductMetaBoxes, DialogCart},
     data() {
         return {
             visible: false,
             loading: false,
             product: {},
-            curImage: {}
+            curImage: {},
+            showLogin: false
         }
     },
     mounted() {
@@ -57,7 +63,9 @@ export default {
                     this.curImage = response.data.images[0];
                     this.visible = true;
                 }).catch(reason => {
-
+                    if (reason.code === 401) {
+                        window.location.href = '/login';
+                    }
                 }).finally(() => {
                     this.loading = false;
                 });
@@ -66,9 +74,10 @@ export default {
 
 
         // 监听自定义事件
-        window.addEventListener('Unauthenticated', function (event) {
+        window.addEventListener('unauthenticated', (event) => {
             console.log('你尚未登录');
             //window.location.href = '/login';
+            this.showLogin = true;
         });
     }
 }

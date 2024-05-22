@@ -3,13 +3,13 @@ import MainApp from './layout/MainApp';
 import MainLayout from "./layout/MainLayout";
 import FixedBottom from "./layout/FixedBottom";
 import MediaDialog from "./components/MediaDialog";
-import VueClipboard from 'vue-clipboard2';
 import ApiService from "./utils/ApiService";
 import LocationDialog from "./components/LocationDialog";
 import WangEditor from "./components/wangedit/WangEditor";
 import FeaturedImage from "./components/FeaturedImage";
 import VueI18n from 'vue-i18n';
 import Validate from "gzdsx-validate";
+import VueClipboard from 'vue-clipboard2';
 import AuthService from "./utils/AuthService";
 
 Vue.use(VueClipboard);

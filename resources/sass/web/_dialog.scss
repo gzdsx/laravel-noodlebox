@@ -57,6 +57,11 @@
         display: flex;
         padding: 10px;
     }
+
+    &__content{
+        display: block;
+        padding: 1rem;
+    }
 }
 
 @keyframes noodle-rotate {

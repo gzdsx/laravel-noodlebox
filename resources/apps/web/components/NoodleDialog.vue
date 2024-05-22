@@ -1,6 +1,6 @@
 <template>
     <div class="noodle-dialog-wrapper" v-show="show" @click="close">
-        <div class="noodle-dialog" @click.stop="click">
+        <div class="noodle-dialog" :class="customClass" @click.stop="click">
             <div class="noodle-dialog__header">
                 <div class="flex-grow-1">
                     <h3 class="title">
@@ -30,6 +30,10 @@ export default {
         title: {
             type: String,
             default: 'Dialog'
+        },
+        customClass: {
+            type: String,
+            default: ''
         }
     },
     data() {

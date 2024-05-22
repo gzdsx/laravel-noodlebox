@@ -62,37 +62,50 @@ var _default = exports["default"] = {
     },
     fetchList: function fetchList() {
       var _this = this;
-      this.loading = true;
       _HttpClient["default"].get('/carts').then(function (res) {
-        res.result.items.forEach(function (item) {
+        res.data.items.forEach(function (item) {
           Object.defineProperty(item, 'total', {
             get: function get() {
               return (this.price * this.quantity).toFixed(2);
             }
           });
         });
-        _this.cart_items = res.result.items;
-      })["catch"](function (reason) {})["finally"](function () {
+        _this.cart_items = res.data.items;
+      })["catch"](function (reason) {
+        console.log(reason.message);
+      })["finally"](function () {
         _this.loading = false;
       });
     },
     removeItem: function removeItem(index) {
       var _this2 = this;
       var item = this.cart_items[index];
+      this.loading = true;
       _HttpClient["default"]["delete"]("/carts/".concat(item.id)).then(function (res) {
         _this2.cart_items.splice(index, 1);
-      })["catch"](function (reason) {})["finally"](function () {});
+      })["catch"](function (reason) {})["finally"](function () {
+        _this2.loading = false;
+      });
     },
     onQuantityChange: function onQuantityChange(index) {
+      var _this3 = this;
       var item = this.cart_items[index];
       var quantity = item.quantity,
         id = item.id;
+      this.loading = true;
       _HttpClient["default"].put("/carts/".concat(id), {
         quantity: quantity
-      }).then(function (res) {})["catch"](function (reason) {})["finally"](function () {});
+      }).then(function (res) {})["catch"](function (reason) {})["finally"](function () {
+        _this3.loading = false;
+      });
     },
     onCheckout: function onCheckout() {
       window.location.href = '/checkout';
+    },
+    metaValue: function metaValue(meta_data) {
+      return meta_data.map(function (item) {
+        return item.value;
+      }).join(', ');
     }
   },
   mounted: function mounted() {
@@ -125,6 +138,10 @@ var _default = exports["default"] = {
     title: {
       type: String,
       "default": 'Dialog'
+    },
+    customClass: {
+      type: String,
+      "default": ''
     }
   },
   data: function data() {
@@ -302,10 +319,10 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports["default"] = void 0;
-var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
 var _NoodleNumberControl = _interopRequireDefault(__webpack_require__(/*! ./NoodleNumberControl.vue */ "./resources/apps/web/components/NoodleNumberControl.vue"));
 var _NoodleLoading = _interopRequireDefault(__webpack_require__(/*! ./NoodleLoading.vue */ "./resources/apps/web/components/NoodleLoading.vue"));
 var _DialogCart = _interopRequireDefault(__webpack_require__(/*! ./DialogCart.vue */ "./resources/apps/web/components/DialogCart.vue"));
+var _CartService = _interopRequireDefault(__webpack_require__(/*! ../CartService */ "./resources/apps/web/CartService.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var _default2 = exports["default"] = {
   name: "ProductMetaBoxes",
@@ -332,8 +349,38 @@ var _default2 = exports["default"] = {
       meta_data: [],
       quantity: 1,
       showCart: false,
-      loading: false
+      loading: false,
+      options: {},
+      additional_options: []
     };
+  },
+  computed: {
+    finalPrice: function finalPrice() {
+      var options = {},
+        additional_options = [];
+      var price = parseFloat(this.product.price);
+      if (Array.isArray(this.product.variation_list)) {
+        this.product.variation_list.map(function (item) {
+          item.options.map(function (option) {
+            if (option.selected && /\d+/.test(option.price)) {
+              price += parseFloat(option.price);
+              options[item.name] = option.title;
+            }
+          });
+        });
+      }
+      if (Array.isArray(this.product.additional_options)) {
+        this.product.additional_options.map(function (option) {
+          if (option.selected && /\d+/.test(option.price)) {
+            price += parseFloat(option.price);
+            additional_options.push(option.title);
+          }
+        });
+      }
+      this.options = options;
+      this.additional_options = additional_options;
+      return price.toFixed(2);
+    }
   },
   methods: {
     onSelectOption: function onSelectOption(v, o) {
@@ -345,58 +392,17 @@ var _default2 = exports["default"] = {
       o.selected = !o.selected;
     },
     addToCart: function addToCart() {
-      var _this = this;
       var product = this.product,
-        quantity = this.quantity;
-      var meta_data = [];
-      product.variation_list.forEach(function (item) {
-        var selected = item.options.filter(function (o) {
-          return o.selected;
-        });
-        if (selected.length > 0) {
-          var _selected$ = selected[0],
-            title = _selected$.title,
-            price = _selected$.price;
-          meta_data.push({
-            key: item.name,
-            value: title,
-            price: price
-          });
-        }
-      });
-      if (Array.isArray(product.additional_options)) {
-        var options = product.additional_options.filter(function (item) {
-          return item.selected;
-        });
-        if (options.length > 0) {
-          meta_data.push({
-            key: 'Additional Options',
-            value: options.map(function (item) {
-              return item.title;
-            }).join(','),
-            price: options.reduce(function (acc, item) {
-              return acc + Number(item.price);
-            }, 0)
-          });
-        }
-      }
-      this.loading = true;
-      _HttpClient["default"].post('/carts', {
-        product_id: product.id,
-        quantity: quantity,
-        meta_data: meta_data
-      }).then(function (res) {
-        _this.showCart = true;
-        _this.$emit('add-cart', res);
-      })["catch"](function (reason) {
-        if (reason.code === 401) {
-          window.location.href = '/login';
-        }
-      })["finally"](function () {
-        _this.loading = false;
-      });
+        finalPrice = this.finalPrice,
+        quantity = this.quantity,
+        options = this.options,
+        additional_options = this.additional_options;
+      var cart = new _CartService["default"]();
+      cart.addToCart(product, finalPrice, quantity, options, additional_options);
+      this.$showToast('Added to cart successfully!');
     }
-  }
+  },
+  mounted: function mounted() {}
 };
 
 /***/ }),
@@ -425,7 +431,11 @@ var render = exports.render = function render() {
     on: {
       close: _vm.close
     }
-  }, [!_vm.loading ? _c("div", {
+  }, [_c("noodle-container", {
+    attrs: {
+      loading: _vm.loading
+    }
+  }, [_c("div", {
     staticClass: "dialog-cart-wrapper"
   }, [_c("div", {
     staticClass: "cart-items"
@@ -456,8 +466,8 @@ var render = exports.render = function render() {
     }, [_c("div", {
       staticClass: "title"
     }, [_vm._v(_vm._s(item.title))]), _vm._v(" "), _c("div", {
-      staticClass: "options"
-    }, [_c("span", [_vm._v("Points: 9")]), _vm._v(" "), _c("a", [_vm._v("Additional options")])])]), _vm._v(" "), _c("div", {
+      staticClass: "metas"
+    }, [_vm._v(_vm._s(_vm.metaValue(item.meta_data)))])]), _vm._v(" "), _c("div", {
       staticClass: "cart-item__price text-bull-cyan"
     }, [_vm._v("€" + _vm._s(item.price))]), _vm._v(" "), _c("div", {
       staticClass: "cart-item__qty"
@@ -501,7 +511,7 @@ var render = exports.render = function render() {
     on: {
       click: _vm.close
     }
-  }, [_vm._v("Continue")])])])]) : _vm._e()]);
+  }, [_vm._v("Continue")])])])])])], 1);
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -537,6 +547,7 @@ var render = exports.render = function render() {
     }
   }, [_c("div", {
     staticClass: "noodle-dialog",
+    "class": _vm.customClass,
     on: {
       click: function click($event) {
         $event.stopPropagation();
@@ -708,9 +719,9 @@ var render = exports.render = function render() {
     staticClass: "product-metabox"
   }, [_c("h3", [_vm._v(_vm._s(_vm.product.title))]), _vm._v(" "), _c("div", {
     staticClass: "product-potins"
-  }, [_vm._v("\n        Noodle Box Earn Points : 9 Points\n    ")]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n        Noodle Box Earn Points : " + _vm._s(_vm.product.points) + " Points\n    ")]), _vm._v(" "), _c("div", {
     staticClass: "product-price text-bull-cyan"
-  }, [_vm._v("€" + _vm._s(_vm.product.price))]), _vm._v(" "), _vm.product.description ? _c("div", {
+  }, [_vm._v("€" + _vm._s(_vm.finalPrice))]), _vm._v(" "), _vm.product.description ? _c("div", {
     staticClass: "product-description text-safety-orange"
   }, [_vm._v("\n        " + _vm._s(_vm.product.description) + "\n    ")]) : _vm._e(), _vm._v(" "), Array.isArray(_vm.product.variation_list) ? _c("div", {
     staticClass: "product-variations"
@@ -789,6 +800,96 @@ var staticRenderFns = exports.staticRenderFns = [function () {
   }), _vm._v(" "), _c("span", [_vm._v("Add Favorite")])])]);
 }];
 render._withStripped = true;
+
+/***/ }),
+
+/***/ "./resources/apps/web/CartService.js":
+/*!*******************************************!*\
+  !*** ./resources/apps/web/CartService.js ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var CartService = exports["default"] = /*#__PURE__*/function () {
+  function CartService() {
+    _classCallCheck(this, CartService);
+    this.cartItems = this.getCartItems();
+  }
+  _createClass(CartService, [{
+    key: "addToCart",
+    value: function addToCart(product, price, quantity) {
+      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+      var addtional_options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
+      this.cartItems.push({
+        product_id: product.id,
+        title: product.title,
+        image: product.image,
+        price: price,
+        quantity: quantity,
+        options: options,
+        addtional_options: addtional_options
+      });
+      this.updateStorage();
+    }
+  }, {
+    key: "removeFromCart",
+    value: function removeFromCart(id) {
+      this.cartItems = this.cartItems.filter(function (item) {
+        return item.product_id !== id;
+      });
+      this.updateStorage();
+    }
+  }, {
+    key: "getCartItems",
+    value: function getCartItems() {
+      try {
+        var cartItems = JSON.parse(localStorage.getItem('cartItems'));
+        if (Array.isArray(cartItems)) {
+          cartItems.forEach(function (item) {
+            Object.defineProperty(item, 'subtotal', {
+              get: function get() {
+                return (Number(this.price) * Number(this.quantity)).toFixed(2);
+              }
+            });
+          });
+          return cartItems;
+        }
+      } catch (e) {
+        return [];
+      }
+    }
+  }, {
+    key: "saveItems",
+    value: function saveItems(items) {
+      this.cartItems = items;
+      this.updateStorage();
+    }
+  }, {
+    key: "clearCart",
+    value: function clearCart() {
+      this.cartItems = [];
+      this.updateStorage();
+    }
+  }, {
+    key: "updateStorage",
+    value: function updateStorage() {
+      localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
+    }
+  }]);
+  return CartService;
+}();
 
 /***/ }),
 
@@ -873,7 +974,7 @@ function (response) {
   // if the custom code is not 20000, it is judged as an error.
   if (res.code) {
     if (res.code === 401) {
-      window.dispatchEvent(new Event('Unauthenticated'));
+      window.dispatchEvent(new Event('unauthenticated'));
     }
     //return Promise.reject(new Error(res.message || "Error"));
     return Promise.reject(res);
@@ -881,7 +982,12 @@ function (response) {
     return res;
   }
 }, function (error) {
-  //console.log('err:' , error) // for debug
+  //console.log("Response Error:", error);
+  if (error.response) {
+    if (error.response.status === 401) {
+      window.dispatchEvent(new Event('unauthenticated'));
+    }
+  }
   return Promise.reject(error);
 });
 var _default = exports["default"] = httpClient;

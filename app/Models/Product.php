@@ -35,8 +35,7 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @property int $is_new 是否新品
  * @property int $is_hot 是否热销
  * @property int $is_recommend 仓储推荐
- * @property int $is_promotion 是否促销
- * @property int $is_top 是否置顶
+ * @property int $sticky 是否置顶
  * @property int $free_delivery 免运费
  * @property int $template_id 运费模板
  * @property int $is_weight_template 是否按重量计价
@@ -44,8 +43,11 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @property int $brand_id 品牌
  * @property string $status 商品状态
  * @property string|null $tax_status 含税状态
+ * @property int $points 赠送积分
  * @property string|null $keywords 关键词
  * @property string|null $description 简短描述
+ * @property int $sort_num 排序
+ * @property string|null $icon 图标
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
@@ -86,23 +88,25 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereEndsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereFreeDelivery($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereHasSkuAttr($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereIcon($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsHot($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsNew($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsPromotion($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsRecommend($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsTop($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsWeightTemplate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereKeywords($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereLike(string $column, string $value, string $boolean = 'and')
+ * @method static \Illuminate\Database\Eloquent\Builder|Product wherePoints($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product wherePurchaseLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereRegularPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSold($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereSortNum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereSticky($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereStock($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereTaxStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereTemplateId($value)
@@ -127,9 +131,9 @@ class Product extends Model
     protected $fillable = [
         'id', 'user_id', 'shop_id', 'title', 'slug', 'image', 'price', 'regular_price', 'purchase_limit',
         'sold', 'stock', 'views', 'collect_num', 'comment_num', 'attr_list', 'variation_list', 'additional_options',
-        'is_new', 'is_hot', 'is_recommend', 'is_promotion', 'is_top', 'free_delivery', 'template_id', '
+        'is_new', 'is_hot', 'is_recommend', 'sticky', 'free_delivery', 'template_id', '
         is_weight_template', 'has_sku_attr', 'brand_id', 'status', 'tax_status',
-        'keywords', 'description', 'created_at', 'updated_at'
+        'points', 'keywords', 'description', 'sort_num', 'icon', 'created_at', 'updated_at'
     ];
     protected $hidden = ['user_id'];
     protected $appends = ['url', 'status_des', 'meta_data'];

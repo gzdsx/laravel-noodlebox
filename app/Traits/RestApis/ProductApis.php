@@ -101,8 +101,8 @@ trait ProductApis
                 $model->skus()->delete();
             }
 
-            if ($newProduct->has('metas')) {
-                foreach ($newProduct->get('metas', []) as $meta_key => $meta_value) {
+            if ($newProduct->has('meta_data')) {
+                foreach ($newProduct->get('meta_data', []) as $meta_key => $meta_value) {
                     $model->updateMeta($meta_key, $meta_value);
                 }
             }

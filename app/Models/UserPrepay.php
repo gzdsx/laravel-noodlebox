@@ -27,7 +27,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|UserPrepay whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserPrepay whereOutTradeNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserPrepay wherePayableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserPrepay wherePrepayId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPrepay wherePaymentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPrepay wherePaymentType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserPrepay whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserPrepay whereUserId($value)
  * @mixin \Eloquent

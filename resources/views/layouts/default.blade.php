@@ -18,7 +18,7 @@
     <meta property="og:modified_time" content="{{now()}}" />
     <meta property="og:image" content="@yield('og-image',settings('logo'))" />
     <link href="https://noodlebox.ie" rel="dns-prefetch">
-    <link href="{{asset('images/sterling/favicon.png')}}" rel="icon">
+    <link href="{{settings('favicon')}}" rel="icon">
     <link href="{{asset('lib/bootstrap/bootstrap.min.css?v='.appversion())}}" rel="stylesheet" type="text/css">
     <link href="{{asset('lib/bootstrap-icons/bootstrap-icons.min.css?v=1.10.5')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('lib/swiper/swiper-bundle.css?v=8.4.7')}}" rel="stylesheet" type="text/css">
@@ -29,7 +29,7 @@
     <script src="{{asset('lib/fancybox/fancybox.umd.js')}}" type="text/javascript"></script>
     <script src="{{asset('lib/bootstrap/bootstrap.bundle.min.js?v=4.6.2')}}" type="text/javascript"></script>
     <script src="{{asset('lib/swiper/swiper-bundle.min.js?v=8.4.7')}}" type="text/javascript"></script>
-    <script src="{{asset('lib/vue.min.js?v=2.6.6')}}" type="text/javascript"></script>
+    <script src="{{asset('dist/web/vendor.js?v='.appversion())}}" type="text/javascript"></script>
 @yield('scripts')
 </head>
 <body class="@yield('body-class')">

@@ -55,25 +55,25 @@ trait CartApis
         $product_id = $request->input('product_id', 0);
         $quantity = $request->input('quantity', 1);
         $meta_data = $request->input('meta_data', []);
-        $meta_price = array_reduce($meta_data, function ($carry, $item) {
-            return $carry + $item['price'];
-        }, 0);
+        $additional_options = $request->input('additional_options', []);
 
         $product = Product::find($product_id);
-        $price = $product->price + $meta_price;
-
-        $cart = $this->repository()->where('product_id', $product_id)->firstOrNew();
-        if (json_encode($cart->meta_data) == json_encode($meta_data)) {
+        $key = md5($product_id . json_encode($meta_data) . json_encode($additional_options));
+        $cart = $this->repository()->firstOrNew(['product_id' => $product_id]);
+        $cartKey = md5($cart->product_id . json_encode($cart->meta_data) . json_encode($cart->additional_options));
+        if ($key == $cartKey) {
             $cart->quantity += $quantity;
             $cart->save();
         } else {
-            $cart->product_id = $product->id;
+            $cart = $this->repository()->make();
+            $cart->product_id = $product_id;
             $cart->title = $product->title;
             $cart->image = $product->image;
-            $cart->price = $price;
+            $cart->original_price = $product->price;
             $cart->quantity = $quantity;
             $cart->meta_data = $meta_data;
-            $cart->user_id = Auth::check() ? Auth::id() : md5(session()->getId());
+            $cart->additional_options = $additional_options;
+            $cart->user_id = Auth::id();
             $cart->save();
         }
 
@@ -99,11 +99,11 @@ trait CartApis
         }
 
         if ($request->has('meta_data')) {
-            $meta_data = $request->input('meta_data', []);
-            $meta_price = array_reduce($meta_data, function ($carry, $item) {
-                return $carry + $item['price'];
-            }, 0);
-            $cart->price = $cart->product->price + $meta_price;
+            $cart->meta_data = $request->input('meta_data', []);
+        }
+
+        if ($request->has('additional_options')) {
+            $cart->additional_options = $request->input('additional_options', []);
         }
 
         $cart->save();

@@ -13,14 +13,9 @@ export default {
     },
     methods: {
         fetchList() {
-            if (this.loading) {
-                return;
-            } else {
-                this.loading = true;
-            }
-
             let {page, pageSize} = this;
             let offset = (page - 1) * pageSize;
+            this.loading = true;
             ApiService.get(this.listApi(), {
                 params: {
                     ...this.listParams(),

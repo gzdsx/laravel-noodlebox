@@ -130,15 +130,24 @@ class ProductFilter extends ModelFilter
      */
     public function sort($sort)
     {
+        $builder = $this->orderByDesc('sticky')->orderByDesc('sort_num');
+        if ($sort == 'sale-asc') {
+            return $builder->orderBy('sold');
+        }
+
         if ($sort == 'sale-desc') {
-            return $this->orderByDesc('sold');
+            return $builder->orderByDesc('sold');
         }
 
         if ($sort == 'price-asc') {
-            return $this->orderBy('price');
+            return $builder->orderBy('price');
         }
 
-        return $this->orderByDesc('id');
+        if ($sort == 'price-desc') {
+            return $builder->orderByDesc('price');
+        }
+
+        return $builder->orderByDesc('id');
     }
 
     /**

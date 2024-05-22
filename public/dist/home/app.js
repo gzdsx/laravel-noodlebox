@@ -40,7 +40,7 @@ var _default = exports["default"] = {
           self.$get('/district/batchget', {
             fid: fid
           }).then(function (response) {
-            var items = response.result.items.map(function (o) {
+            var items = response.data.items.map(function (o) {
               return _objectSpread(_objectSpread({}, o), {}, {
                 leaf: level >= 2
               });
@@ -59,7 +59,7 @@ var _default = exports["default"] = {
     fetchList: function fetchList() {
       var _this = this;
       _ApiService["default"].get('/users/addresses').then(function (response) {
-        _this.items = response.result.items;
+        _this.items = response.data.items;
       });
     },
     handleShowAdd: function handleShowAdd() {
@@ -170,7 +170,7 @@ var _default = exports["default"] = {
         q: this.q,
         offset: this.offset
       }).then(function (response) {
-        _this.items = response.result.items;
+        _this.items = response.data.items;
       });
     },
     handleDelete: function handleDelete(aid) {
@@ -229,7 +229,7 @@ var _default = exports["default"] = {
         q: this.q,
         offset: this.offset
       }).then(function (response) {
-        _this.items = response.result.items;
+        _this.items = response.data.items;
       });
     },
     handleDelete: function handleDelete(itemid) {
@@ -273,7 +273,7 @@ var _default = exports["default"] = {
   mounted: function mounted() {
     var _this = this;
     _ApiService["default"].get('/user/info').then(function (response) {
-      _this.$store.commit('signin', response.result);
+      _this.$store.commit('signin', response.data);
     });
   }
 };
@@ -308,7 +308,7 @@ var _default = exports["default"] = {
   mounted: function mounted() {
     var _this = this;
     this.$get('/account/get').then(function (response) {
-      _this.account = response.result;
+      _this.account = response.data;
     });
   }
 };
@@ -349,12 +349,12 @@ var _default = exports["default"] = {
       var _this = this;
       var order_id = this.$route.params.order_id;
       _ApiService["default"].get("/orders/".concat(order_id)).then(function (response) {
-        _this.order = response.result;
-        var _response$result = response.result,
-          shipping = _response$result.shipping,
-          transaction = _response$result.transaction,
-          items = _response$result.items,
-          buyer = _response$result.buyer;
+        _this.order = response.data;
+        var _response$data = response.data,
+          shipping = _response$data.shipping,
+          transaction = _response$data.transaction,
+          items = _response$data.items,
+          buyer = _response$data.buyer;
         _this.shipping = shipping;
         _this.transaction = transaction;
         _this.items = items;
@@ -367,8 +367,8 @@ var _default = exports["default"] = {
         order_id: this.order_id,
         password: this.password
       }).then(function (response) {
-        if (response.result.errcode) {
-          _this2.$showToast(response.result.errmsg);
+        if (response.data.errcode) {
+          _this2.$showToast(response.data.errmsg);
         } else {
           _this2.$router.go(0);
         }
@@ -429,7 +429,7 @@ var _default = exports["default"] = {
     var _this = this;
     this.fetchList();
     _ApiService["default"].get('/shortcuts?type=close_reason').then(function (response) {
-      _this.closeReasons = response.result.items;
+      _this.closeReasons = response.data.items;
     });
   },
   methods: {
@@ -440,8 +440,8 @@ var _default = exports["default"] = {
         offset: this.offset,
         count: 10
       })).then(function (response) {
-        _this2.orderList = response.result.items;
-        _this2.total = response.result.total;
+        _this2.orderList = response.data.items;
+        _this2.total = response.data.total;
       })["finally"](function () {
         _this2.loading = false;
       });
@@ -559,7 +559,7 @@ var _default = exports["default"] = {
       this.$get('/bought/get', {
         order_id: order_id
       }).then(function (response) {
-        _this.order = response.result.order;
+        _this.order = response.data.order;
         _this.reviews = _this.order.items.map(function (it) {
           return {
             itemid: it.itemid,
@@ -628,7 +628,7 @@ var _default = exports["default"] = {
       this.$get('/refund/get', {
         refund_id: refund_id
       }).then(function (response) {
-        var refund = response.result.refund;
+        var refund = response.data.refund;
         var images = refund.images,
           items = refund.items,
           order = refund.order;
@@ -643,7 +643,7 @@ var _default = exports["default"] = {
         order_id: order_id,
         suborders: [sub_order_id]
       }).then(function (response) {
-        var refund = response.result.refund;
+        var refund = response.data.refund;
         var images = refund.images,
           items = refund.items,
           order = refund.order;
@@ -660,7 +660,7 @@ var _default = exports["default"] = {
     fetchReasons: function fetchReasons() {
       var _this2 = this;
       this.$get('/refundreason/getall').then(function (response) {
-        _this2.reasons = response.result.items;
+        _this2.reasons = response.data.items;
       });
     },
     handlePickedImage: function handlePickedImage(img) {
@@ -698,7 +698,7 @@ var _default = exports["default"] = {
           refund: refund,
           images: images
         }).then(function (response) {
-          _this3.refund = response.result.refund;
+          _this3.refund = response.data.refund;
           _this3.$router.replace({
             path: '/refund/detail',
             query: {
@@ -716,7 +716,7 @@ var _default = exports["default"] = {
           images: images,
           suborders: [sub_order_id]
         }).then(function (response) {
-          _this3.refund = response.result.refund;
+          _this3.refund = response.data.refund;
           _this3.$router.replace({
             path: '/refund/detail',
             query: {
@@ -762,7 +762,7 @@ var _default = exports["default"] = {
       this.$get('/refund/get', {
         refund_id: refund_id
       }).then(function (response) {
-        _this.refund = response.result.refund;
+        _this.refund = response.data.refund;
       });
     },
     handleRevoke: function handleRevoke() {
@@ -860,7 +860,7 @@ var _default = exports["default"] = {
     var _this = this;
     this.fetchList();
     this.$get('/account/get').then(function (response) {
-      _this.account = response.result.account;
+      _this.account = response.data.account;
     });
   },
   methods: {
@@ -869,8 +869,8 @@ var _default = exports["default"] = {
       this.$get('/transaction/batchget', _objectSpread(_objectSpread({}, this.searchFields), {}, {
         offset: this.offset
       })).then(function (response) {
-        _this2.items = response.result.items;
-        _this2.total = response.result.total;
+        _this2.items = response.data.items;
+        _this2.total = response.data.total;
       });
     },
     formatDate: function formatDate(date) {
@@ -965,8 +965,8 @@ var _default = exports["default"] = {
       this.$post('/security/mobile/update', {
         mobile: this.mobile
       }).then(function (response) {
-        if (response.result.errcode) {
-          _this.$showToast(response.result.errmsg);
+        if (response.data.errcode) {
+          _this.$showToast(response.data.errmsg);
         } else {
           _this.user.mobile = _this.mobile;
           _this.showMobile = false;
@@ -988,8 +988,8 @@ var _default = exports["default"] = {
       this.$post('/security/email/update', {
         email: this.email
       }).then(function (response) {
-        if (response.result.errcode) {
-          _this2.$showToast(response.result.errmsg);
+        if (response.data.errcode) {
+          _this2.$showToast(response.data.errmsg);
         } else {
           _this2.user.email = _this2.email;
           _this2.showEmail = false;
@@ -1012,8 +1012,8 @@ var _default = exports["default"] = {
         password: this.password,
         newpassword: this.newpassword
       }).then(function (response) {
-        if (response.result.errcode) {
-          _this3.$showToast(response.result.errmsg);
+        if (response.data.errcode) {
+          _this3.$showToast(response.data.errmsg);
         } else {
           _this3.showPass = false;
           _this3.$showToast('密码已更新');
@@ -1069,7 +1069,7 @@ var _default = exports["default"] = {
           var level = node.level;
           var fid = node.data ? node.data.id : 0;
           self.$get('/district/batchget?fid=' + fid).then(function (response) {
-            var items = response.result.items.map(function (o) {
+            var items = response.data.items.map(function (o) {
               return _objectSpread(_objectSpread({}, o), {}, {
                 leaf: level >= 2
               });
@@ -1090,7 +1090,7 @@ var _default = exports["default"] = {
   mounted: function mounted() {
     var _this = this;
     _ApiService["default"].get('/user/profile').then(function (response) {
-      var profile = response.result.profile;
+      var profile = response.data.profile;
       var province = profile.province,
         city = profile.city,
         district = profile.district;
@@ -1122,7 +1122,7 @@ var _default = exports["default"] = {
         avatar: avatar
       }).then(function (response) {
         //this.$router.go(0);
-        _this3.userinfo.avatar = response.result.avatar;
+        _this3.userinfo.avatar = response.data.avatar;
       });
     }
   }

@@ -32,14 +32,16 @@ Route::namespace('Web')->group(function () {
     Route::get('category/{slug}', 'ProductController@category');
 
     Route::get('points-mall', 'PointsMallController@index')->name('points-mall');
-    Route::get('cart', 'CartController@index')->name('cart')->middleware('auth');
+    Route::get('cart', 'CartController@index')->name('cart');
     Route::get('checkout', 'CheckoutController@index')->name('checkout')->middleware('auth');
     Route::get('home', 'HomeController@index')->name('home')->middleware('auth');
-    Route::get('orders/{id}', 'OrderController@show')->name('home')->middleware('auth');
+    Route::get('orders/{id}', 'OrderController@show')->name('order.show')->middleware('auth');
+    Route::get('orders/invoice/{hashid}', 'OrderController@invoice')->name('order.invoice');
 
     Route::get('my-account', 'MyAccountController@index')->name('my-account')->middleware('auth');
     Route::get('my-account/orders', 'OrderController@index')->name('my-orders')->middleware('auth');
 
     Route::get('pos', 'PosController@index')->name('pos')->middleware('auth');
+    Route::post('paypal/create-order', 'PaypalController@createOrder');
     Route::get('{page}', 'PageController@show')->where('page', '[a-zA-Z0-9_\-]+');
 });

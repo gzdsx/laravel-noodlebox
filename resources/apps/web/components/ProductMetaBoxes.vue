@@ -2,9 +2,9 @@
     <div class="product-metabox">
         <h3>{{ product.title }}</h3>
         <div class="product-potins">
-            Noodle Box Earn Points : 9 Points
+            Noodle Box Earn Points : {{ product.points }} Points
         </div>
-        <div class="product-price text-bull-cyan">€{{ product.price }}</div>
+        <div class="product-price text-bull-cyan">€{{ finalPrice }}</div>
         <div class="product-description text-safety-orange" v-if="product.description">
             {{ product.description }}
         </div>
@@ -57,10 +57,10 @@
 </template>
 
 <script>
-import HttpClient from "../HttpClient";
 import NoodleNumberControl from "./NoodleNumberControl.vue";
 import NoodleLoading from "./NoodleLoading.vue";
 import DialogCart from "./DialogCart.vue";
+import CartService from "../CartService";
 
 export default {
     name: "ProductMetaBoxes",
@@ -83,7 +83,39 @@ export default {
             meta_data: [],
             quantity: 1,
             showCart: false,
-            loading: false
+            loading: false,
+            options: {},
+            additional_options: []
+        }
+    },
+    computed: {
+        finalPrice() {
+            let options = {}, additional_options = [];
+            let price = parseFloat(this.product.price);
+            if (Array.isArray(this.product.variation_list)) {
+                this.product.variation_list.map((item) => {
+                    item.options.map((option) => {
+                        if (option.selected && /\d+/.test(option.price)) {
+                            price += parseFloat(option.price);
+                            options[item.name] = option.title;
+                        }
+                    });
+                });
+            }
+
+            if (Array.isArray(this.product.additional_options)) {
+                this.product.additional_options.map((option) => {
+                    if (option.selected && /\d+/.test(option.price)) {
+                        price += parseFloat(option.price);
+                        additional_options.push(option.title);
+                    }
+                });
+            }
+
+            this.options = options;
+            this.additional_options = additional_options;
+
+            return price.toFixed(2);
         }
     },
     methods: {
@@ -96,47 +128,21 @@ export default {
             o.selected = !o.selected;
         },
         addToCart() {
-            let {product, quantity} = this;
-            let meta_data = [];
-            product.variation_list.forEach((item) => {
-                let selected = item.options.filter((o) => o.selected);
-                if (selected.length > 0) {
-                    const {title, price} = selected[0];
-                    meta_data.push({
-                        key: item.name,
-                        value: title,
-                        price
-                    });
-                }
-            });
+            let {product, finalPrice, quantity, options, additional_options} = this;
 
-            if (Array.isArray(product.additional_options)) {
-                const options = product.additional_options.filter((item) => item.selected);
-                if (options.length > 0) {
-                    meta_data.push({
-                        key: 'Additional Options',
-                        value: options.map((item) => item.title).join(','),
-                        price: options.reduce((acc, item) => acc + Number(item.price), 0)
-                    });
-                }
-            }
-
-            this.loading = true;
-            HttpClient.post('/carts', {
-                product_id: product.id,
-                quantity: quantity,
-                meta_data: meta_data
-            }).then((res) => {
-                this.showCart = true;
-                this.$emit('add-cart', res);
-            }).catch(reason => {
-                if (reason.code === 401) {
-                    window.location.href = '/login';
-                }
-            }).finally(() => {
-                this.loading = false;
-            });
+            const cart = new CartService();
+            cart.addToCart(
+                product,
+                finalPrice,
+                quantity,
+                options,
+                additional_options
+            );
+            this.$showToast('Added to cart successfully!');
         }
+    },
+    mounted() {
+
     }
 }
 </script>

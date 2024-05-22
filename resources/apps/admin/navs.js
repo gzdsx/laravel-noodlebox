@@ -39,6 +39,11 @@ export default [
                 path: '/settings/mail',
                 isLink: false
             },
+            {
+                name: 'sidebar.settings_theme',
+                path: '/settings/theme',
+                isLink: false
+            },
         ]
     },
     {
@@ -149,6 +154,27 @@ export default [
             {
                 name: '照片墙',
                 path: '/photo-wall',
+                isLink: false
+            },
+        ]
+    },
+    {
+        name: '抽奖',
+        icon: 'gift',
+        children: [
+            {
+                name: '参数设置',
+                path: '/lottery/settings',
+                isLink: false
+            },
+            {
+                name: '奖品设置',
+                path: '/lottery/prizes',
+                isLink: false
+            },
+            {
+                name: '获奖记录',
+                path: '/lottery/records',
                 isLink: false
             },
         ]

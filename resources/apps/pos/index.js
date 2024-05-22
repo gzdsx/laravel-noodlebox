@@ -1,6 +1,5 @@
 import Vue from "vue";
 import VueRouter from 'vue-router';
-import ApiService from "./ApiService";
 import * as vClickOutside from 'v-click-outside-x';
 import dayjs from "dayjs";
 import Vuex from 'vuex';

@@ -13,9 +13,8 @@
                         <div class="cart-item__main">
                             <div class="cart-item__title">
                                 <div class="title">{{ item.title }}</div>
-                                <div class="options">
-                                    <span>Points: 9</span>
-                                    <a>Additional options</a>
+                                <div class="metas">
+                                    {{ metaValue(item.options) }}
                                 </div>
                             </div>
                             <div class="cart-item__price text-bull-cyan">€{{ item.price }}</div>
@@ -23,7 +22,7 @@
                                 <noodle-number-control v-model="item.quantity" @change="onQuantityChange(index)"/>
                             </div>
                         </div>
-                        <div class="cart-item__total text-bull-cyan">€{{ item.total }}</div>
+                        <div class="cart-item__total text-bull-cyan">€{{ item.subtotal }}</div>
                     </div>
                 </div>
             </div>
@@ -45,9 +44,10 @@
 </template>
 
 <script>
-import NoodleNumberControl from "./NoodleNumberControl.vue";
-import HttpClient from "../HttpClient";
+import NoodleNumberControl from "../components/NoodleNumberControl.vue";
+import CartService from "../CartService";
 
+const cart = new CartService();
 export default {
     name: "NoodleCart",
     components: {NoodleNumberControl},
@@ -62,7 +62,7 @@ export default {
         total() {
             let total = 0;
             this.cart_items.forEach((item) => {
-                total += parseFloat(item.total);
+                total += parseFloat(item.subtotal);
             });
             return total.toFixed(2);
         }
@@ -71,53 +71,27 @@ export default {
         close() {
             this.$emit('input', false);
         },
-        fetchList() {
-            this.loading = true;
-            HttpClient.get('/carts').then((res) => {
-                res.data.items.forEach((item) => {
-                    Object.defineProperty(item, 'total', {
-                        get() {
-                            return (this.price * this.quantity).toFixed(2);
-                        },
-                    });
-                });
-                this.cart_items = res.data.items;
-            }).catch(reason => {
-
-            }).finally(() => {
-                this.loading = false;
-            });
-        },
         removeItem(index) {
-            let item = this.cart_items[index];
-            HttpClient.delete(`/carts/${item.id}`).then((res) => {
-                this.cart_items.splice(index, 1);
-            }).catch(reason => {
-
-            }).finally(() => {
-
-            });
+            this.cart_items.splice(index, 1);
+            const cartItems = cart.getCartItems();
+            cartItems.splice(index, 1);
+            cart.saveItems(cartItems);
         },
         onQuantityChange(index) {
             let item = this.cart_items[index];
-            let {quantity, id} = item;
-            //this.loading = true;
-            HttpClient.put(`/carts/${id}`, {
-                quantity: quantity
-            }).then((res) => {
-
-            }).catch(reason => {
-
-            }).finally(() => {
-                //this.loading = false;
-            });
+            let cartItems = cart.getCartItems();
+            cartItems[index].quantity = item.quantity;
+            cart.saveItems(cartItems);
         },
         onCheckout() {
-            window.location.href = '/checkout';
-        }
+            window.location.assign('/checkout');
+        },
+        metaValue(options) {
+            return Object.values(options).join(',');
+        },
     },
     mounted() {
-        this.fetchList();
+        this.cart_items = cart.getCartItems();
     }
 }
 </script>

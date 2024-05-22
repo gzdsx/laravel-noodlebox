@@ -4686,6 +4686,7 @@ input[type=checkbox]:checked, input[type=radio]:checked {
   margin-bottom: 10px;
   padding: 15px;
   display: block;
+  position: relative;
 }
 
 .tablenav {
@@ -4702,8 +4703,10 @@ input[type=checkbox]:checked, input[type=radio]:checked {
 }
 
 .table-actions {
-  display: flex;
   flex: 1;
+  display: flex;
+  -moz-column-gap: 10px;
+       column-gap: 10px;
 }
 .table-pagination {
   display: block;
@@ -4845,6 +4848,7 @@ input[type=checkbox]:checked, input[type=radio]:checked {
   color: #87878A;
   line-height: 1.1;
   margin-top: 8px;
+  font-size: 14px;
 }
 .el-form-tips:hover {
   color: #000000;
@@ -4881,6 +4885,16 @@ input[type=checkbox]:checked, input[type=radio]:checked {
 
 .sortable-chosen {
   cursor: move;
+}
+
+.tag-top {
+  background-color: #409EFF;
+  color: #ffffff;
+  font-size: 10px;
+  line-height: 1;
+  padding: 3px 5px;
+  border-radius: 5px;
+  display: inline-block;
 }
 
 .v-common-nav {
@@ -4969,6 +4983,55 @@ input[type=checkbox]:checked, input[type=radio]:checked {
 .form-inline .form-item-input {
   display: flex;
   align-items: center;
+}
+
+.badges-wrapper {
+  display: flex;
+  gap: 10px;
+}
+.badges-wrapper .badge-item {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  border-radius: 3px;
+}
+.badges-wrapper .badge-item img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+.badges-wrapper .badge-item .delete {
+  position: absolute;
+  background-color: #333;
+  border-radius: 10rem;
+  color: #ffffff;
+  top: -8px;
+  right: -8px;
+  padding: 2px;
+  cursor: pointer;
+  display: none;
+}
+.badges-wrapper .badge-item:hover .delete {
+  display: block;
+}
+.badges-wrapper .badge-item.addnew {
+  border: 1px dashed #dcdfe6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.badges-wrapper .badge-item.addnew:hover {
+  border-color: #333;
+}
+.badges-wrapper .badge-item.addnew .el-icon-plus {
+  font-size: 20px;
+  color: #939393;
+}
+
+.badge-icon {
+  border: 1px solid #ccc;
 }
 
 .media-dialog {
@@ -5267,6 +5330,14 @@ input[type=checkbox]:checked, input[type=radio]:checked {
   font-weight: 400;
   text-align: left;
 }
+.order-table thead th .el-icon-delete {
+  font-size: 18px;
+  cursor: pointer;
+  color: #888888;
+}
+.order-table thead th .el-icon-delete:hover {
+  color: #000000;
+}
 .order-table tbody td {
   padding: 12px 10px;
   font-size: 12px;
@@ -5278,7 +5349,6 @@ input[type=checkbox]:checked, input[type=radio]:checked {
 }
 .order-table tbody td .ac-link {
   display: block;
-  margin-top: 5px;
 }
 .order-table tbody td .el-button--mini {
   padding: 6px 10px;
@@ -5316,8 +5386,8 @@ input[type=checkbox]:checked, input[type=radio]:checked {
   display: flex;
 }
 .order-table .order-item .thumb {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   -o-object-fit: cover;
      object-fit: cover;
   margin-right: 10px;
@@ -5327,7 +5397,6 @@ input[type=checkbox]:checked, input[type=radio]:checked {
   flex-direction: column;
 }
 .order-table .order-item .title {
-  margin-bottom: 5px;
   font-size: 14px;
   font-weight: 600;
 }

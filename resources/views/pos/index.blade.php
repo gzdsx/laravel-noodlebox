@@ -16,6 +16,7 @@
 <body>
 <div id="app">@yield('content')</div>
 @yield('foot')
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNN6AquuEdTY8mwR2WwzP5toj97s46Tv4&libraries=places&language=en"></script>
 <script src="{{asset('dist/pos/index.js?v='.appversion())}}" type="text/javascript"></script>
 </body>
 </html>

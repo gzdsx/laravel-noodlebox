@@ -3,15 +3,8 @@
         <div slot="header">
             <h2>{{ $t('settings.general') }}</h2>
         </div>
-        <section class="page-section setting-form-wrapper">
+        <section class="page-section setting-form-wrapper" v-loading="loading">
             <el-form size="medium" label-width="160px">
-                <el-form-item :label="$t('settings.logo')">
-                    <div class="w120 bg-secondary" @click="onShowDialog('logo')">
-                        <el-image :src="settings.logo" class="w120" fit="contain" v-if="settings.logo"/>
-                        <div class="img-placeholder img-120" v-else></div>
-                    </div>
-                    <div class="el-form-tips">{{ $t('settings.logo_tips') }}</div>
-                </el-form-item>
                 <el-form-item :label="$t('settings.sitename')">
                     <el-input type="text" class="w500" v-model="settings.sitename"/>
                     <div class="el-form-tips">{{ $t('settings.sitename_tips') }}</div>

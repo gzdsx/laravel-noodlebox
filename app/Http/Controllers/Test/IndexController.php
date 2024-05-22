@@ -3,27 +3,61 @@
 namespace App\Http\Controllers\Test;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\CompressProductImage;
-use App\Jobs\DownloadProductImage;
-use App\Jobs\SyncProductSku;
-use App\Models\BuildiumUploaded;
-use App\Models\Category;
-use App\Models\Order;
-use App\Models\Post;
-use App\Models\Product;
-use App\Models\ProductVariation;
-use App\Models\ShippingZone;
+use App\Jobs\SyncUsers;
+use App\Models\UserAddress;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class IndexController extends Controller
 {
     public function index(Request $request)
     {
-       return Auth::user()->carts;
+        //$this->dispatchSync(new SyncUsers(1));
+//        $i = 2;
+//        while ($i < 150) {
+//            $this->dispatch(new SyncUsers($i));
+//            $i++;
+//        }
+//
+//        return 'ok';
+
+//        try {
+//            $client = new Client();
+//            $response = $client->get('https://noodlebox.ie/wp-json/wp/v2/users', [
+//                'query' => [
+//                    'page' => 1,
+//                    'per_page' => 100,
+//                    'orderby' => 'id',
+//                    'order' => 'asc',
+//                ],
+//                //'auth' => [env('WC_CONSUMER_KEY'), env('WC_CONSUMER_SECRET')],
+//                'headers' => [
+//                    'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0',
+//                    'Accept' => 'application/json'
+//                ],
+//            ]);
+//
+//            $users = json_decode($response->getBody()->getContents());
+//
+//            return $users;
+//        }catch (\Exception $e){
+//            return $e->getMessage();
+//        }
+
+//        foreach (UserAddress::with(['user'])->get() as $item) {
+//            if ($item->user && !$item->user->phone && $item->phone) {
+//                $item->user->phone = $item->phone;
+//                $item->user->save();
+//            }
+//        }
+//
+//        return 'ok';
+
+        return Str::uuid()->toString();
     }
 
     public function combineAttrs($arr)

@@ -71,7 +71,8 @@ return [
         'no_access' => '暂无数据',
         'activate' => '激活',
         'deactivate' => '停用',
-        'url'=>'链接'
+        'url'=>'链接',
+        'points'=>'积分'
     ],
     'topbar' => [
         'home' => '后台管理中心',
@@ -88,7 +89,7 @@ return [
         'settings_attach' => '附件设置',
         'settings_watermark' => '水印设置',
         'settings_mail' => '邮件设置',
-        'settings_sterling' => 'Sterling',
+        'settings_theme' => '主题设置',
         'users' => '用户',
         'user_add' => '添加用户',
         'user_manage' => '用户管理',

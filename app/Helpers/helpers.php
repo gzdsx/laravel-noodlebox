@@ -55,7 +55,7 @@ function distance($lat1, $lng1, $lat2, $lng2)
  * @param $rad
  * @return array
  */
-function get_point_range($lng, $lat, $distance = 1, $rad = 6371)
+function get_coordinate_range($lng, $lat, $distance = 1, $rad = 6371)
 {
     $dlng = 2 * asin(sin($distance / (2 * $rad)) / cos(deg2rad($lat)));
     $dlng = rad2deg($dlng);
@@ -228,7 +228,7 @@ function is_wechat()
  * @param $options
  * @return \Illuminate\Http\JsonResponse
  */
-function json_success($data = [], $options = 0)
+function json_success($data = [], $options = JSON_UNESCAPED_UNICODE)
 {
     return response()->json([
         'code' => 0,

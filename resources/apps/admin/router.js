@@ -32,6 +32,9 @@ router.addRoutes(EcommerceRoutes);
 const TradeRoutes = require('./trade/routes');
 router.addRoutes(TradeRoutes);
 
+const LotteryRoutes = require('./lottery/routes');
+router.addRoutes(LotteryRoutes);
+
 router.addRoutes([
     {
         path: '*',

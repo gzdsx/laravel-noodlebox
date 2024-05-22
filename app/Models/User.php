@@ -28,6 +28,7 @@ use Laravel\Passport\HasApiTokens;
  * @property int $email_status 邮箱验证状态
  * @property int $name_status 实名认证状态
  * @property int $status 状态
+ * @property int $points 积分
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property-read \App\Models\UserAccount|null $account
@@ -35,6 +36,8 @@ use Laravel\Passport\HasApiTokens;
  * @property-read int|null $addresses_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $boughts
  * @property-read int|null $boughts_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Cart> $carts
+ * @property-read int|null $carts_count
  * @property-read \App\Models\UserCertify|null $certify
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $clients
  * @property-read int|null $clients_count
@@ -42,6 +45,8 @@ use Laravel\Passport\HasApiTokens;
  * @property-read int|null $collected_posts_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserConnect> $connects
  * @property-read int|null $connects_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserCreditCard> $creditCards
+ * @property-read int|null $credit_cards_count
  * @property-read \Illuminate\Support\Collection $meta_data
  * @property-read array|string|null $status_des
  * @property-read \App\Models\UserGroup|null $group
@@ -81,6 +86,7 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePoints($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
@@ -95,7 +101,7 @@ class User extends Authenticatable
     protected $primaryKey = 'id';
     protected $fillable = [
         'id', 'gid', 'nickname', 'phone', 'email', 'password', 'remember_token',
-        'avatar', 'email_status', 'name_status', 'freeze', 'status'
+        'avatar', 'email_status', 'name_status', 'freeze', 'status', 'points'
     ];
     protected $hidden = ['password', 'remember_token'];
     protected $appends = [
@@ -265,5 +271,10 @@ class User extends Authenticatable
     public function getRole()
     {
         return $this->getMeta('capability');
+    }
+
+    public function creditCards()
+    {
+        return $this->hasMany(UserCreditCard::class, 'user_id', 'id');
     }
 }

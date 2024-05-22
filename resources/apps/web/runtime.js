@@ -1,4 +1,5 @@
 import NoodleBoxApp from "./components/NoodleBoxApp.vue";
+
 new Vue({
     el: '#noodlebox',
     render: function (h) {

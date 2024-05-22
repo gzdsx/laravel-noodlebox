@@ -12,6 +12,8 @@ import ShopList from "./ShopList.vue";
 import ShopEdit from "./ShopEdit.vue";
 import PhotoWall from "./PhotoWall.vue";
 import DeliveryerList from "./DeliveryerList.vue";
+import OrderList from "./OrderList.vue";
+import OrderDetail from "./OrderDetail.vue";
 
 module.exports = [
     {path: '/product/list', component: ProductList, meta: {title: '商品管理'}},
@@ -32,4 +34,6 @@ module.exports = [
     {path: '/shop/edit/:id?', component: ShopEdit, meta: {title: '编辑门店'}},
     {path: '/photo-wall', component: PhotoWall, meta: {title: '照片墙'}},
     {path: '/deliveryers', component: DeliveryerList, meta: {title: '配送员管理'}},
+    {path: '/order/list', component: OrderList, meta: {title: '订单管理', group: 'trade'}},
+    {path: '/order/detail/:id?', component: OrderDetail, meta: {title: '订单详情', group: 'trade'}},
 ]

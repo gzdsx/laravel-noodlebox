@@ -58,6 +58,13 @@
       'Agent' => 'Jenssegers\\Agent\\Facades\\Agent',
     ),
   ),
+  'laravel/cashier' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Cashier\\CashierServiceProvider',
+    ),
+  ),
   'laravel/passport' => 
   array (
     'providers' => 
@@ -126,6 +133,17 @@
       'Captcha' => 'Mews\\Captcha\\Facades\\Captcha',
     ),
   ),
+  'mikemclin/laravel-wp-password' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'MikeMcLin\\WpPassword\\WpPasswordProvider',
+    ),
+    'aliases' => 
+    array (
+      'WpPassword' => 'MikeMcLin\\WpPassword\\Facades\\WpPassword',
+    ),
+  ),
   'nesbot/carbon' => 
   array (
     'providers' => 
@@ -192,6 +210,17 @@
     'providers' => 
     array (
       0 => 'EloquentFilter\\ServiceProvider',
+    ),
+  ),
+  'vinkla/hashids' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Vinkla\\Hashids\\HashidsServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Hashids' => 'Vinkla\\Hashids\\Facades\\Hashids',
     ),
   ),
 );

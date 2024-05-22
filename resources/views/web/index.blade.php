@@ -4,10 +4,10 @@
 
 @section('content')
     <section class="home-video-bg">
-        <video src="{{asset('images/video-bg.mp4')}}" autoplay muted loop></video>
+        <video src="{{settings('home_page_banner_src')}}" autoplay muted loop></video>
         <div class="home-video-content">
             <div class="container">
-                <img src="{{asset('images/noodlebox/logo-large.png')}}" class="logo-large" alt=""/>
+                <img src="{{settings('home_page_logo')}}" class="logo-large" alt=""/>
                 <h3 class="font-weight-bold text-center text-white">
                     Order Online !
                 </h3>

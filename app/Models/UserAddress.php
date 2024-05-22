@@ -13,13 +13,15 @@ use Illuminate\Support\Facades\Auth;
  * @property int $id 主键
  * @property int $user_id 用户ID
  * @property string|null $tag 标签
- * @property string|null $name 姓名
+ * @property string|null $first_name 名字
+ * @property string|null $last_name 姓氏
  * @property string|null $phone 电话
- * @property string|null $country
+ * @property string|null $country 国家
  * @property string|null $state 省
  * @property string|null $city 市
  * @property string|null $county 区县
- * @property string|null $address 详细地址
+ * @property string|null $address_line_1 详细地址1
+ * @property string|null $address_line_2 详细地址2
  * @property float $latitude 纬度
  * @property float $longitude 经度
  * @property string|null $postalcode 邮编
@@ -29,15 +31,17 @@ use Illuminate\Support\Facades\Auth;
  * @method static Builder|UserAddress newModelQuery()
  * @method static Builder|UserAddress newQuery()
  * @method static Builder|UserAddress query()
- * @method static Builder|UserAddress whereAddress($value)
+ * @method static Builder|UserAddress whereAddressLine1($value)
+ * @method static Builder|UserAddress whereAddressLine2($value)
  * @method static Builder|UserAddress whereCity($value)
  * @method static Builder|UserAddress whereCountry($value)
  * @method static Builder|UserAddress whereCounty($value)
+ * @method static Builder|UserAddress whereFirstName($value)
  * @method static Builder|UserAddress whereId($value)
  * @method static Builder|UserAddress whereIsdefault($value)
+ * @method static Builder|UserAddress whereLastName($value)
  * @method static Builder|UserAddress whereLatitude($value)
  * @method static Builder|UserAddress whereLongitude($value)
- * @method static Builder|UserAddress whereName($value)
  * @method static Builder|UserAddress wherePhone($value)
  * @method static Builder|UserAddress wherePostalcode($value)
  * @method static Builder|UserAddress whereState($value)
@@ -50,8 +54,11 @@ class UserAddress extends Model
     protected $table = 'user_address';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'user_id', 'name', 'phone', 'state', 'city', 'county', 'address',
-        'postalcode', 'isdefault', 'gender', 'tag', 'latitude', 'longitude'
+        'user_id', 'first_name', 'last_name',
+        'phone', 'state', 'city', 'county',
+        'address_line_1', 'address_line_2',
+        'postalcode', 'isdefault', 'tag',
+        'latitude', 'longitude'
     ];
     protected $appends = ['formatted_address'];
 

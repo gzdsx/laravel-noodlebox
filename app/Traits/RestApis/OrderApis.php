@@ -2,6 +2,8 @@
 
 namespace App\Traits\RestApis;
 
+use App\Models\Order;
+use App\Models\ShippingZone;
 use App\Models\UserPrepay;
 use App\Support\TradeUtil;
 use GuzzleHttp\Client;
@@ -30,7 +32,8 @@ trait OrderApis
         $query = $this->repository()->filter($request->all());
         $total = $query->count();
         $items = $query->offset($request->input('offset', 0))
-            ->limit($request->input('limit', 10))->orderByDesc('order_id')->get();
+            ->limit($request->input('limit', 10))
+            ->orderByDesc('created_at')->get();
 
         return json_success([
             'total' => $total,
@@ -52,6 +55,7 @@ trait OrderApis
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function store(Request $request, $id = 0)
     {
@@ -61,6 +65,8 @@ trait OrderApis
         $order->payment_method = $request->input('payment_method');
         $order->payment_method_title = $request->input('payment_method_title');
         $order->shipping_method = $request->input('shipping_method');
+        $order->shipping_zone_id = $request->input('shipping_zone_id');
+        $order->shipping_total = $request->input('shipping_total');
         $order->buyer_note = $request->input('buyer_note');
         $order->shipping = $request->input('shipping', []);
         $order->billing = $request->input('billing', []);
@@ -74,9 +80,15 @@ trait OrderApis
         $total = 0;
         $fee_lines = $request->input('fee_lines', []);
         foreach ($fee_lines as $fee_line) {
-            $total += $fee_line['total'];
+            $total += $fee_line['total'] ?? 0;
         }
         $order->fee_lines = $fee_lines;
+
+        if ($order->shipping_method == 'delivery') {
+            $zone = ShippingZone::findOrFail($order->shipping_zone_id);
+            $order->shipping_total = $zone->fee;
+            $total += $zone->fee;
+        }
 
         $discount_total = 0;
         $discount_lines = $request->input('discount_lines', []);
@@ -94,6 +106,14 @@ trait OrderApis
             $order->total += $order_item['price'] * $order_item['quantity'];
             $order->items()->create($order_item);
         }
+
+        if ($order->payment_method == 'paypal') {
+            $order->status = Order::ORDER_STATUS_PENDING;
+        } else {
+            $order->status = Order::ORDER_STATUS_COMPLETED;
+            $order->payment_status = 1;
+            $order->payment_at = now();
+        }
         $order->save();
 
         //存储地址
@@ -105,7 +125,7 @@ trait OrderApis
             $address->save();
         }
 
-        $model = $this->repository()->find($order->order_id);
+        $model = $this->repository()->find($order->id);
         if ($model->payment_method == 'paypal') {
             if (env('PAYPAL_ENV') == 'sandbox') {
                 $auth = [
@@ -152,18 +172,18 @@ trait OrderApis
 
                 $data = json_decode($response->getBody()->getContents(), true);
                 $prepay = new UserPrepay();
-                $prepay->payable_id = $model->order_id;
+                $prepay->payable_id = $model->id;
                 $prepay->payment_id = $data['id'];
                 $prepay->data = $data;
                 $prepay->user()->associate(Auth::id());
                 $prepay->save();
-                $approval_url = [$data['links'][1]['href']];
+                $approval_url = $data['links'][1]['href'];
 
             } catch (\Exception $e) {
                 return json_error($e->getMessage());
             }
         } else {
-            $approval_url = [url('/order/' . $model->id)];
+            $approval_url = url('orders/' . $model->id);
         }
 
         return json_success([

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * App\Models\OrderItem
  *
- * @property int $trade_id 主键
+ * @property int $id 主键
  * @property int $order_id 订单ID
  * @property int $product_id 商品ID
  * @property string|null $title 商品名称
@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereIsGift($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereMetaData($value)
@@ -37,7 +38,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereSkuTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereTradeId($value)
  * @mixin \Eloquent
  */
 class OrderItem extends Model
@@ -45,7 +45,7 @@ class OrderItem extends Model
     use HasImageAttribute;
 
     protected $table = 'order_item';
-    protected $primaryKey = 'trade_id';
+    protected $primaryKey = 'id';
     protected $fillable = [
         'order_id', 'product_id', 'title', 'price', 'quantity', 'image',
         'meta_data', 'sku_id', 'sku_title', 'is_gift', 'status'

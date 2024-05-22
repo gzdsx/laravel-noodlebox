@@ -11,7 +11,7 @@
                 <el-table-column width="45" type="selection"/>
                 <el-table-column :label="$t('user.avatar')" width="70">
                     <template slot-scope="scope">
-                        <featured-image :src="scope.row.image" :alt="$t('user.avatar')"/>
+                        <featured-image :src="scope.row.image" width="60px" height="60px" :alt="$t('user.avatar')"/>
                     </template>
                 </el-table-column>
                 <el-table-column prop="name" :label="$t('kefu.name')"/>
