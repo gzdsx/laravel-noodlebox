@@ -23,7 +23,7 @@
                 </div>
             </div>
         </div>
-        <div class="page-section" v-loading="loading">
+        <div class="page-section">
             <div class="table-edit-header">
                 <el-tabs @tab-click="onClickTab" value="all">
                     <el-tab-pane label="全部" name="all"/>
@@ -34,113 +34,58 @@
                     <el-tab-pane label="已取消" name="canceled"/>
                 </el-tabs>
             </div>
-            <div class="order-list">
-                <table class="order-table">
-                    <colgroup>
-                        <col>
-                        <col width="100">
-                        <col width="70">
-                        <col width="145">
-                        <col width="120">
-                        <col width="125">
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th>宝贝</th>
-                        <th class="align-center">单价</th>
-                        <th class="align-center">数量</th>
-                        <th class="align-center">实付款</th>
-                        <th class="align-center">交易状态</th>
-                        <th class="align-center">交易操作</th>
-                    </tr>
-                    </thead>
-                </table>
-
-                <el-container direction="vertical">
-                    <el-checkbox-group v-model="selectionIds">
-                        <div v-for="(order,index) in dataList" :key="index">
-                            <table class="order-table">
-                                <colgroup>
-                                    <col>
-                                    <col width="100">
-                                    <col width="70">
-                                    <col width="145">
-                                    <col width="120">
-                                    <col width="125">
-                                </colgroup>
-                                <thead>
-                                <tr>
-                                    <th colspan="2">
-                                        <div class="display-flex">
-                                            <div class="col-checkbox">
-                                                <el-checkbox :label="order.id">{{ '' }}</el-checkbox>
-                                            </div>
-                                            <div class="col-order-time">{{ order.created_at }}</div>
-                                            <div class="col-order-no">订单号:{{ order.order_no }}</div>
-                                            <div class="col-order-buyer">
-                                                <i class="iconfont icon-peoplefill"></i>
-                                                <span>{{ order.buyer_name }}</span>
-                                            </div>
-                                        </div>
-                                    </th>
-                                    <th></th>
-                                    <th colspan="3" class="align-right">
-                                        <i class="el-icon-delete" @click="onDeleteOne(order.id)"></i>
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr v-for="(item,idx) in order.items">
-                                    <td>
-                                        <div class="order-item">
-                                            <img :src="item.image" class="thumb" alt="">
-                                            <div class="flex">
-                                                <div class="title">{{ item.title }}</div>
-                                                <div class="sku">{{ metaValues(item.meta_data) }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="align-center">€{{ item.price }}</div>
-                                    </td>
-                                    <td>
-                                        <div class="align-center">x{{ item.quantity }}</div>
-                                    </td>
-                                    <td>
-                                        <div class="align-center" v-if="idx===0">
-                                            <p><strong>€{{ order.total }}</strong></p>
-                                            <p class="col-freight">(配送费: €{{ order.shipping_total }})</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="align-center" v-if="idx===0">
-                                            <p>{{ order.status_des }}</p>
-                                            <p>
-                                                <router-link :to="'/order/detail/'+order.id"
-                                                             target="_blank">订单详情
-                                                </router-link>
-                                            </p>
-                                            <p>
-                                                <a :href="order.links.invoice" target="_blank">电子小票</a>
-                                            </p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="align-center" v-if="idx===0">
-                                            <el-button size="small" type="primary" @click="onDispose(order)">处理订单
-                                            </el-button>
-                                            <p v-if="order.status==='pending'">
-                                                <a class="ac-link" @click="onCancel(order.id)">取消订单</a>
-                                            </p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+            <el-table :data="dataList" v-loading="loading" @selection-change="onSelectionChange">
+                <el-table-column width="45" type="selection"/>
+                <el-table-column width="220" label="Order">
+                    <template slot-scope="scope">
+                        <div>
+                            <router-link :to="'/order/detail/' + scope.row.id" target="_blank">
+                                <span class="text-danger font-weight-bold"
+                                      v-if="scope.row.is_modified">{{ scope.row.order_no }}</span>
+                                <span class="text-primary" v-else>{{ scope.row.order_no }}</span>
+                            </router-link>
                         </div>
-                    </el-checkbox-group>
-                </el-container>
-            </div>
+                        <div>{{ scope.row.buyer_name }}</div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="Created Via" width="120" prop="created_via"/>
+                <el-table-column label="Ship to" width="200">
+                    <template slot-scope="scope">
+                        <div style="line-height: 1.1"><small>{{ formatAddress(scope.row.shipping) }}</small></div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="Total" width="80">
+                    <template slot-scope="scope">
+                        {{ '€' + scope.row.total }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="Status" width="100" prop="status"/>
+                <el-table-column label="Date" width="170" prop="created_at"/>
+                <el-table-column label="Driver" width="100" prop="driver">
+                    <template slot-scope="scope">
+                        <div v-if="scope.row.deliveryer">
+                            <span :style="{'color': scope.row.deliveryer.color}">{{ scope.row.deliveryer.name }}</span>
+                        </div>
+                        <div v-else>----</div>
+                        <div><strong>{{scope.row.short_code}}</strong></div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="Shipping M" width="100" prop="shipping_method">
+                    <template slot-scope="scope">
+                        <div v-if="scope.row.shipping_method=='delivery'">
+                            <div>Delivery</div>
+                            <small>{{ scope.row.shipping_zone.title }}</small>
+                        </div>
+                        <span v-else>Collection</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="Actions" width="auto" align="right" fixed="right">
+                    <template slot-scope="scope">
+                        <el-button size="mini" type="text" @click="onDispose(scope.row)">处理订单</el-button>
+                        <el-button size="mini" type="text" @click="onPrint(scope.row)">Print</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
             <div class="table-edit-footer">
                 <el-button size="small" type="primary" :disabled="selectionIds.length===0" @click="onBatchDelete">
                     批量删除
@@ -158,6 +103,7 @@
         </div>
         <dialog-dispose-order
                 :order="currentOrder"
+                @update="fetchList"
                 v-model="showOrderDialog"
         />
     </main-layout>
@@ -180,7 +126,8 @@ export default {
                 status: 'all'
             },
             showOrderDialog: false,
-            currentOrder: {}
+            currentOrder: {},
+            invoceLink: ''
         }
     },
 
@@ -192,7 +139,8 @@ export default {
             return this.params;
         },
         onBatchDelete() {
-            this.deleteOrders(this.selectionIds);
+            let ids = this.selectionIds.map(it => it.id);
+            this.deleteOrders(ids);
         },
         onDeleteOne(id) {
             this.deleteOrders([id]);
@@ -224,6 +172,30 @@ export default {
         onDispose(order) {
             this.currentOrder = order;
             this.showOrderDialog = true;
+        },
+        formatAddress(address) {
+            let addressline = address.first_name + ',' + address.address_line_1;
+            if (address.address_line_2) {
+                addressline += ' ' + address.address_line_2;
+            }
+
+            if (address.city) {
+                addressline += ',' + address.city;
+            }
+
+            if (address.state) {
+                addressline += ',' + address.state;
+            }
+
+            if (address.postalcode) {
+                addressline += ',' + address.postalcode;
+            }
+
+            return addressline;
+        },
+        onPrint(order) {
+            let printWin = window.open(order.links.invoice, '_blank');
+            printWin.print();
         }
     },
     mounted() {

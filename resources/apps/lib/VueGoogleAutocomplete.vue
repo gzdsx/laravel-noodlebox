@@ -8,8 +8,8 @@
             :placeholder="placeholder"
             :disabled="disabled"
             v-model="autocompleteText"
-            @focus="onFocus()"
-            @blur="onBlur()"
+            @focus="onFocus"
+            @blur="onBlur"
             @change="onChange"
             @keypress="onKeyPress"
             @keyup="onKeyUp"
@@ -33,7 +33,7 @@ const ADDRESS_COMPONENTS = {
 
 const CITIES_TYPE = ['locality', "neighborhood", 'administrative_area_level_3'];
 const REGIONS_TYPE = ['locality', 'sublocality', 'postal_code', 'country',
-    'administrative_area_level_1', 'administrative_area_level_2', 'neighborhood'];
+    'administrative_area_level_1', 'administrative_area_level_2'];
 
 /*
   By default, we're only including basic place data because requesting these
@@ -172,6 +172,8 @@ export default {
         this.autocomplete.setFields(this.fields);
 
         this.autocomplete.addListener('place_changed', this.onPlaceChanged);
+
+        this.autocompleteText = this.value;
     },
 
     methods: {
@@ -190,11 +192,13 @@ export default {
 
             if (place.address_components !== undefined) {
                 // return returnData object and PlaceResult object
-                this.$emit('placechanged', this.formatResult(place), place, this.id);
+                let formattedPlace = this.formatResult(place);
+                this.$emit('placechanged', formattedPlace, place, this.id);
 
                 // update autocompleteText then emit change event
-                this.autocompleteText = document.getElementById(this.id).value
-                this.onChange()
+                this.autocompleteText = document.getElementById(this.id).value;
+                //this.autocompleteText = formattedPlace.route;
+                //this.onChange()
             }
         },
 

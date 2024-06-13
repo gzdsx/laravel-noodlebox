@@ -10,14 +10,14 @@
         <section class="page-section">
             <el-table :data="dataList" v-loading="loading" @selection-change="onSelectionChange">
                 <el-table-column width="40" type="selection"/>
-                <el-table-column label="类型" width="100">
+                <el-table-column label="图片" width="100">
                     <template slot-scope="scope">
                         <featured-image :src="scope.row.image" width="60px" height="60px"/>
                     </template>
                 </el-table-column>
                 <el-table-column label="名称">
                     <template slot-scope="scope">
-                        <strong>{{ scope.row.title }}</strong>
+                        <strong>{{ scope.row.name }}</strong>
                     </template>
                 </el-table-column>
                 <el-table-column label="类型" width="100">
@@ -26,8 +26,9 @@
                         <span v-else>积分</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="percent" label="中奖概率" width="100"/>
-                <el-table-column prop="sort_num" label="显示顺序" width="100"/>
+                <el-table-column prop="probability" label="中奖概率" width="100"/>
+                <el-table-column prop="stock" label="数量" width="100"/>
+                <el-table-column prop="sort_num" label="排序" width="100"/>
                 <el-table-column label="状态" width="100">
                     <template slot-scope="scope">
                         <span v-if="scope.row.status">已激活</span>
@@ -75,7 +76,7 @@
                     <featured-image :src="prize.image" width="100px" height="100px" fit="contain" @click="onShowMedia"/>
                 </el-form-item>
                 <el-form-item label="名称">
-                    <el-input class="w500" v-model="prize.title"/>
+                    <el-input class="w500" v-model="prize.name"/>
                 </el-form-item>
                 <el-form-item label="类型">
                     <el-select class="w200" v-model="prize.type">
@@ -84,13 +85,13 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="积分" v-if="prize.type==='point'">
-                    <el-input class="w200" v-model="prize.title"/>
+                    <el-input class="w200" v-model="prize.points"/>
                 </el-form-item>
                 <el-form-item label="数量">
                     <el-input class="w200" v-model="prize.stock"/>
                 </el-form-item>
                 <el-form-item label="中奖概率">
-                    <el-input class="w200" v-model="prize.percent"/>
+                    <el-input class="w200" v-model="prize.probability"/>
                 </el-form-item>
                 <el-form-item label="显示顺序">
                     <el-input class="w200" v-model="prize.sort_num"/>
@@ -156,7 +157,7 @@ export default {
         },
         onSubmit() {
             let {prize} = this;
-            if (!prize.title) {
+            if (!prize.name) {
                 this.$message.error('请填写名称');
                 return false;
             }
@@ -184,12 +185,13 @@ export default {
         resetData() {
             this.prize = {
                 id: 0,
-                title: '',
-                percent: '10',
+                name: '',
+                probability: '10',
                 stock: 100,
                 type: 'product',
                 image: '',
-                sort_num: 0
+                sort_num: 0,
+                status: 1
             }
         },
         onShowMedia() {

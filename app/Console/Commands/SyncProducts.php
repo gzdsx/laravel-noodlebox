@@ -53,7 +53,7 @@ class SyncProducts extends Command
                     'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0',
                     'Accept' => 'application/json'
                 ],
-                'proxy' => 'socks5://127.0.0.1:1089'
+                //'proxy' => 'socks5://127.0.0.1:1089'
             ]);
 
             $statusMap = [
@@ -66,7 +66,8 @@ class SyncProducts extends Command
 
             $items = json_decode($response->getBody()->getContents(), true);
             foreach ($items as $item) {
-                $product = new Product();
+                $meta_data = array_column($item['meta_data'], 'value','key');
+                $product = Product::findOrNew($item['id'] ?? 0);
                 $product->id = $item['id'] ?? 0;
                 $product->title = $item['name'] ?? '';
                 $product->slug = $item['slug'] ?? '';
@@ -79,6 +80,9 @@ class SyncProducts extends Command
                 $product->stock = $item['stock_quantity'] ?? 1000;
                 $product->created_at = $item['date_created'] ?? now();
                 $product->updated_at = $item['date_modified'] ?? now();
+                $product->points = $meta_data['wps_points_product_value'] ?? 0;
+                $product->point_price = $meta_data['wps_points_product_purchase_value'] ?? 0;
+                $product->allow_point_purchase = $meta_data['wps_product_points_enable'] == 'yes';
                 $product->user_id = 1000000;
                 $product->save();
 

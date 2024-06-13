@@ -56,7 +56,7 @@ trait UserLogin
         }
 
         $mobileLogin = $this->guard()->attempt([
-            'phone' => $account,
+            'phone_number' => $account,
             'password' => $password
         ], $request->filled('remember'));
 

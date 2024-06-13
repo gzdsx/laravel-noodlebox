@@ -1,6 +1,5 @@
 <template>
-    <div class="container">
-        <order-tabs :active-tab="status" @change="onTabChange"/>
+    <div>
         <div class="my-orders">
             <div class="order-item" v-for="(order,index) in orders" :key="index">
                 <div class="order-item__header">
@@ -16,12 +15,15 @@
                         </div>
                         <div class="order-item__title">
                             <div class="title">{{ item.title }}</div>
-                            <div class="order-item__metas">
-                                <dl v-for="meta in item.meta_data" :key="meta.id">
-                                    <dt>{{ meta.key }}:</dt>
-                                    <dd>{{ meta.value }}</dd>
-                                </dl>
-                            </div>
+                            <small class="text-muted" v-if="item.meta_data&&item.meta_data.options">
+                                {{ Object.values(item.meta_data.options).join(',') }}
+                            </small>
+                            <small class="text-muted" v-if="item.meta_data&&item.meta_data.additional_options">
+                                {{ item.meta_data.additional_options.join(',') }}
+                            </small>
+                            <small class="text-muted" v-if="item.meta_data&&item.meta_data.purchase_via">
+                                via {{ item.meta_data.purchase_via }}
+                            </small>
                         </div>
                         <div class="order-item__price">
                             <strong>€{{ item.price }}</strong>
@@ -33,7 +35,7 @@
                     Total: €{{ order.total }} (Shipping Total: €{{ order.shipping_total }})
                 </div>
                 <div class="order-item__footer">
-                    <a :href="'/orders/' + order.order_id" class="btn btn-sm btn-outline-light rounded-pill">View</a>
+                    <button class="btn btn-outline-light btn-sm" @click="addCart(order)">Order Again</button>
                 </div>
             </div>
         </div>
@@ -43,6 +45,7 @@
 <script>
 import HttpClient from "../HttpClient";
 import OrderTabs from "./OrderTabs.vue";
+
 export default {
     name: "MyOrders",
     components: {OrderTabs},
@@ -53,10 +56,10 @@ export default {
             status: 'all'
         }
     },
-    methods:{
+    methods: {
         fetchList() {
             this.loading = true;
-            HttpClient.get('/orders?status='+this.status).then((res) => {
+            HttpClient.get('/orders?status=' + this.status).then((res) => {
                 this.orders = res.data.items;
             }).catch(reason => {
 
@@ -64,9 +67,15 @@ export default {
                 this.loading = false;
             });
         },
-        onTabChange(tab){
+        onTabChange(tab) {
             this.status = tab;
             this.fetchList();
+        },
+        addCart(order) {
+            HttpClient.post(`/orders/${order.id}/purchase`).then(response => {
+                //this.$showToast('Order placed successfully');
+                window.location.assign('/cart');
+            });
         }
     },
     mounted() {

@@ -32,9 +32,10 @@
     <script src="{{asset('dist/web/vendor.js?v='.appversion())}}" type="text/javascript"></script>
 @yield('scripts')
 </head>
-<body class="@yield('body-class')">
+<body class="@yield('body-class','body') mobile-body">
 @yield('header-before')
 @yield('header', view('web.header'))
+@yield('header-mobile', view('web.header-mobile'))
 @yield('header-after')
 <main id="main" class="main">
     @yield('content')

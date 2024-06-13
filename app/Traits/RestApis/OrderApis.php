@@ -2,9 +2,14 @@
 
 namespace App\Traits\RestApis;
 
+use App\Events\OrderChanged;
+use App\Models\Cart;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\ShippingZone;
+use App\Models\UserPointTransaction;
 use App\Models\UserPrepay;
+use App\Support\Paypal;
 use App\Support\TradeUtil;
 use GuzzleHttp\Client;
 use \Illuminate\Http\Request;
@@ -66,16 +71,17 @@ trait OrderApis
         $order->payment_method_title = $request->input('payment_method_title');
         $order->shipping_method = $request->input('shipping_method');
         $order->shipping_zone_id = $request->input('shipping_zone_id');
-        $order->shipping_total = $request->input('shipping_total');
+        $order->shipping_total = $request->input('shipping_total', 0);
         $order->buyer_note = $request->input('buyer_note');
         $order->shipping = $request->input('shipping', []);
         $order->billing = $request->input('billing', []);
+        $order->created_via = $request->input('created_via', 'checkout');
+        $order->meta_data = $request->input('meta_data', []);
+        $order->shipping_lines = $request->input('shipping_lines', []);
 
-        if (Auth::check()) {
-            $buyer = Auth::user();
-            $order->buyer_id = $buyer->id;
-            $order->buyer_name = $buyer->nickname;
-        }
+        $buyer = Auth::user();
+        $order->buyer_id = $buyer->id;
+        $order->buyer_name = $buyer->nickname;
 
         $total = 0;
         $fee_lines = $request->input('fee_lines', []);
@@ -96,15 +102,63 @@ trait OrderApis
             $total -= $discount_line['total'] ?? 0;
             $discount_total += $discount_line['total'] ?? 0;
         }
+
+        $points = $request->input('points', 0);
+        if ($points > 0) {
+            $points_total = $points * settings('points_exchange_rate', 0);
+            $total -= $points_total;
+
+            $buyer->points -= $points;
+            $buyer->save();
+
+            $transaction = new UserPointTransaction();
+            $transaction->user_id = $buyer->id;
+            $transaction->points = $points;
+            $transaction->type = 2;
+            $transaction->detail = 'exchange';
+            $transaction->save();
+        }
+
         $order->discount_lines = $discount_lines;
         $order->discount_total = $discount_total;
         $order->total = $total;
         $order->save();
 
-        $order_items = $request->input('order_items', []);
-        foreach ($order_items as $order_item) {
-            $order->total += $order_item['price'] * $order_item['quantity'];
-            $order->items()->create($order_item);
+        $point_payment_amount = 0;
+        $items = $request->input('items', []);
+        foreach ($items as $item) {
+            $order->total += $item['price'] * $item['quantity'];
+            $order->items()->create($item);
+        }
+
+        if ($point_payment_amount > 0) {
+            $buyer->points -= $point_payment_amount;
+            $buyer->save();
+
+            $transaction = new UserPointTransaction();
+            $transaction->user_id = $buyer->id;
+            $transaction->points = $point_payment_amount;
+            $transaction->type = 2;
+            $transaction->detail = 'purchase';
+            $transaction->save();
+        }
+
+        foreach ($order->items()->with(['product'])->get() as $item) {
+            if ($item->product) {
+                if ($item->product->points > 0) {
+                    $points = $item->product->points * $item->quantity;
+                    $buyer->points += $points;
+                    $buyer->save();
+
+                    $transaction = new UserPointTransaction();
+                    $transaction->user_id = $buyer->id;
+                    $transaction->points = $points;
+                    $transaction->type = 2;
+                    $transaction->detail = 'earn';
+                    $transaction->save();
+                }
+            }
+
         }
 
         if ($order->payment_method == 'paypal') {
@@ -115,80 +169,93 @@ trait OrderApis
             $order->payment_at = now();
         }
         $order->save();
+        $order->refresh();
 
-        //存储地址
-        $address_id = $order->shipping['id'] ?? 0;
-        if (!$address_id) {
-            $address = Auth::user()->addresses()->make();
-            $address->fill($order->shipping);
-            $address->isdefault = 1;
-            $address->save();
-        }
+        event(new OrderChanged($order, 'created'));
+
+        //更新地址
+        Auth::user()->updateMeta('billing_address', $order->billing);
+        Auth::user()->updateMeta('shipping_address', $order->shipping);
 
         $model = $this->repository()->find($order->id);
-        if ($model->payment_method == 'paypal') {
-            if (env('PAYPAL_ENV') == 'sandbox') {
-                $auth = [
-                    env('PAYPAL_SANDBOX_CLIENT_ID'),
-                    env('PAYPAL_SANDBOX_CLIENT_SECRET')
-                ];
-                $apiUrl = 'https://api-m.sandbox.paypal.com/v1/payments/payment';
-                //$apiUrl = 'https://api-m.sandbox.paypal.com/v2/checkout/orders';
-            } else {
-                $auth = [
-                    env('PAYPAL_CLIENT_ID'),
-                    env('PAYPAL_CLIENT_SECRET')
-                ];
-                $apiUrl = 'https://api-m.paypal.com/v1/payments/payment';
-                //$apiUrl = 'https://api-m.paypal.com/v2/checkout/orders';
-            }
+        $self_link = url('orders/' . $order->id);
+        $approval_link = url('orders/' . $order->id);
 
+        /*
+        if ($model->payment_method == 'paypal') {
             try {
-                $client = new Client();
-                $response = $client->post($apiUrl, [
-                    'headers' => [
-                        'Content-Type' => 'application/json'
-                    ],
-                    'auth' => $auth,
-                    'json' => [
-                        'intent' => 'sale',
-                        'payer' => [
-                            'payment_method' => 'paypal'
+                $shipping = collect($order->shipping);
+                $jsonRes = Paypal::createOrder([
+                    'intent' => 'CAPTURE',
+                    'purchase_units' => [
+                        [
+                            'amount' => [
+                                'value' => format_amount($order->total),
+                                'currency_code' => 'EUR'
+                            ],
                         ],
-                        'transactions' => [
-                            [
-                                'amount' => [
-                                    'total' => $model->total,
-                                    'currency' => 'EUR'
+                    ],
+                    'payment_source' => [
+                        'paypal' => [
+                            'experience_context' => [
+                                'payment_method_preference' => 'IMMEDIATE_PAYMENT_REQUIRED',
+                                'payment_method_selected' => 'PAYPAL',
+                                'landing_page_type' => 'BILLING',
+                                'user_action' => 'CONTINUE',
+                                'return_url' => route('paypal.return'),
+                                'cancel_url' => route('paypal.cancel')
+                            ],
+                            'name' => [
+                                'given_name' => $shipping->get('first_name'),
+                                'surname' => $shipping->get('last_name')
+                            ],
+                            'email_address' => $shipping->get('email'),
+                            'phone' => [
+                                'phone_type' => 'MOBILE',
+                                'phone_number' => [
+                                    'national_number' => $shipping->get('phone')
                                 ]
+                            ],
+                            'address' => [
+                                'address_line_1' => $shipping->get('address_line_1'),
+                                'address_line_2' => $shipping->get('address_line_2'),
+                                'admin_area_2' => $shipping->get('city'),
+                                'admin_area_1' => $shipping->get('state'),
+                                'postal_code' => $shipping->get('postalcode'),
+                                'country_code' => 'IR'
                             ]
                         ],
-                        'redirect_urls' => [
-                            'return_url' => url('/payment/paypal'),
-                            'cancel_url' => route('my-account')
-                        ]
-                    ]
+                    ],
                 ]);
 
-                $data = json_decode($response->getBody()->getContents(), true);
+                $paypalData = json_decode($jsonRes, true);
                 $prepay = new UserPrepay();
                 $prepay->payable_id = $model->id;
-                $prepay->payment_id = $data['id'];
-                $prepay->data = $data;
+                $prepay->payment_id = $paypalData['id'];
+                $prepay->data = $paypalData;
                 $prepay->user()->associate(Auth::id());
                 $prepay->save();
-                $approval_url = $data['links'][1]['href'];
-
+                $approval_link = $paypalData['links'][1]['href'];
             } catch (\Exception $e) {
-                return json_error($e->getMessage());
+                return json_error($e->getMessage(), 422);
             }
-        } else {
-            $approval_url = url('orders/' . $model->id);
         }
-
+        */
+        Cart::whereUserId($buyer->id)->delete();
         return json_success([
             'order' => $model,
-            'approval_url' => $approval_url
+            'links' => [
+                [
+                    'rel' => 'self',
+                    'href' => $self_link,
+                    'method' => 'GET',
+                ],
+                [
+                    'rel' => 'approval',
+                    'href' => $approval_link,
+                    'method' => 'GET',
+                ],
+            ],
         ]);
     }
 }

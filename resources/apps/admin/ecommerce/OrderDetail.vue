@@ -26,8 +26,8 @@
                             <img :src="item.image" class="thumb" alt="">
                             <div class="flex">
                                 <div class="title">{{ item.title }}</div>
-                                <div class="item-metas">
-                                    {{ metaValues(item.meta_data) }}
+                                <div class="item-metas" v-if="item.meta_data.options">
+                                    {{ metaValues(item.meta_data.options) }}
                                 </div>
                             </div>
                         </div>
@@ -80,74 +80,49 @@
                     <td>{{ order.payment_method_title }}</td>
                 </tr>
                 <tr>
-                    <td class="cell-label">买家账号</td>
-                    <td>{{ order.buyer_name }}</td>
-                </tr>
-                <tr>
-                    <td class="cell-label">配送地址</td>
-                    <td>{{ formatAddress(shipping) }}</td>
+                    <td class="cell-label" valign="top">配送地址</td>
+                    <td>
+                        <div v-if="shipping.first_name">{{ shipping.first_name }}</div>
+                        <div v-if="shipping.last_name">{{ shipping.last_name }}</div>
+                        <div v-if="shipping.address_line_1">{{ shipping.address_line_1 }}</div>
+                        <div v-if="shipping.address_line_2">{{ shipping.address_line_2 }}</div>
+                        <div v-if="shipping.city">{{ shipping.city }}</div>
+                        <div v-if="shipping.state">{{ shipping.state }}</div>
+                        <div v-if="shipping.postal_code">{{ shipping.postal_code }}</div>
+                        <div v-if="shipping.country">{{ shipping.country }}</div>
+                        <div v-if="shipping.phone">
+                            <span v-if="shipping.phone.national_number">+{{ shipping.phone.national_number }}</span>
+                            <span v-if="shipping.phone.phone_number">{{ shipping.phone.phone_number }}</span>
+                        </div>
+                        <div v-if="shipping.email">{{ shipping.email }}</div>
+                    </td>
                 </tr>
                 <tr v-if="order.deliveryer">
                     <td class="cell-label">配送员</td>
                     <td>{{ order.deliveryer.name }}</td>
                 </tr>
+                <tr>
+                    <td class="cell-label"></td>
+                    <td>
+                        <el-button size="medium" type="primary" @update="onOrderUpdated" @click="showDialog=true">
+                            订单处理
+                        </el-button>
+                    </td>
+                </tr>
                 </tbody>
             </table>
-
-            <template>
-                <div class="edit-title">
-                    <strong>订单操作</strong>
-                </div>
-                <table class="dsxui-formtable">
-                    <colgroup>
-                        <col width="80">
-                        <col>
-                    </colgroup>
-                    <tbody>
-                    <tr>
-                        <td class="cell-label">订单状态</td>
-                        <td>
-                            <el-select size="medium" class="w300" v-model="order_data.status">
-                                <el-option
-                                        v-for="(v,k) in statusList"
-                                        :label="v"
-                                        :value="k"
-                                        :key="k"
-                                />
-                            </el-select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="cell-label">配送员</td>
-                        <td>
-                            <el-select size="medium" class="w300" v-model="order_data.deliveryer_id">
-                                <el-option
-                                        v-for="(v,k) in deliveryerList"
-                                        :label="v.name"
-                                        :value="v.id"
-                                        :key="k"
-                                />
-                            </el-select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <el-button size="medium" type="primary" @click="onSubmit">提交</el-button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </template>
         </section>
+        <dialog-dispose-order v-model="showDialog" :order="order"/>
     </main-layout>
 </template>
 
 <script>
 import ApiService from "../utils/ApiService";
+import DialogDisposeOrder from "./DialogDisposeOrder.vue";
 
 export default {
     name: "OrderDetail",
+    components: {DialogDisposeOrder},
     data() {
         return {
             order: {},
@@ -158,7 +133,8 @@ export default {
                 status: 'pending',
                 deleiveryer_id: ''
             },
-            loading: true
+            loading: true,
+            showDialog: false
         }
     },
     methods: {
@@ -227,6 +203,10 @@ export default {
                 this.deliveryerList = response.data.items;
             });
         },
+        onOrderUpdated() {
+            this.fetchData();
+            this.showDialog = false;
+        }
     },
     mounted() {
         this.fetchData();

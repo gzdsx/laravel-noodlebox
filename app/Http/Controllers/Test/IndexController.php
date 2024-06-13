@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Test;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\SyncUsers;
+use App\Models\Order;
 use App\Models\UserAddress;
+use App\Support\BulkSMS;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Srmklive\PayPal\Facades\PayPal;
 
 class IndexController extends Controller
 {
@@ -57,7 +60,39 @@ class IndexController extends Controller
 //
 //        return 'ok';
 
-        return Str::uuid()->toString();
+//        try {
+//            return BulkSMS::sendSms([
+//                'body' => '【NoodleBox】{F0######} is your verification code, please do not disclose it to others.',
+//                'from' => 'NoodleBox',
+//                'to' => [
+//                    'address' => '+353879359054',
+//                    'fields' => ['123456']
+//                ]
+//            ]);
+//        } catch (\Exception $e) {
+//            return $e->getMessage();
+//        }
+
+        //return BulkSMS::showSms('1377020783284461568');
+
+//        foreach (Order::all() as $order) {
+//            $short_code = str_pad(rand(0, 9999), 4, '0');
+//            if ($order->short_code != $short_code) {
+//                $order->short_code = $short_code;
+//                $order->save();
+//            }
+//        }
+
+        $client = new Client();
+        $response = $client->get('https://noodlebox.ie/wp-json/wc/v3/orders/142800', [
+            'auth' => [env('WC_CONSUMER_KEY'), env('WC_CONSUMER_SECRET')],
+            'headers' => [
+                'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0',
+                'Accept' => 'application/json'
+            ],
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
     }
 
     public function combineAttrs($arr)

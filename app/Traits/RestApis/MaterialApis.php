@@ -62,25 +62,37 @@ trait MaterialApis
         $material->mime = $file->getMimeType();
 
         $image = Image::make($file->getRealPath());
-        if ($image->exif('Orientation')) {
-            switch ($image->exif('Orientation')) {
-                case 8:
-                    $image->rotate(90);
-                    break;
-                case 3:
-                    $image->rotate(180);
-                    break;
-                case 6:
-                    $image->rotate(-90);
-                    break;
+        if ($material->mime == 'image/jpeg') {
+            if ($image->exif('Orientation')) {
+                switch ($image->exif('Orientation')) {
+                    case 8:
+                        $image->rotate(90);
+                        break;
+                    case 3:
+                        $image->rotate(180);
+                        break;
+                    case 6:
+                        $image->rotate(-90);
+                        break;
+                }
             }
         }
+
 
         //大图
         $hashName = Str::random(40);
         $filePath = 'image/' . date('Y') . '/' . date('m');
         Storage::makeDirectory($filePath);
         $maxWidth = $request->input('width', intval(settings('image_max_width')));
+
+        if ($material->mime == 'image/gif') {
+            $material->size = $image->filesize();
+            $material->width = $image->width();
+            $material->height = $image->height();
+            $material->src = $file->store($filePath);
+            $material->thumb = $material->src;
+            return $material;
+        }
 
         if ($request->input('fit')) {
             $width = min($maxWidth, $image->width(), $image->height());

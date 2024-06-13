@@ -14,6 +14,8 @@ import PhotoWall from "./PhotoWall.vue";
 import DeliveryerList from "./DeliveryerList.vue";
 import OrderList from "./OrderList.vue";
 import OrderDetail from "./OrderDetail.vue";
+import PosMachineList from "./PosMachineList.vue";
+import Settings from "./Settings.vue";
 
 module.exports = [
     {path: '/product/list', component: ProductList, meta: {title: '商品管理'}},
@@ -36,4 +38,6 @@ module.exports = [
     {path: '/deliveryers', component: DeliveryerList, meta: {title: '配送员管理'}},
     {path: '/order/list', component: OrderList, meta: {title: '订单管理', group: 'trade'}},
     {path: '/order/detail/:id?', component: OrderDetail, meta: {title: '订单详情', group: 'trade'}},
+    {path: '/pos-machines', component: PosMachineList, meta: {title: 'POS管理', group: 'trade'}},
+    {path: '/shop/settings', component: Settings, meta: {title: '店铺设置', group: 'trade'}},
 ]

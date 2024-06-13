@@ -14,10 +14,14 @@
 namespace App\Traits\RestApis;
 
 
+use App\Models\Deliveryer;
 use App\Models\Order;
+use App\Models\OrderNote;
+use App\Models\ShippingZone;
 use App\Support\TradeUtil;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 trait SoldApis
 {
@@ -61,17 +65,121 @@ trait SoldApis
      */
     public function update(Request $request, $id)
     {
-        $model = $this->repository()->findOrFail($id);
-        $model->fill($request->input('order', []));
+        $order = $this->repository()->findOrFail($id);
 
-        if ($model->status == Order::ORDER_STATUS_PENDING) {
-            $model->payment_status = 0;
-            $model->payment_at = null;
+        $order_notes = [];
+        if ($request->has('status')) {
+            $status = $request->input('status');
+            if ($status !== $order->status) {
+                $order_notes[] = 'Order status changed from ' . $order->status . ' to ' . $status . '.';
+                $order->status = $status;
+            }
         }
 
-        $model->save();
+        $is_modified = $order->is_modified;
+        if ($request->has('shipping_method')) {
+            $shipping_method = $request->input('shipping_method');
+            if ($shipping_method != $order->shipping_method) {
+                $order_notes[] = 'Order shipping method changed from ' . $order->shipping_method . ' to ' . $shipping_method . '.';
+                $order->shipping_method = $shipping_method;
+                $is_modified = true;
+            }
+        }
 
-        return json_success($model);
+        if ($request->has('shipping_zone_id')) {
+            $shipping_zone_id = $request->input('shipping_zone_id');
+            $shipping_zone = ShippingZone::find($shipping_zone_id);
+            if ($shipping_zone) {
+                $order->total = $order->total - $order->shipping_total + $shipping_zone->fee;
+                $order->shipping_total = $shipping_zone->fee;
+                $order->shipping_zone_id = $shipping_zone_id;
+            }
+        }
+
+        if ($request->has('payment_method')) {
+            $payment_method = $request->input('payment_method');
+            if ($payment_method != $order->payment_method) {
+
+                $content = 'Order payment method changed from ' . __('payment.methods.' . $order->payment_method) . ' to ' . __('payment.methods.' . $payment_method) . '.';
+                if ($payment_method == 'customize') {
+                    $payment_cash_amount = $request->input('payment_cash_amount');
+                    $content .= '<br />By Card:' . ($order->total - $payment_cash_amount);
+                    $content .= '<br />By Cash:' . $payment_cash_amount;
+                }
+
+                $order_notes[] = $content;
+                $order->payment_method = $payment_method;
+                $is_modified = true;
+            }
+        }
+
+        if ($shipping_method == 'collection') {
+            $order->deliveryer_id = 0;
+        } else {
+            if ($request->has('deliveryer_id')) {
+                $deliveryer_id = $request->input('deliveryer_id');
+                if ($deliveryer_id != $order->deliveryer_id) {
+                    //$is_modify = true;
+                    $deliveryer = Deliveryer::find($deliveryer_id);
+                    if ($deliveryer) {
+                        $order_notes[] = 'Order assigned deliveryer:' . $deliveryer->name;
+                        $order->deliveryer_id = $deliveryer_id;
+                    }
+                }
+            }
+        }
+
+        if ($request->has('total')) {
+            $total = $request->input('total');
+            if ($total != $order->total) {
+                $order_notes[] = 'Order total changed from ' . $order->total . ' to ' . $total . '.';
+                $order->total = $total;
+                $is_modified = true;
+            }
+        }
+
+        if ($request->has('buyer_note')) {
+            $buyer_note = $request->input('buyer_note');
+            if ($buyer_note != $order->buyer_note) {
+                $order->buyer_note = $request->input('buyer_note');
+                $order_notes[] = 'Buyer note changed to ' . $request->input('buyer_note') . '.';
+                $is_modified = true;
+            }
+        }
+
+        if ($request->has('fee_lines')) {
+            $order->fee_lines = $request->input('fee_lines', []);
+        }
+
+        if ($request->has('discount_lines')) {
+            $order->discount_lines = $request->input('discount_lines', []);
+        }
+
+        $order->short_code = $request->input('short_code', '');
+        $order->is_modified = $is_modified;
+        $order->save();
+
+        if ($request->has('items')) {
+            $order_items = $request->input('items', []);
+            $ids = array_column($order_items, 'id');
+            if (count($ids) > 0) {
+                $order->items()->whereNotIn('id', $ids)->delete();
+            }
+
+            foreach ($order_items as $item) {
+                $order->items()->updateOrCreate(['id' => $item['id']], $item);
+            }
+        }
+
+        foreach ($order_notes as $content) {
+            $note = new OrderNote();
+            $note->order_id = $order->id;
+            $note->user_id = Auth::id();
+            $note->content = $content;
+            $note->save();
+        }
+
+        return json_success($order);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Ecommerce;
 
 use App\Http\Controllers\Admin\BaseController;
 use App\Http\Controllers\Controller;
+use App\Models\DeliveryerTransaction;
 use Illuminate\Http\Request;
 
 class DeliveryerController extends BaseController
@@ -47,6 +48,20 @@ class DeliveryerController extends BaseController
     public function batchDestroy(Request $request)
     {
         $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
+        return json_success();
+    }
+
+    public function settlement(Request $request, $id)
+    {
+        $amount = $request->input('amount');
+        $model = $this->repository()->findOrFail($id);
+
+        $transaction = new DeliveryerTransaction();
+        $transaction->amount = $amount;
+        $transaction->deliveryer_id = $model->id;
+        $transaction->note = $request->input('note');
+        $transaction->type = 'income';
+        $transaction->save();
         return json_success();
     }
 }

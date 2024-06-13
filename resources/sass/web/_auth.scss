@@ -50,26 +50,34 @@
         gap: 15px;
         justify-content: center;
 
-        i{
+        i {
             font-size: 40px;
         }
 
-        a{
+        a {
             color: #ffffff;
 
-            &:hover{
+            &:hover {
                 color: var(--safety-orange);
             }
         }
     }
 }
 
-.dialog-login-wapper{
+.dialog-login-wapper {
     margin: 0 auto;
     padding: 20px;
 }
 
-.auth-dialog{
+.auth-dialog {
     max-width: 500px;
     min-width: 500px;
+}
+
+.sign-form {
+    display: none;
+
+    &:first-child {
+        display: block;
+    }
 }

@@ -29,6 +29,9 @@ class EventServiceProvider extends ServiceProvider
         Logout::class => [
             'App\Listeners\Auth\LogoutListener'
         ],
+        'App\Events\OrderChanged' => [
+            'App\Listeners\Order\OrderChangedListener'
+        ]
     ];
 
     /**

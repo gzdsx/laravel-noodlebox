@@ -1,0 +1,193 @@
+@import "animation";
+
+.lottery {
+    &-overlayer {
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &-bg {
+        background-color: rgba(0, 0, 0, 0.9);
+    }
+
+    &-container {
+        display: flex;
+        margin: 0 auto;
+        flex-direction: column;
+        padding: 2rem;
+        max-width: 750px;
+    }
+
+    &-game-box {
+        flex: 1;
+        display: block;
+    }
+
+    &-show {
+        transform: none !important;
+    }
+
+    &-float {
+        position: fixed;
+        z-index: 997;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+
+        img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            cursor: pointer;
+        }
+    }
+
+    &-close {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        background-color: #fefefe;
+        padding: 10px;
+        font-size: 1.4rem;
+        text-transform: uppercase;
+        border-radius: 10px 0 0 10px;
+        color: teal;
+        cursor: pointer;
+    }
+
+    &-header {
+        display: block;
+        text-align: center;
+
+        .h1 {
+            font-size: 2em;
+            font-weight: 400;
+            text-align: center;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        p {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+    }
+
+    &-win-points {
+        position: fixed;
+        font-weight: 900;
+        color: #FDD729;
+        font-size: 20px;
+        animation: add-points 3s linear forwards;
+        z-index: 99999;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        text-shadow: 10px 10px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    &-prize-dialog {
+        max-width: 320px !important;
+        min-width: 320px !important;
+        padding: 1rem;
+        border: 1px #E59C00 solid;
+        border-radius: 1rem;
+        color: #ff6000;
+        background-color: #000000;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.3s ease-in-out;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        row-gap: 1rem;
+
+        &.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .prize-image {
+            display: block;
+            text-align: center;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                display: block;
+            }
+        }
+
+        .prize-name {
+            color: #ff6000;
+            text-align: center;
+            line-height: 1;
+            margin: 10px 0 0;
+        }
+    }
+
+    &-cart {
+        display: block;
+        padding: 1rem;
+
+        &-items {
+            display: flex;
+            flex-direction: column;
+        }
+
+        &-item {
+            display: flex;
+            column-gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--safety-orange);
+            padding: 10px 0;
+
+            &__image {
+                img {
+                    width: 64px;
+                    height: 64px;
+                    object-fit: cover;
+                    border-radius: 2px;
+                }
+            }
+
+            &__name {
+                flex: 1;
+                font-weight: 500;
+            }
+
+            &__qty {
+                width: 60px;
+            }
+        }
+
+        &-actions {
+            display: flex;
+            column-gap: 1rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .lottery {
+        &-float {
+            display: none;
+        }
+    }
+}
+
+@import "game";
+@import "truntable";
+@import "chest";

@@ -35,8 +35,9 @@
                         <span>{{Auth::user()->nickname}}</span>
                     </a>
                     <a href="{{url('cart')}}" class="logout-btn">
-                        <i class="bi bi-cart"></i>
-                        <span>Cart</span>
+                        <i class="bi bi-cart">
+                            <span class="badge cart-count">0</span>
+                        </i>
                     </a>
                 </div>
             @else
@@ -46,8 +47,9 @@
                         <span>Login</span>
                     </a>
                     <a href="{{url('cart')}}" class="logout-btn">
-                        <i class="bi bi-cart"></i>
-                        <span>Cart</span>
+                        <i class="bi bi-cart">
+                            <span class="badge cart-count">0</span>
+                        </i>
                     </a>
                 </div>
             @endif
@@ -62,6 +64,6 @@
             } else {
                 $('.header').removeClass('bg-crimson');
             }
-        })
+        });
     })(jQuery);
 </script>

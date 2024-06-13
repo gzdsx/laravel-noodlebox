@@ -37,7 +37,6 @@ trait UserRegister
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'nickname' => 'bail|required|string|nickname',
             'email' => 'bail|required|string|email|unique:user',
             'password' => 'bail|required|string|pwd',
         ]);

@@ -2055,8 +2055,18 @@ html, body {
   margin-right: 10px;
 }
 .order-table .order-item .item-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+.order-table .order-item .item-info .el-icon-edit {
+  position: absolute;
+  top: 0;
+  right: 15px;
+  font-size: 16px;
+  color: #838383;
+  cursor: pointer;
 }
 .order-table .order-item .title {
   font-size: 14px;
@@ -2098,6 +2108,12 @@ html, body {
 }
 .order-table .order-item .item-metas dl dd {
   margin-bottom: 0;
+}
+
+.order-calculator {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
 }
 
 .refund-form {

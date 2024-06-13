@@ -208,6 +208,10 @@ input[type="checkbox"]:checked, input[type='radio']:checked {
         flex: 1;
         display: flex;
         column-gap: 10px;
+
+        .el-button {
+            margin-left: 0;
+        }
     }
 
     &-pagination {
@@ -393,11 +397,11 @@ input[type="checkbox"]:checked, input[type='radio']:checked {
     }
 }
 
-.el-radio__inner,.el-checkbox__inner {
+.el-radio__inner, .el-checkbox__inner {
     transform: scale(1.2);
 }
 
-.el-input-group__append, .el-input-group__prepend{
+.el-input-group__append, .el-input-group__prepend {
     padding: 0 10px !important;
 }
 

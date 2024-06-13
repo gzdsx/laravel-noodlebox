@@ -25,7 +25,7 @@
                 cursor: pointer;
                 color: #888888;
 
-                &:hover{
+                &:hover {
                     color: #000000;
                 }
             }
@@ -100,8 +100,19 @@
         }
 
         .item-info {
+            flex: 1;
             display: flex;
             flex-direction: column;
+            position: relative;
+
+            .el-icon-edit {
+                position: absolute;
+                top: 0;
+                right: 15px;
+                font-size: 16px;
+                color: #838383;
+                cursor: pointer;
+            }
         }
 
         .title {
@@ -152,4 +163,11 @@
             }
         }
     }
+}
+
+
+.order-calculator {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
 }

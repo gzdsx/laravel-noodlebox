@@ -57,20 +57,30 @@ var _default = exports["default"] = {
   },
   data: function data() {
     return {
-      show: false
+      show: false,
+      showAnimate: false
     };
   },
   watch: {
     visible: function visible(val) {
+      var _this = this;
       if (val !== this.show) {
         this.show = val;
       }
       if (val) {
         document.body.appendChild(this.$el);
+        document.querySelector('html').classList.add('noscroll');
+        this.$nextTick(function () {
+          setTimeout(function () {
+            _this.showAnimate = true;
+          }, 20);
+        });
       } else {
+        this.showAnimate = false;
         if (this.$el && this.$el.parentNode) {
           this.$el.parentNode.removeChild(this.$el);
         }
+        document.querySelector('html').classList.remove('noscroll');
       }
     }
   },
@@ -78,7 +88,9 @@ var _default = exports["default"] = {
     close: function close() {
       this.$emit('close');
     },
-    click: function click() {}
+    click: function click() {
+      return false;
+    }
   },
   created: function created() {
     this.show = this.visible;
@@ -177,27 +189,35 @@ exports.staticRenderFns = exports.render = void 0;
 var render = exports.render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("div", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.show,
-      expression: "show"
-    }],
+  return _vm.show ? _c("div", {
     staticClass: "noodle-dialog-wrapper",
     on: {
-      click: _vm.close
-    }
-  }, [_c("div", {
-    staticClass: "noodle-dialog",
-    "class": _vm.customClass,
-    on: {
       click: function click($event) {
-        $event.stopPropagation();
+        if (!$event.type.indexOf("key") && _vm._k($event.keyCode, "p", undefined, $event.key, undefined)) return null;
+        $event.preventDefault();
+        return _vm.close.apply(null, arguments);
+      },
+      touchstart: function touchstart($event) {
+        $event.preventDefault();
         return _vm.click.apply(null, arguments);
       }
     }
   }, [_c("div", {
+    staticClass: "noodle-dialog show",
+    "class": [_vm.customClass, {
+      show: _vm.showAnimate
+    }],
+    on: {
+      click: function click($event) {
+        $event.stopPropagation();
+        return _vm.click.apply(null, arguments);
+      },
+      touchstart: function touchstart($event) {
+        $event.stopPropagation();
+        return _vm.click.apply(null, arguments);
+      }
+    }
+  }, [_vm.$slots.header ? _vm._t("header") : _c("div", {
     staticClass: "noodle-dialog__header"
   }, [_c("div", {
     staticClass: "flex-grow-1"
@@ -212,7 +232,7 @@ var render = exports.render = function render() {
     staticClass: "noodle-dialog__body"
   }, [_vm._t("default")], 2), _vm._v(" "), _c("div", {
     staticClass: "noodle-dialog__footer"
-  })])]);
+  })], 2)]) : _vm._e();
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -310,7 +330,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.vue-toast[data-v-05b457d0]{\n    position: fixed;\n    left: 50%;\n    top:50%;\n    background: #0A1621;\n    padding: 20px 30px;\n    border-radius: 5px;\n    transform: translate(-50%,-50%);\n    color:#fefefe;\n    font-size: 18px;\n    z-index: 99999;\n}\n.fadein[data-v-05b457d0] {\n    animation: animate_in-05b457d0 0.35s;\n}\n.fadeout[data-v-05b457d0] {\n    animation: animate_out-05b457d0 0.25s;\n    opacity: 0;\n}\n@keyframes animate_in-05b457d0 {\n0% {\n        opacity: 0;\n}\n100%{\n        opacity: 1;\n}\n}\n@keyframes animate_out-05b457d0 {\n0% {\n        opacity: 1;\n}\n100%{\n        opacity: 0;\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.vue-toast[data-v-05b457d0]{\n    position: fixed;\n    left: 50%;\n    top:50%;\n    background: #000;\n    padding: 20px 30px;\n    border-radius: 5px;\n    transform: translate(-50%,-50%);\n    color:#ffffff;\n    font-size: 18px;\n    z-index: 99999;\n    box-shadow: 0 3px 5px rgba(0,0,0,0.2);\n    text-align: center;\n}\n.fadein[data-v-05b457d0] {\n    animation: animate_in-05b457d0 0.35s;\n}\n.fadeout[data-v-05b457d0] {\n    animation: animate_out-05b457d0 0.25s;\n    opacity: 0;\n}\n@keyframes animate_in-05b457d0 {\n0% {\n        opacity: 0;\n}\n100%{\n        opacity: 1;\n}\n}\n@keyframes animate_out-05b457d0 {\n0% {\n        opacity: 1;\n}\n100%{\n        opacity: 0;\n}\n}\n@media (max-width: 768px) {\n.vue-toast[data-v-05b457d0]{\n        font-size: 16px;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

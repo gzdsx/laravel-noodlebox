@@ -48,6 +48,8 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @property string|null $description 简短描述
  * @property int $sort_num 排序
  * @property string|null $icon 图标
+ * @property int $allow_point_purchase
+ * @property int $point_price
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
@@ -78,6 +80,7 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @method static \Illuminate\Database\Eloquent\Builder|Product query()
  * @method static \Illuminate\Database\Eloquent\Builder|Product simplePaginateFilter(?int $perPage = null, ?int $columns = [], ?int $pageName = 'page', ?int $page = null)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereAdditionalOptions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereAllowPointPurchase($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereAttrList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereBeginsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereBrandId($value)
@@ -97,6 +100,7 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsWeightTemplate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereKeywords($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereLike(string $column, string $value, string $boolean = 'and')
+ * @method static \Illuminate\Database\Eloquent\Builder|Product wherePointPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product wherePoints($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product wherePurchaseLimit($value)
@@ -133,7 +137,8 @@ class Product extends Model
         'sold', 'stock', 'views', 'collect_num', 'comment_num', 'attr_list', 'variation_list', 'additional_options',
         'is_new', 'is_hot', 'is_recommend', 'sticky', 'free_delivery', 'template_id', '
         is_weight_template', 'has_sku_attr', 'brand_id', 'status', 'tax_status',
-        'points', 'keywords', 'description', 'sort_num', 'icon', 'created_at', 'updated_at'
+        'points', 'keywords', 'description', 'sort_num', 'icon', 'created_at', 'updated_at',
+        'allow_point_purchase', 'point_price'
     ];
     protected $hidden = ['user_id'];
     protected $appends = ['url', 'status_des', 'meta_data'];

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\User;
 
 use App\Http\Controllers\Admin\BaseController;
 use App\Models\User;
+use App\Models\UserPointTransaction;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -150,6 +151,36 @@ class UserController extends BaseController
                 $user->update($request->input('data', []));
             }
         });
+        return json_success();
+    }
+
+    public function updatePoints(Request $request, $id)
+    {
+        $user = $this->repository()->findOrFail($id);
+        $action = $request->input('action');
+        $amount = $request->input('amount');
+
+        if ($amount > 0) {
+            $transaction = new UserPointTransaction();
+            $transaction->user_id = $user->id;
+            $transaction->points = $amount;
+
+            if ($action == 'add'){
+                $user->points += $amount;
+                $transaction->type = 1;
+            }else{
+                if ($user->points < $amount){
+                    $transaction->points = $user->points;
+                    $user->points = 0;
+                }else{
+                    $user->points -= $amount;
+                }
+                $transaction->type = 2;
+            }
+
+            $transaction->save();
+            $user->save();
+        }
         return json_success();
     }
 }

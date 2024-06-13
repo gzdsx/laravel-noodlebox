@@ -60,9 +60,9 @@ export default {
     },
     methods: {
         fetchData() {
-            let {uid} = this.$route.params;
-            if (uid) {
-                UserService.getUser(uid).then(response => {
+            let {id} = this.$route.params;
+            if (id) {
+                UserService.getUser(id).then(response => {
                     this.user = response.data;
                 });
             }

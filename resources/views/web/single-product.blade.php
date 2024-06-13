@@ -6,12 +6,19 @@
 @section('body-class','single-product')
 
 @section('scripts')
-   <script>
-       var product = @json($product);
-   </script>
+    <script>
+        window.g_config = {
+            productId: {{$product->id}},
+        }
+    </script>
 @endsection
 
 @section('content')
+    <div class="d-none">
+        <h1>{{$product->title}}</h1>
+        <div class="price">price:{{$product->price}}</div>
+        <div class="description">{!! $product->description !!}</div>
+    </div>
     <section class="page-section">
         <div class="container">
             <div class="row">
@@ -28,6 +35,16 @@
                                         </div>
                                     @endforeach
                                 </div>
+                                @if($product->icon=='new')
+                                    <span class="product-icon product-icon__new">new!</span>
+                                @endif
+                                @if($product->icon=='hot')
+                                    <span class="product-icon product-icon__hot">hot!</span>
+                                @endif
+
+                                @if($product->getMeta('spicy'))
+                                    <span class="product-spicy product-spicy__{{$product->getMeta('spicy')}}"></span>
+                                @endif
                             </div>
                             <div class="swiper product-thumbnails">
                                 <div class="swiper-wrapper">
@@ -80,8 +97,19 @@
                     <div class="product-item">
                         <div class="product-item__image">
                             <a href="{{$prod->url}}" title="{{$prod->title}}">
-                                <img src="{{asset('images/noodlebox/placeholder.png')}}" data-src="{{$prod->image}}" alt="{{$prod->title}}"/>
+                                <img src="{{asset('images/noodlebox/placeholder.png')}}" data-src="{{$prod->image}}"
+                                     alt="{{$prod->title}}"/>
                             </a>
+                            @if($prod->icon=='new')
+                                <span class="product-icon product-icon__new">new!</span>
+                            @endif
+                            @if($prod->icon=='hot')
+                                <span class="product-icon product-icon__hot">hot!</span>
+                            @endif
+
+                            @if($prod->getMeta('spicy'))
+                                <span class="product-spicy product-spicy__{{$product->getMeta('spicy')}}"></span>
+                            @endif
                         </div>
                         <div class="product-item__title">
                             <a href="{{$prod->url}}">
@@ -100,5 +128,5 @@
 @stop
 
 @section('footer-scripts')
-    <script src="{{ asset('dist/web/metabox.js?v='.appversion()) }}" type="text/javascript"></script>
+    <script src="{{ asset('dist/web/product.js?v='.appversion()) }}" type="text/javascript"></script>
 @endsection

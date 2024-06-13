@@ -1,0 +1,105 @@
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+
+}
+
+@keyframes move {
+    0% {
+        transform: translate(0px, 0px);
+    }
+    100% {
+        transform: translate(0px, -5px);
+    }
+
+}
+
+@keyframes move2 {
+    0% {
+        transform: translate(0px, 30px);
+        opacity: 0;
+    }
+    70% {
+        transform: translate(0px, -20px);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0px, 0px);
+        opacity: 1;
+    }
+}
+
+@keyframes shake {
+    0% {
+        transform: scale3d(1, 1, 1);
+    }
+
+    6% {
+        transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, -8deg);
+    }
+
+    18%, 30%, 42% {
+        transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 8deg);
+
+    }
+
+    12%, 24%, 36%, 48% {
+        transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -8deg);
+    }
+    54% {
+        transform: scale3d(1, 1, 1);
+    }
+
+    60% {
+        transform: scale3d(1, 1, 1);
+    }
+
+    80% {
+        transform: scale3d(1, 1, 1) translate3d(0px, 150px, 0);
+    }
+    90% {
+        transform: scale3d(1, 1, 1) translate3d(0px, 100px, 0);
+    }
+    100% {
+        transform: scale3d(1, 1, 1) translate3d(0px, 0, 0);
+    }
+}
+
+@keyframes spinner-rotate {
+    0% {
+        transform: rotate(0);
+    }
+
+    50% {
+        transform: rotate(180deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes add-points {
+    0% {
+        transform: scale(1) translate(0, 100px);
+        opacity: 0;
+    }
+
+    15% {
+        transform: scale(5) translate(0, -20px);
+        opacity: 1;
+    }
+
+    85% {
+        transform: scale(5) translate(0, -20px);
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}

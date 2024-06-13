@@ -23,19 +23,14 @@
                                 <img src="{{$item->image}}" class="order-product__thumb" alt="">
                                 <div class="order-product__title">
                                     <div class="title">{{ $item->title }}</div>
-                                    @if(!empty($item->meta_data))
-                                        <div class="metas">
-                                            @foreach($item->meta_data as $meta)
-                                                <dl class="meta-data-item">
-                                                    <dt>{{$meta['key'] ?? ''}}</dt>
-                                                    <dd>{{ $meta['value']??'' }}</dd>
-                                                </dl>
-                                            @endforeach
-                                        </div>
+                                    @if(!empty($item->meta_data['options']))
+                                        <small class="text-safety-orange">
+                                            {{implode(',',array_values($item->meta_data['options']))}}
+                                        </small>
                                     @endif
                                 </div>
                                 <div class="order-product__price">
-                                    <strong>€{{$item->price}}</strong>
+                                    <strong class="text-turquoise">€{{$item->price}}</strong>
                                     <span>x{{$item->quantity}}</span>
                                 </div>
                             </div>
@@ -44,11 +39,12 @@
                     <div class="order-totals">
                         <div class="order-total">
                             <div class="order-total__label">Subtotal</div>
-                            <div class="order-total__value">€{{$order->total}}</div>
+                            <div class="order-total__value">€{{bcsub($order->total,$order->shipping_total,2)}}</div>
                         </div>
                         <div class="order-total">
                             <div class="order-total__label">Shipping</div>
-                            <div class="order-total__value">€{{$order->shipping_total}} via {{$order->shipping_method}}</div>
+                            <div class="order-total__value">€{{$order->shipping_total}}
+                                via {{$order->shipping_method}}</div>
                         </div>
                         <div class="order-total">
                             <div class="order-total__label">Total</div>
@@ -58,9 +54,9 @@
                     <div class="blank-2"></div>
                     <h3>Shipping Address</h3>
                     <div class="order-shipping">
-                        <div>{{$order->shipping['name'] ?? ''}}</div>
+                        <div>{{$order->shipping['first_name'] ?? ''}}</div>
                         <div>
-                            {{$order->shipping['address'] ?? ''}}
+                            {{$order->shipping['address_line_1'] ?? ''}}
                         </div>
                         @if(isset($order->shipping['city']))
                             <div>
@@ -72,15 +68,23 @@
                                 {{$order->shipping['state'] ?? ''}}
                             </div>
                         @endif
-                        @if(isset($order->shipping['country']))
+                        @if(isset($order->shipping['postalcode']))
                             <div>
-                                {{$order->shipping['country'] ?? ''}}
+                                {{$order->shipping['postalcode'] ?? ''}}
                             </div>
                         @endif
-                        <div>
-                            <i class="bi bi-telephone"></i>
-                            <span>{{$order->shipping['phone'] ?? ''}}</span>
-                        </div>
+                        @if(is_array($order->shipping['phone']))
+                            <div>
+                                <i class="bi bi-telephone"></i>
+                                <span>+{{$order->shipping['phone']['national_number'] ?? ''}}</span>
+                                <span>{{$order->shipping['phone']['phone_number'] ?? ''}}</span>
+                            </div>
+                        @else
+                            <div>
+                                <i class="bi bi-telephone"></i>
+                                {{$order->shipping['phone'] ?? ''}}
+                            </div>
+                        @endif
                         @if(isset($order->shipping['email']))
                             <div>
                                 <i class="bi bi-envelope"></i>

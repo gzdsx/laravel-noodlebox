@@ -1,7 +1,13 @@
 <template>
-    <div class="noodle-dialog-wrapper" v-show="show" @click="close">
-        <div class="noodle-dialog" :class="customClass" @click.stop="click">
-            <div class="noodle-dialog__header">
+    <div class="noodle-dialog-wrapper" v-if="show" @click.p.prevent="close" @touchstart.prevent="click">
+        <div
+                class="noodle-dialog show"
+                :class="[customClass,{'show':showAnimate}]"
+                @click.stop="click"
+                @touchstart.stop="click"
+        >
+            <slot name="header" v-if="$slots.header"/>
+            <div class="noodle-dialog__header" v-else>
                 <div class="flex-grow-1">
                     <h3 class="title">
                         {{ title }}
@@ -38,7 +44,8 @@ export default {
     },
     data() {
         return {
-            show: false
+            show: false,
+            showAnimate: false
         }
     },
     watch: {
@@ -49,10 +56,18 @@ export default {
 
             if (val) {
                 document.body.appendChild(this.$el);
+                document.querySelector('html').classList.add('noscroll');
+                this.$nextTick(() => {
+                    setTimeout(() => {
+                        this.showAnimate = true;
+                    }, 20);
+                });
             } else {
+                this.showAnimate = false;
                 if (this.$el && this.$el.parentNode) {
                     this.$el.parentNode.removeChild(this.$el);
                 }
+                document.querySelector('html').classList.remove('noscroll');
             }
         }
     },
@@ -61,7 +76,7 @@ export default {
             this.$emit('close');
         },
         click() {
-
+            return false
         }
     },
     created() {

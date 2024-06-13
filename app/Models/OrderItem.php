@@ -20,8 +20,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $sku_id 属性ID
  * @property string|null $sku_title 商品属性
  * @property int $is_gift 是否赠品
- * @property string $status 交易状态
+ * @property string $subtotal 小计
+ * @property string $total 合计
  * @property-read \App\Models\Order|null $order
+ * @property-read \App\Models\Product|null $product
  * @property-read \App\Models\Refund|null $refund
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newQuery()
@@ -36,8 +38,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereSkuId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereSkuTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereSubtotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereTotal($value)
  * @mixin \Eloquent
  */
 class OrderItem extends Model
@@ -48,10 +51,10 @@ class OrderItem extends Model
     protected $primaryKey = 'id';
     protected $fillable = [
         'order_id', 'product_id', 'title', 'price', 'quantity', 'image',
-        'meta_data', 'sku_id', 'sku_title', 'is_gift', 'status'
+        'meta_data', 'sku_id', 'sku_title', 'is_gift', 'status', 'subtotal', 'total'
     ];
     protected $casts = [
-        'meta_data' => 'array'
+        'meta_data' => 'json'
     ];
 
     public $timestamps = false;
@@ -70,5 +73,10 @@ class OrderItem extends Model
     public function refund()
     {
         return $this->hasOne(Refund::class, 'trade_id', 'trade_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 }

@@ -3,58 +3,36 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use GuzzleHttp\Client;
+use App\Models\Order;
+use App\Models\UserPrepay;
+use App\Support\Paypal;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 
 class PaypalController extends BaseController
 {
-    public function createOrder(Request $request)
+    public function capture(Request $request)
     {
-        $client = new Client();
-        $response = $client->request('POST', 'https://api.sandbox.paypal.com/v2/checkout/orders', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . $this->getPaypalToken(),
-            ],
-            'json' => [
-                'intent' => 'CAPTURE',
-                'purchase_units' => [
-                    [
-                        'amount' => [
-                            'value' => '1.00',
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+        $payer_id = $request->input('PayerID');
+        $orderId = $request->input('token');
+        $prepay = UserPrepay::wherePaymentId($orderId)->firstOrFail();
+        $order = Order::findOrFail($prepay->payable_id);
+        if ($order->isPaid()){
+            return redirect('orders/' . $order->id);
+        }
 
-        return response($response->getBody()->getContents())->json();
-    }
+        try {
+            $json = Paypal::captureOrder($orderId);
+            $data = json_decode($json);
+            if ($data->status == 'COMPLETED') {
+                $order->markAsPaid();
+            }
 
+        } catch (GuzzleException $e) {
+            dd($e);
+            //return $e->getMessage();
+        }
 
-    /**
-     * @return mixed
-     * @throws \Exception
-     */
-    protected function getPaypalToken()
-    {
-        return cache()->remember('paypal_token', 30000, function () {
-            $client = new Client();
-            $response = $client->request('POST', 'https://api.sandbox.paypal.com/v1/oauth2/token', [
-                'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ],
-                'form_params' => [
-                    'grant_type' => 'client_credentials',
-                ],
-                'auth' => [
-                    env('PAYPAL_SANDBOX_CLIENT_ID'),
-                    env('PAYPAL_SANDBOX_CLIENT_SECRET'),
-                ],
-            ]);
-
-            $data = json_decode($response->getBody()->getContents());
-            return $data->access_token;
-        });
+        return redirect('orders/' . $order->id);
     }
 }

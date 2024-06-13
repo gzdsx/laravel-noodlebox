@@ -9,20 +9,34 @@
             closeable
             @close="close"
     >
-        <el-table :data="items" @selection-change="onSelectionChange" v-loading="loading">
+        <el-table :data="dataList" @selection-change="onSelectionChange" v-loading="loading">
             <el-table-column width="45" type="selection"/>
             <el-table-column label="图标" width="70">
                 <template slot-scope="scope">
-                    <featured-image :src="scope.row.icon" fit="contain" custom-class="badge-icon" width="36px" height="36px"/>
+                    <featured-image :src="scope.row.icon" fit="contain" custom-class="badge-icon" width="36px"
+                                    height="36px"/>
                 </template>
             </el-table-column>
             <el-table-column prop="name" label="名称"/>
-            <el-table-column label="操作选项" width="80">
+            <el-table-column label="操作选项" width="80" align="right">
                 <template slot-scope="scope">
                     <i class="el-icon-close" @click="handleDelete(scope.row.id)"></i>
                 </template>
             </el-table-column>
         </el-table>
+        <div class="tablenav tablenav-bottom">
+            <div class="table-actions">
+                <el-button size="small" type="primary" :disabled="!selectionIds.length" @click="handleConfirm">使用选项</el-button>
+            </div>
+            <el-pagination
+                    background
+                    layout="prev, pager, next,total"
+                    :total="total"
+                    :page-size="pageSize"
+                    :current-page="page"
+                    @current-change="onPageChange"
+            />
+        </div>
         <el-form :inline="true" size="medium" style="margin-top: 10px;">
             <el-form-item>
                 <featured-image :src="badge.icon" width="36px" height="36px" @click="showMediaDialog=true"/>
@@ -34,19 +48,17 @@
                 <el-button @click="handleSubmit">Add</el-button>
             </el-form-item>
         </el-form>
-        <div slot="footer" class="dialog-footer">
-            <el-button size="medium" @click="close">取消</el-button>
-            <el-button size="medium" type="primary" @click="handleConfirm">确定</el-button>
-        </div>
         <media-dialog v-model="showMediaDialog" @confirm="onChooseImage"/>
     </el-dialog>
 </template>
 
 <script>
 import ApiService from "../utils/ApiService";
+import Pagination from "../mixins/Pagination";
 
 export default {
     name: "BadgePanel",
+    mixins: [Pagination],
     props: {
         type: {
             type: String,
@@ -59,11 +71,10 @@ export default {
     },
     data() {
         return {
-            items: [],
+            pageSize: 10,
             loading: false,
             showMediaDialog: false,
             badge: {},
-            selectionIds: []
         }
     },
     watch: {
@@ -74,19 +85,16 @@ export default {
         }
     },
     methods: {
+        listApi() {
+            return '/badges';
+        },
+        listParams() {
+            return {
+                type: this.type
+            }
+        },
         close() {
             this.$emit('input', false);
-        },
-        fetchList() {
-            const {type} = this;
-            this.loading = true;
-            ApiService.get('/badges?type=' + type).then(response => {
-                this.items = response.data.items;
-            }).catch(reason => {
-
-            }).finally(() => {
-                this.loading = false;
-            });
         },
         onChooseImage(m) {
             this.badge.icon = m.src;
@@ -96,10 +104,10 @@ export default {
             badge.type = this.type;
             this.loading = true;
             ApiService.post('/badges', badge).then(response => {
-                this.items.push(response.data);
+                this.dataList.push(response.data);
                 this.badge = {};
             }).catch(reason => {
-                console.log(reason);
+                //console.log(reason);
                 this.$message.error(reason.message);
             }).finally(() => {
                 this.loading = false;
@@ -111,7 +119,7 @@ export default {
             }).then(() => {
                 this.loading = true;
                 ApiService.delete('/badges/' + id).then(response => {
-                    this.items = this.items.filter(item => item.id !== id);
+                    this.dataList = this.dataList.filter(item => item.id !== id);
                 }).catch(reason => {
                     this.$message.error(reason.message);
                 }).finally(() => {
@@ -119,7 +127,7 @@ export default {
                 });
             });
         },
-        handleConfirm(){
+        handleConfirm() {
             this.$emit('confirm', this.selectionIds);
             this.close();
         },

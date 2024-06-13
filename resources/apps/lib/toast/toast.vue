@@ -7,13 +7,15 @@
         position: fixed;
         left: 50%;
         top:50%;
-        background: #0A1621;
+        background: #000;
         padding: 20px 30px;
         border-radius: 5px;
         transform: translate(-50%,-50%);
-        color:#fefefe;
+        color:#ffffff;
         font-size: 18px;
         z-index: 99999;
+        box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+        text-align: center;
     }
     .fadein {
         animation: animate_in 0.35s;
@@ -36,6 +38,12 @@
         }
         100%{
             opacity: 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .vue-toast{
+            font-size: 16px;
         }
     }
 </style>

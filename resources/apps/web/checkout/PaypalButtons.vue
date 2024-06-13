@@ -4,64 +4,32 @@
 
 <script>
 import {loadScript} from "@paypal/paypal-js";
-import * as uuid from 'uuid';
-import HttpClient from "../HttpClient";
 
 let paypal;
 export default {
     name: "PaypalButtons",
     props: {
-        order: {
-            type: Object,
+        createOrder: {
+            type: Function,
             default() {
-                return {
-                    id: '',
-                    total: 100,
-                    currency: 'EUR',
-                    payment_method: 'paypal',
-                    payment_method_title: 'PayPal',
-                    transaction_id: '',
-                    status: 'pending',
-                    shipping_lines: [],
-                    billing: {
-                        first_name: '',
-                        last_name: '',
-                        company: '',
-                        address_1: '',
-                        address_2: '',
-                        city: '',
-                        state: '',
-                        postcode: '',
-                        country: '',
-                        email: '',
-                        phone: '',
-                    },
-                    shipping: {
-                        first_name: 'David',
-                        last_name: 'Song',
-                        company: '',
-                        address_1: 'zhongyangdajie',
-                        address_2: '',
-                        city: 'Guiyang',
-                        state: 'Guizhou',
-                        postcode: '558300',
-                        country: 'China',
-                        email: '307718818@qq.com',
-                        phone: '18685849696',
-                    },
-                    line_items: [],
-                    meta_data: [],
+                return () => {
+
                 }
             }
         },
-        card: {
-            type: Object,
+        onApprove: {
+            type: Function,
             default() {
-                return {
-                    id: uuid.v4(),
-                    name: 'card',
-                    number: '5298680048963093',
-                    expiry: '2024-07'
+                return (data, actions) => {
+
+                }
+            }
+        },
+        onCancel: {
+            type: Function,
+            default() {
+                return () => {
+
                 }
             }
         }
@@ -76,56 +44,26 @@ export default {
         }).then((paypalObj) => {
             paypal = paypalObj;
             this.$nextTick(() => {
-                let {order, card} = this;
-                let {shipping} = order;
+                let {orderData, card} = this;
                 paypal
                     .Buttons({
-                        createOrder: async (data, actions) => {
-                            // return actions.order.create({
-                            //     purchase_units: [
-                            //         {
-                            //             reference_id: uuid.v4(),
-                            //             amount: {
-                            //                 value: order.total,
-                            //             },
-                            //         },
-                            //     ],
-                            //     payment_source: {
-                            //         //card,
-                            //         paypal: {
-                            //             name: {
-                            //                 given_name: shipping.first_name,
-                            //                 surname: shipping.last_name,
-                            //             },
-                            //             email_address: shipping.email,
-                            //             phone: {
-                            //                 phone_number: {
-                            //                     national_number: shipping.phone,
-                            //                 },
-                            //             },
-                            //             address: {
-                            //                 address_line_1: shipping.address_1,
-                            //                 address_line_2: shipping.address_2,
-                            //                 admin_area_2: shipping.city,
-                            //                 admin_area_1: shipping.state,
-                            //                 postal_code: shipping.postcode,
-                            //                 country_code: 'IE',
-                            //             },
-                            //             experience_context: {
-                            //                 user_action: "PAY_NOW",
-                            //                 payment_method_preference: "IMMEDIATE_PAYMENT_REQUIRED",
-                            //             }
-                            //         },
-                            //
-                            //     }
-                            // });
+                        onInit: (data, actions) => {
 
-                            let response = await HttpClient.post('/payment/paypal/create-order', {order, card});
-                            if (response.data.id) {
-                                return response.data.id
-                            } else {
-                                throw new Error(response.message);
-                            }
+                        },
+                        onClick: async (data, actions) => {
+
+                        },
+                        createOrder: async (data, actions) => {
+                            return this.createOrder(data, actions);
+                        },
+                        onApprove: async (data, actions) => {
+                            return this.onApprove(data, actions);
+                        },
+                        onCancel: async (data, actions) => {
+                            return this.onCancel(data, actions);
+                        },
+                        onError: async (err) => {
+                            console.log(err);
                         }
                     })
                     .render("#paypal-buttons-id")
@@ -136,8 +74,6 @@ export default {
         }).catch((error) => {
             console.error("failed to load the PayPal JS SDK script", error);
         });
-
-        console.log(uuid.v4());
     }
 }
 </script>

@@ -13,15 +13,15 @@ use Illuminate\Support\Facades\Auth;
  * @property int $id 主键
  * @property int $user_id 用户ID
  * @property string|null $tag 标签
- * @property string|null $first_name 名字
- * @property string|null $last_name 姓氏
+ * @property string|null $first_name 姓名
+ * @property string|null $last_name
  * @property string|null $phone 电话
- * @property string|null $country 国家
+ * @property string|null $country
  * @property string|null $state 省
  * @property string|null $city 市
  * @property string|null $county 区县
- * @property string|null $address_line_1 详细地址1
- * @property string|null $address_line_2 详细地址2
+ * @property string|null $address_line_1 详细地址
+ * @property string|null $address_line_2 详细地址
  * @property float $latitude 纬度
  * @property float $longitude 经度
  * @property string|null $postalcode 邮编
@@ -88,9 +88,27 @@ class UserAddress extends Model
      */
     public function getFormattedAddressAttribute()
     {
-        if ($this->province == $this->city) {
-            return $this->city . $this->district . $this->street;
+        $address = $this->address_line_1;
+        if ($this->address_line_2) {
+            $address .= ' ' . $this->address_line_2;
         }
-        return $this->province . $this->city . $this->district . $this->street;
+
+        if ($this->county) {
+            $address .= ',' . $this->county;
+        }
+
+        if ($this->city) {
+            $address .= ',' . $this->city;
+        }
+
+        if ($this->state) {
+            $address .= ',' . $this->state;
+        }
+
+        if ($this->postalcode) {
+            $address .= ',' . $this->postalcode;
+        }
+
+        return $address;
     }
 }

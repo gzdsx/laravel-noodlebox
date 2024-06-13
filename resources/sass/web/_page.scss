@@ -116,9 +116,35 @@
     }
 }
 
+.shop {
+    &-pc {
+        display: block;
+    }
+
+    &-mobile {
+        display: none;
+        position: relative;
+
+        .shop-main {
+            flex: 1;
+            padding: 10px 0;
+            overflow-x: hidden;
+            min-height: 90vh;
+        }
+    }
+}
+
 @media (max-width: 767px) {
-    .page-section{
+    .page-section {
         padding-top: 2rem;
         padding-bottom: 2rem;
+    }
+
+    .shop-pc {
+        display: none;
+    }
+
+    .shop-mobile {
+        display: flex;
     }
 }

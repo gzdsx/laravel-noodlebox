@@ -86,7 +86,7 @@ class Handler extends ExceptionHandler
     {
         return json_error(
             $e->getMessage() ? $e->getMessage() : 'Server Error',
-            $this->isHttpException($e) ? $e->getStatusCode() : 500,
+            $this->isHttpException($e) ? $e->getStatusCode() : 422,
             env('APP_DEBUG') ?
                 [
                     'headers' => $this->isHttpException($e) ? $e->getHeaders() : [],

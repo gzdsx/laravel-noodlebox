@@ -28,7 +28,10 @@ export default {
     },
     created() {
         ApiService.get('/settings').then(res => {
-            this.settings = res.data;
+            this.settings = {
+                ...this.settings,
+                ...res.data
+            };
         });
     }
 }

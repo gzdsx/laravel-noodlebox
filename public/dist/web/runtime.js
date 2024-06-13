@@ -134,10 +134,15 @@ var _ProductMetaBoxes = _interopRequireDefault(__webpack_require__(/*! ./Product
 var _NoodleDialog = _interopRequireDefault(__webpack_require__(/*! ./NoodleDialog.vue */ "./resources/apps/web/components/NoodleDialog.vue"));
 var _NoodleLoading = _interopRequireDefault(__webpack_require__(/*! ./NoodleLoading.vue */ "./resources/apps/web/components/NoodleLoading.vue"));
 var _NoodleDialogLogin = _interopRequireDefault(__webpack_require__(/*! ./NoodleDialogLogin.vue */ "./resources/apps/web/components/NoodleDialogLogin.vue"));
+var _CartService = _interopRequireDefault(__webpack_require__(/*! ../CartService */ "./resources/apps/web/CartService.js"));
+var _DialogLottery = _interopRequireDefault(__webpack_require__(/*! ../lottery/DialogLottery.vue */ "./resources/apps/web/lottery/DialogLottery.vue"));
+var _LotteryApp = _interopRequireDefault(__webpack_require__(/*! ../lottery/LotteryApp.vue */ "./resources/apps/web/lottery/LotteryApp.vue"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var _default = exports["default"] = {
   name: "NoodleBoxApp",
   components: {
+    LotteryApp: _LotteryApp["default"],
+    DialogLottery: _DialogLottery["default"],
     NoodleDialogLogin: _NoodleDialogLogin["default"],
     NoodleLoading: _NoodleLoading["default"],
     NoodleDialog: _NoodleDialog["default"],
@@ -152,6 +157,11 @@ var _default = exports["default"] = {
       curImage: {},
       showLogin: false
     };
+  },
+  methods: {
+    close: function close() {
+      this.visible = false;
+    }
   },
   mounted: function mounted() {
     var _this = this;
@@ -173,13 +183,27 @@ var _default = exports["default"] = {
         });
       });
     });
+    var cart = new _CartService["default"]();
+    document.querySelectorAll('.cart-count').forEach(function (item) {
+      item.innerHTML = cart.getCount();
+    });
 
     // 监听自定义事件
     window.addEventListener('unauthenticated', function (event) {
       console.log('你尚未登录');
-      //window.location.href = '/login';
-      _this.showLogin = true;
+      //window.location.href = '/login?redirect=' + window.location.href;
+      //this.showLogin = true;
     });
+
+    window.addEventListener('cartChanged', function (event) {
+      //console.log(event);
+      _HttpClient["default"].get('/carts').then(function (response) {
+        document.querySelectorAll('.cart-count').forEach(function (item) {
+          item.innerHTML = response.data.total;
+        });
+      });
+    });
+    window.dispatchEvent(new Event('cartChanged'));
   }
 };
 
@@ -216,20 +240,30 @@ var _default = exports["default"] = {
   },
   data: function data() {
     return {
-      show: false
+      show: false,
+      showAnimate: false
     };
   },
   watch: {
     visible: function visible(val) {
+      var _this = this;
       if (val !== this.show) {
         this.show = val;
       }
       if (val) {
         document.body.appendChild(this.$el);
+        document.querySelector('html').classList.add('noscroll');
+        this.$nextTick(function () {
+          setTimeout(function () {
+            _this.showAnimate = true;
+          }, 20);
+        });
       } else {
+        this.showAnimate = false;
         if (this.$el && this.$el.parentNode) {
           this.$el.parentNode.removeChild(this.$el);
         }
+        document.querySelector('html').classList.remove('noscroll');
       }
     }
   },
@@ -237,7 +271,9 @@ var _default = exports["default"] = {
     close: function close() {
       this.$emit('close');
     },
-    click: function click() {}
+    click: function click() {
+      return false;
+    }
   },
   created: function created() {
     this.show = this.visible;
@@ -365,30 +401,34 @@ var _default = exports["default"] = {
       if (val !== this.quantity) {
         this.quantity = val;
       }
-    },
-    quantity: function quantity(val) {
-      this.$emit('change', val);
     }
   },
   methods: {
-    onInput: function onInput() {
-      if (!/\d+/.test(this.quantity)) {
+    onInput: function onInput(e) {
+      console.log(e);
+      //this.$emit('input', e);
+      this.quantity = e.target.value;
+    },
+    onChange: function onChange() {
+      this.quantity = parseInt(this.quantity);
+      if (!/^\d+$/.test(this.quantity)) {
         this.quantity = 1;
       }
       if (this.quantity < 1) {
         this.quantity = 1;
       }
       this.$emit('input', this.quantity);
+      this.$emit('change', this.quantity);
     },
     onDecrease: function onDecrease() {
       if (this.quantity > 1) {
         this.quantity--;
-        this.onInput();
+        this.onChange();
       }
     },
     onIncrease: function onIncrease() {
       this.quantity++;
-      this.onInput();
+      this.onChange();
     }
   },
   mounted: function mounted() {
@@ -415,6 +455,7 @@ var _NoodleNumberControl = _interopRequireDefault(__webpack_require__(/*! ./Nood
 var _NoodleLoading = _interopRequireDefault(__webpack_require__(/*! ./NoodleLoading.vue */ "./resources/apps/web/components/NoodleLoading.vue"));
 var _DialogCart = _interopRequireDefault(__webpack_require__(/*! ./DialogCart.vue */ "./resources/apps/web/components/DialogCart.vue"));
 var _CartService = _interopRequireDefault(__webpack_require__(/*! ../CartService */ "./resources/apps/web/CartService.js"));
+var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var _default2 = exports["default"] = {
   name: "ProductMetaBoxes",
@@ -429,7 +470,9 @@ var _default2 = exports["default"] = {
       "default": function _default() {
         return {
           variation_list: [],
-          additional_options: []
+          additional_options: [],
+          meta_data: {},
+          metas: []
         };
       }
     }
@@ -443,7 +486,8 @@ var _default2 = exports["default"] = {
       showCart: false,
       loading: false,
       options: {},
-      additional_options: []
+      additional_options: [],
+      usePointPurchase: false
     };
   },
   computed: {
@@ -484,17 +528,524 @@ var _default2 = exports["default"] = {
       o.selected = !o.selected;
     },
     addToCart: function addToCart() {
+      var _this = this;
+      var options = this.options,
+        additional_options = this.additional_options,
+        usePointPurchase = this.usePointPurchase;
+      _HttpClient["default"].post('/carts', {
+        product_id: this.product.id,
+        quantity: this.quantity,
+        meta_data: {
+          options: options,
+          additional_options: additional_options
+        },
+        purchase_via: usePointPurchase ? 'point' : 'order'
+      }).then(function (res) {
+        window.dispatchEvent(new Event('cartChanged'));
+        _this.$showToast('Added to cart successfully!');
+        _this.$emit('added');
+      })["catch"](function (reason) {
+        //console.log(reason);
+        _this.$showToast(reason.message);
+      })["finally"](function () {});
+    },
+    saveToCart: function saveToCart() {
       var product = this.product,
         finalPrice = this.finalPrice,
         quantity = this.quantity,
         options = this.options,
-        additional_options = this.additional_options;
+        additional_options = this.additional_options,
+        usePointPurchase = this.usePointPurchase;
       var cart = new _CartService["default"]();
-      cart.addToCart(product, finalPrice, quantity, options, additional_options);
+      cart.addToCart({
+        product_id: product.id,
+        title: product.title,
+        image: product.image,
+        price: finalPrice,
+        quantity: quantity,
+        options: options,
+        additional_options: additional_options,
+        usePointPurchase: usePointPurchase,
+        point_price: product.point_price
+      });
       this.$showToast('Added to cart successfully!');
+      this.$emit('added', cart.getCartItems());
     }
   },
   mounted: function mounted() {}
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLottery.vue?vue&type=script&lang=js":
+/*!**********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLottery.vue?vue&type=script&lang=js ***!
+  \**********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _LuckyBox = _interopRequireDefault(__webpack_require__(/*! ./LuckyBox.vue */ "./resources/apps/web/lottery/LuckyBox.vue"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+var _default = exports["default"] = {
+  name: "DialogLottery",
+  components: {
+    LuckyBox: _LuckyBox["default"]
+  },
+  props: {
+    value: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  data: function data() {
+    return {
+      visible: true,
+      prize: null
+    };
+  },
+  watch: {
+    value: function value(val) {
+      if (val !== this.visible) {
+        this.visible = val;
+      }
+    }
+  },
+  methods: {
+    close: function close() {
+      this.$emit('input', false);
+    }
+  },
+  mounted: function mounted() {
+    var _this = this;
+    this.$nextTick(function () {
+      _this.visible = true;
+    });
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=script&lang=js":
+/*!**************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=script&lang=js ***!
+  \**************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+var _default = exports["default"] = {
+  name: "DialogLotteryCart",
+  data: function data() {
+    return {
+      dataList: [],
+      loading: true,
+      showCheckout: false
+    };
+  },
+  props: {
+    value: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  watch: {
+    value: function value(val) {
+      if (val) {
+        this.fetchList();
+      }
+    }
+  },
+  methods: {
+    fetchList: function fetchList() {
+      var _this = this;
+      this.loading = true;
+      _HttpClient["default"].get('/carts?purchase_via=lottery').then(function (res) {
+        _this.dataList = res.data.items;
+      })["finally"](function () {
+        _this.loading = false;
+      });
+    },
+    handleCheckout: function handleCheckout() {
+      //this.showCheckout = true;
+      window.location.assign('/cart');
+    }
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogPrize.vue?vue&type=script&lang=js":
+/*!********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogPrize.vue?vue&type=script&lang=js ***!
+  \********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _default2 = exports["default"] = {
+  name: "DialogPrize",
+  props: {
+    value: {
+      type: Boolean,
+      "default": false
+    },
+    prize: {
+      type: Object,
+      "default": function _default() {
+        return {};
+      }
+    },
+    title: {
+      type: String,
+      "default": 'Congratulations'
+    },
+    buttonTitle: {
+      type: String,
+      "default": '👆 Claim this prize now'
+    }
+  },
+  data: function data() {
+    return {
+      showDialog: false
+    };
+  },
+  watch: {
+    value: function value(val) {
+      var _this = this;
+      if (val) {
+        this.$nextTick(function () {
+          setTimeout(function () {
+            _this.showDialog = true;
+          }, 20);
+        });
+      } else {
+        this.showDialog = false;
+      }
+    }
+  },
+  methods: {
+    handlePickPrize: function handlePickPrize() {
+      this.$emit('pick', this.prize);
+    }
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryApp.vue?vue&type=script&lang=js":
+/*!*******************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryApp.vue?vue&type=script&lang=js ***!
+  \*******************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
+var _LuckyBox = _interopRequireDefault(__webpack_require__(/*! ./LuckyBox.vue */ "./resources/apps/web/lottery/LuckyBox.vue"));
+var _DialogPrize = _interopRequireDefault(__webpack_require__(/*! ./DialogPrize.vue */ "./resources/apps/web/lottery/DialogPrize.vue"));
+var _LotteryLoading = _interopRequireDefault(__webpack_require__(/*! ./LotteryLoading.vue */ "./resources/apps/web/lottery/LotteryLoading.vue"));
+var _DialogLotteryCart = _interopRequireDefault(__webpack_require__(/*! ./DialogLotteryCart.vue */ "./resources/apps/web/lottery/DialogLotteryCart.vue"));
+var _LotteryTurntable = _interopRequireDefault(__webpack_require__(/*! ./LotteryTurntable.vue */ "./resources/apps/web/lottery/LotteryTurntable.vue"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+var _default = exports["default"] = {
+  name: "LotteryApp",
+  components: {
+    LotteryTurntable: _LotteryTurntable["default"],
+    DialogLotteryCart: _DialogLotteryCart["default"],
+    LotteryLoading: _LotteryLoading["default"],
+    DialogPrize: _DialogPrize["default"],
+    LuckyBox: _LuckyBox["default"]
+  },
+  data: function data() {
+    return {
+      settings: {},
+      prize: {},
+      showPrize: false,
+      loading: false,
+      showPoints: false,
+      showCart: false,
+      showLottery: false,
+      error: null
+    };
+  },
+  methods: {
+    fetchSettings: function fetchSettings() {
+      var _this = this;
+      _HttpClient["default"].get('/lottery/settings').then(function (res) {
+        _this.settings = res.data;
+      })["catch"](function (reason) {});
+    },
+    onDraw: function onDraw(prize) {
+      this.prize = prize;
+      this.showPrize = true;
+    },
+    onError: function onError(reason) {
+      this.error = reason.message;
+    },
+    onPickPrize: function onPickPrize(prize) {
+      var _this2 = this;
+      this.showPrize = false;
+      if (prize.type === 'point') {
+        this.showPoints = true;
+        setTimeout(function () {
+          _this2.showPoints = false;
+        }, 2000);
+      } else {
+        this.showCart = true;
+      }
+    }
+  },
+  created: function created() {
+    var _this3 = this;
+    this.fetchSettings();
+    document.querySelector('[data-show-lottery]').addEventListener('click', function () {
+      _this3.showLottery = true;
+    });
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryLoading.vue?vue&type=script&lang=js":
+/*!***********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryLoading.vue?vue&type=script&lang=js ***!
+  \***********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _default = exports["default"] = {
+  name: "LotteryLoading"
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=script&lang=js":
+/*!*************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=script&lang=js ***!
+  \*************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+var _default2 = exports["default"] = {
+  name: 'LotteryTurntable',
+  props: {
+    rotateCircle: {
+      "default": 6
+    },
+    turntableStyleOption: {
+      "default": function _default() {
+        return {
+          // 背景色
+          prizeBgColors: ['#AE3EFF', '#4D3FFF', '#FC262C', '#3A8BFF', '#EE7602', '#FE339F', '#AE3EFF', '#4D3FFF', '#FC262C', '#3A8BFF', '#EE7602', '#FE339F'],
+          // 转盘的外边框颜色
+          borderColor: '#df1e15'
+        };
+      }
+    },
+    duringTime: {
+      "default": 6.5
+    }
+  },
+  data: function data() {
+    return {
+      // 开始转动的角度
+      startRotateDegree: 0,
+      rotateAngle: 0,
+      rotateTransition: '',
+      prizeData: [],
+      prize: {}
+    };
+  },
+  methods: {
+    // 根据index计算每一格要旋转的角度的样式
+    getRotateAngle: function getRotateAngle(index) {
+      var angle = 360 / this.prizeData.length * index + 180 / this.prizeData.length;
+      return {
+        transform: "rotate(".concat(angle, "deg)")
+      };
+    },
+    // 初始化圆形转盘canvas
+    init: function init() {
+      // 各种数据
+      var data = this.turntableStyleOption;
+      var prizeNum = this.prizeData.length;
+      var prizeBgColors = data.prizeBgColors,
+        borderColor = data.borderColor;
+      // 开始绘画
+      var canvas = this.$refs.canvas;
+      var ctx = canvas.getContext("2d");
+      var canvasW = this.$refs.canvas.width = this.$refs.turntable.clientWidth; // 画板的高度
+      var canvasH = this.$refs.canvas.height = this.$refs.turntable.clientHeight; // 画板的宽度
+      // translate方法重新映射画布上的 (0,0) 位置
+      ctx.translate(0, canvasH);
+      // rotate方法旋转当前的绘图，因为文字适合当前扇形中心线垂直的！
+      ctx.rotate(-90 * Math.PI / 180);
+      // 圆环的外圆的半径
+      var outRadius = canvasW / 2;
+      // 圆环的内圆的半径
+      var innerRadius = 0;
+      var baseAngle = Math.PI * 2 / prizeNum; // 计算每个奖项所占角度数
+      ctx.clearRect(0, 0, canvasW, canvasH); //去掉背景默认的黑色
+      ctx.strokeStyle = borderColor; // 设置画图线的颜色
+      for (var index = 0; index < prizeNum; index++) {
+        var angle = index * baseAngle;
+        ctx.beginPath(); //开始绘制
+        // 标准圆弧：arc(x,y,radius,startAngle,endAngle,anticlockwise)
+        ctx.fillStyle = prizeBgColors[index]; //设置每个扇形区域的颜色
+        ctx.arc(canvasW * 0.5, canvasH * 0.5, outRadius, angle, angle + baseAngle, false);
+        ctx.arc(canvasW * 0.5, canvasH * 0.5, innerRadius, angle + baseAngle, angle, true);
+        ctx.stroke(); //开始链线
+        ctx.fill(); //填充颜色
+
+        ctx.save(); //保存当前环境的状态
+      }
+    },
+    // 转动起来
+    rotate: function rotate(index) {
+      var _this = this;
+      // 运转时长
+      var duringTime = this.duringTime;
+      var rotateAngle = this.startRotateDegree + this.rotateCircle * 360 + 360 - (180 / this.prizeData.length + 360 / this.prizeData.length * index) - this.startRotateDegree % 360;
+      this.startRotateDegree = rotateAngle;
+      this.rotateAngle = "rotate(".concat(rotateAngle, "deg)");
+      this.rotateTransition = "transform ".concat(duringTime, "s cubic-bezier(0.250, 0.460, 0.455, 0.995)");
+      setTimeout(function () {
+        _this.$emit('draw', _this.prize);
+      }, duringTime * 1000 + 500);
+    },
+    fetchPrizeData: function fetchPrizeData() {
+      var _this2 = this;
+      _HttpClient["default"].get('/lottery/prizes').then(function (res) {
+        _this2.prizeData = res.data.items;
+        _this2.init();
+      });
+    },
+    handleDraw: function handleDraw() {
+      var _this3 = this;
+      _HttpClient["default"].get('/lottery/draw').then(function (res) {
+        _this3.prize = res.data;
+        var index = _this3.prizeData.findIndex(function (item) {
+          return item.id === res.data.id;
+        });
+        _this3.rotate(index);
+      })["catch"](function (reason) {
+        if (reason.code === 401) {
+          window.location.assign('/login?redirect=' + location.href);
+        } else {
+          setTimeout(function () {
+            _this3.$emit('error', reason);
+          }, _this3.duringTime * 1000);
+        }
+      })["finally"](function () {});
+    }
+  },
+  mounted: function mounted() {
+    this.fetchPrizeData();
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LuckyBox.vue?vue&type=script&lang=js":
+/*!*****************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LuckyBox.vue?vue&type=script&lang=js ***!
+  \*****************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+var _default = exports["default"] = {
+  name: "LuckyBox",
+  data: function data() {
+    return {
+      shaking: false,
+      isopend: false,
+      loading: false,
+      error: null
+    };
+  },
+  methods: {
+    handlerLottery: function handlerLottery() {
+      var _this = this;
+      if (this.isopend) {
+        return;
+      }
+      this.shaking = true;
+      setTimeout(function () {
+        _this.isopend = true;
+        _this.draw();
+      }, 1300);
+    },
+    draw: function draw() {
+      var _this2 = this;
+      this.loading = true;
+      _HttpClient["default"].get('/lottery/draw').then(function (res) {
+        setTimeout(function () {
+          _this2.$emit('draw', res.data);
+        }, 1000);
+      })["catch"](function (reason) {
+        if (reason.code === 401) {
+          window.location.assign('/login?redirect=' + location.href);
+        } else {
+          _this2.setTimeout(function () {
+            _this2.$emit('error', reason);
+          }, 1000);
+        }
+      })["finally"](function () {
+        setTimeout(function () {
+          _this2.loading = false;
+        }, 1000);
+      });
+    },
+    handleTryAgain: function handleTryAgain() {
+      this.isopend = false;
+      this.shaking = false;
+    }
+  }
 };
 
 /***/ }),
@@ -628,7 +1179,7 @@ var render = exports.render = function render() {
     _c = _vm._self._c;
   return _c("div", [_c("noodle-dialog", {
     attrs: {
-      title: "Add to cart",
+      title: "",
       visible: _vm.visible
     },
     on: {
@@ -636,12 +1187,17 @@ var render = exports.render = function render() {
         _vm.visible = false;
       }
     }
-  }, [_c("noodle-container", {
+  }, [_c("div", {
+    attrs: {
+      slot: "header"
+    },
+    slot: "header"
+  }), _vm._v(" "), _c("noodle-container", {
     attrs: {
       loading: _vm.loading
     }
   }, [_c("div", {
-    staticClass: "dialog-metas-container"
+    staticClass: "dialog-metas-container position-relative"
   }, [_c("div", {
     staticClass: "row flex-column flex-md-row"
   }, [_c("div", {
@@ -671,17 +1227,22 @@ var render = exports.render = function render() {
       }
     })]);
   }), 0)])]), _vm._v(" "), _c("div", {
-    staticClass: "col"
+    staticClass: "col product-col-metas"
   }, [_c("product-meta-boxes", {
     attrs: {
       product: _vm.product
     },
     on: {
-      "add-cart": function addCart($event) {
+      added: function added($event) {
         _vm.visible = false;
       }
     }
-  })], 1)])])])], 1), _vm._v(" "), _c("noodle-dialog-login", {
+  })], 1)])]), _vm._v(" "), _c("div", {
+    staticClass: "close-meta",
+    on: {
+      click: _vm.close
+    }
+  }, [_c("span", [_vm._v("×")])])])], 1), _vm._v(" "), _c("noodle-dialog-login", {
     on: {
       close: function close($event) {
         _vm.showLogin = false;
@@ -694,7 +1255,7 @@ var render = exports.render = function render() {
       },
       expression: "showLogin"
     }
-  })], 1);
+  }), _vm._v(" "), _c("lottery-app")], 1);
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -717,27 +1278,35 @@ exports.staticRenderFns = exports.render = void 0;
 var render = exports.render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("div", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.show,
-      expression: "show"
-    }],
+  return _vm.show ? _c("div", {
     staticClass: "noodle-dialog-wrapper",
     on: {
-      click: _vm.close
-    }
-  }, [_c("div", {
-    staticClass: "noodle-dialog",
-    "class": _vm.customClass,
-    on: {
       click: function click($event) {
-        $event.stopPropagation();
+        if (!$event.type.indexOf("key") && _vm._k($event.keyCode, "p", undefined, $event.key, undefined)) return null;
+        $event.preventDefault();
+        return _vm.close.apply(null, arguments);
+      },
+      touchstart: function touchstart($event) {
+        $event.preventDefault();
         return _vm.click.apply(null, arguments);
       }
     }
   }, [_c("div", {
+    staticClass: "noodle-dialog show",
+    "class": [_vm.customClass, {
+      show: _vm.showAnimate
+    }],
+    on: {
+      click: function click($event) {
+        $event.stopPropagation();
+        return _vm.click.apply(null, arguments);
+      },
+      touchstart: function touchstart($event) {
+        $event.stopPropagation();
+        return _vm.click.apply(null, arguments);
+      }
+    }
+  }, [_vm.$slots.header ? _vm._t("header") : _c("div", {
     staticClass: "noodle-dialog__header"
   }, [_c("div", {
     staticClass: "flex-grow-1"
@@ -752,7 +1321,7 @@ var render = exports.render = function render() {
     staticClass: "noodle-dialog__body"
   }, [_vm._t("default")], 2), _vm._v(" "), _c("div", {
     staticClass: "noodle-dialog__footer"
-  })])]);
+  })], 2)]) : _vm._e();
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -803,7 +1372,7 @@ var render = exports.render = function render() {
     staticClass: "form-control form-control-lg",
     attrs: {
       type: "text",
-      placeholder: "Phone/Email",
+      placeholder: "Email",
       required: "required"
     },
     domProps: {
@@ -958,12 +1527,6 @@ var render = exports.render = function render() {
   }, [_vm._v("-")]), _vm._v(" "), _c("div", {
     staticClass: "number-control__input"
   }, [_c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.quantity,
-      expression: "quantity"
-    }],
     staticClass: "number-control__input__input",
     attrs: {
       type: "number",
@@ -974,11 +1537,7 @@ var render = exports.render = function render() {
       value: _vm.quantity
     },
     on: {
-      change: _vm.onInput,
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.quantity = $event.target.value;
-      }
+      change: _vm.onChange
     }
   })]), _vm._v(" "), _c("div", {
     staticClass: "number-control__btn",
@@ -1010,13 +1569,36 @@ var render = exports.render = function render() {
     _c = _vm._self._c;
   return _c("div", {
     staticClass: "product-metabox"
-  }, [_c("h3", [_vm._v(_vm._s(_vm.product.title))]), _vm._v(" "), _c("div", {
+  }, [_c("div", {
+    staticClass: "product-sticky"
+  }, [_c("div", {
+    staticClass: "product-thumbnail"
+  }, [_c("img", {
+    attrs: {
+      src: _vm.product.image,
+      alt: ""
+    }
+  })]), _vm._v(" "), _c("div", {
+    staticClass: "product-info"
+  }, [_c("h3", {
+    staticClass: "product-name"
+  }, [_vm._v(_vm._s(_vm.product.title))]), _vm._v(" "), _c("div", {
     staticClass: "product-potins"
-  }, [_vm._v("\n        Noodle Box Earn Points : " + _vm._s(_vm.product.points) + " Points\n    ")]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n                Earn Points : " + _vm._s(_vm.product.points) + " Points\n            ")]), _vm._v(" "), !_vm.usePointPurchase ? _c("div", {
     staticClass: "product-price text-bull-cyan"
-  }, [_vm._v("€" + _vm._s(_vm.finalPrice))]), _vm._v(" "), _vm.product.description ? _c("div", {
+  }, [_vm._v("€" + _vm._s(_vm.finalPrice))]) : _vm._e()])]), _vm._v(" "), _vm.product.description ? _c("div", {
     staticClass: "product-description text-safety-orange"
-  }, [_vm._v("\n        " + _vm._s(_vm.product.description) + "\n    ")]) : _vm._e(), _vm._v(" "), Array.isArray(_vm.product.variation_list) ? _c("div", {
+  }, [_vm._v("\n        " + _vm._s(_vm.product.description) + "\n    ")]) : _vm._e(), _vm._v(" "), _vm.product.meta_data.badges ? _c("div", {
+    staticClass: "product-badges"
+  }, _vm._l(_vm.product.meta_data.badges, function (b, i) {
+    return _c("img", {
+      key: i,
+      attrs: {
+        src: b,
+        alt: ""
+      }
+    });
+  }), 0) : _vm._e(), _vm._v(" "), Array.isArray(_vm.product.variation_list) ? _c("div", {
     staticClass: "product-variations"
   }, _vm._l(_vm.product.variation_list, function (v, i) {
     return _c("div", {
@@ -1058,7 +1640,46 @@ var render = exports.render = function render() {
         }
       }
     }, [_vm._v(_vm._s(o.title))]);
-  }), 0)])]) : _vm._e(), _vm._v(" "), _c("div", {
+  }), 0)])]) : _vm._e(), _vm._v(" "), _vm.product.allow_point_purchase ? _c("div", {
+    staticClass: "mt-4"
+  }, [_c("label", {
+    staticClass: "text-safety-orange"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.usePointPurchase,
+      expression: "usePointPurchase"
+    }],
+    staticStyle: {
+      transform: "scale(1.5)",
+      "margin-right": "3px"
+    },
+    attrs: {
+      type: "checkbox"
+    },
+    domProps: {
+      checked: Array.isArray(_vm.usePointPurchase) ? _vm._i(_vm.usePointPurchase, null) > -1 : _vm.usePointPurchase
+    },
+    on: {
+      change: function change($event) {
+        var $$a = _vm.usePointPurchase,
+          $$el = $event.target,
+          $$c = $$el.checked ? true : false;
+        if (Array.isArray($$a)) {
+          var $$v = null,
+            $$i = _vm._i($$a, $$v);
+          if ($$el.checked) {
+            $$i < 0 && (_vm.usePointPurchase = $$a.concat([$$v]));
+          } else {
+            $$i > -1 && (_vm.usePointPurchase = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+          }
+        } else {
+          _vm.usePointPurchase = $$c;
+        }
+      }
+    }
+  }), _vm._v(" "), _c("span", [_vm._v("Use " + _vm._s(_vm.product.point_price) + " Noodle Box Points for purchasing this Product")])])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "product-add-order"
   }, [_c("noodle-number-control", {
     model: {
@@ -1069,7 +1690,7 @@ var render = exports.render = function render() {
       expression: "quantity"
     }
   }), _vm._v(" "), _c("div", [_c("button", {
-    staticClass: "btn btn-bull-cyan text-white",
+    staticClass: "btn btn-danger text-white",
     on: {
       click: _vm.addToCart
     }
@@ -1096,10 +1717,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./resources/apps/web/CartService.js":
-/*!*******************************************!*\
-  !*** ./resources/apps/web/CartService.js ***!
-  \*******************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLottery.vue?vue&type=template&id=423d1adb&scoped=true":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLottery.vue?vue&type=template&id=423d1adb&scoped=true ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -1108,8 +1729,422 @@ render._withStripped = true;
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("noodle-dialog", {
+    attrs: {
+      title: "Lottery",
+      visible: _vm.visible
+    },
+    on: {
+      close: _vm.close
+    }
+  }, [_c("lucky-box")], 1);
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=template&id=fee0deca&scoped=true":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=template&id=fee0deca&scoped=true ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("noodle-dialog", {
+    attrs: {
+      title: "Your Prizes",
+      visible: _vm.value
+    },
+    on: {
+      "update:visible": function updateVisible($event) {
+        _vm.value = $event;
+      },
+      close: function close($event) {
+        return _vm.$emit("input", false);
+      }
+    }
+  }, [!_vm.showCheckout ? _c("noodle-container", {
+    attrs: {
+      loading: _vm.loading
+    }
+  }, [_c("div", {
+    staticClass: "lottery-cart"
+  }, [_c("div", {
+    staticClass: "lottery-cart-items"
+  }, _vm._l(_vm.dataList, function (item, index) {
+    return _c("div", {
+      key: index,
+      staticClass: "lottery-cart-item"
+    }, [_c("div", {
+      staticClass: "lottery-cart-item__image"
+    }, [_c("img", {
+      attrs: {
+        src: item.image,
+        alt: ""
+      }
+    })]), _vm._v(" "), _c("div", {
+      staticClass: "lottery-cart-item__name"
+    }, [_vm._v("\n                        " + _vm._s(item.title) + "\n                    ")]), _vm._v(" "), _c("div", {
+      staticClass: "lottery-cart-item__qty"
+    }, [_vm._v("\n                        x " + _vm._s(item.quantity) + "\n                    ")])]);
+  }), 0), _vm._v(" "), _c("div", {
+    staticClass: "lottery-cart-actions"
+  }, [_c("button", {
+    staticClass: "btn btn-danger",
+    on: {
+      click: _vm.handleCheckout
+    }
+  }, [_vm._v("Continue")])])])]) : _vm._e()], 1);
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogPrize.vue?vue&type=template&id=a1eefcb8&scoped=true":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogPrize.vue?vue&type=template&id=a1eefcb8&scoped=true ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _vm.value ? _c("div", {
+    staticClass: "lottery-overlayer"
+  }, [_c("div", {
+    staticClass: "lottery-prize-dialog",
+    "class": {
+      show: _vm.showDialog
+    }
+  }, [_c("h3", {
+    domProps: {
+      innerHTML: _vm._s(_vm.title)
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "prize-image"
+  }, [_c("img", {
+    attrs: {
+      src: _vm.prize.image,
+      alt: ""
+    }
+  })]), _vm._v(" "), _c("p", {
+    staticClass: "prize-name"
+  }, [_vm._v(_vm._s(_vm.prize.name))]), _vm._v(" "), _c("div", [_c("button", {
+    staticClass: "btn btn-bull-cyan btn-block text-white",
+    domProps: {
+      innerHTML: _vm._s(_vm.buttonTitle)
+    },
+    on: {
+      click: _vm.handlePickPrize
+    }
+  })])])]) : _vm._e();
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryApp.vue?vue&type=template&id=05f327e4&scoped=true":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryApp.vue?vue&type=template&id=05f327e4&scoped=true ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", [_vm.showLottery ? _c("div", {
+    staticClass: "lottery-overlayer lottery-bg"
+  }, [_c("div", {
+    staticClass: "lottery-container"
+  }, [_c("div", {
+    staticClass: "lottery-header"
+  }, [_c("div", {
+    staticClass: "h1",
+    domProps: {
+      innerHTML: _vm._s(_vm.settings.name)
+    }
+  }), _vm._v(" "), _c("p", {
+    domProps: {
+      innerHTML: _vm._s(_vm.settings.description)
+    }
+  }), _vm._v(" "), _vm.error ? _c("p", {
+    staticClass: "text-danger",
+    domProps: {
+      innerHTML: _vm._s(_vm.error)
+    }
+  }) : _vm._e()]), _vm._v(" "), _c("div", {
+    staticClass: "lottery-game-box"
+  }, [_vm.settings.lottery_type === "chest" ? _c("lucky-box", {
+    on: {
+      draw: _vm.onDraw,
+      error: _vm.onError
+    }
+  }) : _c("lottery-turntable", {
+    on: {
+      draw: _vm.onDraw,
+      error: _vm.onError
+    }
+  })], 1), _vm._v(" "), _c("dialog-prize", {
+    attrs: {
+      prize: _vm.prize,
+      title: _vm.settings.winning_text,
+      "button-title": _vm.settings.pick_text
+    },
+    on: {
+      pick: _vm.onPickPrize
+    },
+    model: {
+      value: _vm.showPrize,
+      callback: function callback($$v) {
+        _vm.showPrize = $$v;
+      },
+      expression: "showPrize"
+    }
+  })], 1), _vm._v(" "), _c("span", {
+    staticClass: "lottery-close",
+    on: {
+      click: function click($event) {
+        _vm.showLottery = false;
+      }
+    }
+  }, [_vm._v("close")])]) : _vm._e(), _vm._v(" "), _vm.loading ? _c("lottery-loading") : _vm._e(), _vm._v(" "), _c("dialog-lottery-cart", {
+    model: {
+      value: _vm.showCart,
+      callback: function callback($$v) {
+        _vm.showCart = $$v;
+      },
+      expression: "showCart"
+    }
+  }), _vm._v(" "), _vm.showPoints ? _c("div", {
+    staticClass: "lottery-win-points"
+  }, [_vm._v("+" + _vm._s(_vm.prize.points))]) : _vm._e(), _vm._v(" "), _vm.settings.enable === "yes" ? _c("div", {
+    staticClass: "lottery-float"
+  }, [_c("img", {
+    attrs: {
+      src: _vm.settings.float_icon,
+      alt: ""
+    },
+    on: {
+      click: function click($event) {
+        _vm.showLottery = true;
+      }
+    }
+  })]) : _vm._e()], 1);
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryLoading.vue?vue&type=template&id=276649ae&scoped=true":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryLoading.vue?vue&type=template&id=276649ae&scoped=true ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _vm._m(0);
+};
+var staticRenderFns = exports.staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "lottery-overlayer"
+  }, [_c("div", {
+    staticClass: "spinner-border text-light",
+    attrs: {
+      role: "status"
+    }
+  }, [_c("span", {
+    staticClass: "sr-only"
+  }, [_vm._v("Loading...")])])]);
+}];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=template&id=d4db50c4&scoped=true":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=template&id=d4db50c4&scoped=true ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "turntable-container"
+  }, [_c("div", {
+    ref: "turntable",
+    staticClass: "turntable"
+  }, [_c("div", {
+    staticClass: "myTurntable",
+    style: {
+      transform: _vm.rotateAngle,
+      transition: _vm.rotateTransition
+    }
+  }, [_c("canvas", {
+    ref: "canvas",
+    attrs: {
+      id: "canvas"
+    }
+  }, [_vm._v("\n                当前浏览器版本过低，请使用其他浏览器尝试\n            ")]), _vm._v(" "), _c("div", {
+    staticClass: "prize-container"
+  }, _vm._l(_vm.prizeData, function (item, index) {
+    return _c("div", {
+      staticClass: "item",
+      style: _vm.getRotateAngle(index)
+    }, [_c("div", {
+      staticClass: "turntable-name"
+    }, [_vm._v(_vm._s(item.name))]), _vm._v(" "), _c("div", {
+      staticClass: "turntable-img"
+    }, [_c("img", {
+      attrs: {
+        src: item.image,
+        alt: ""
+      }
+    })])]);
+  }), 0)]), _vm._v(" "), _c("img", {
+    staticClass: "start-button",
+    attrs: {
+      src: "/images/lottery/vodsot2.png",
+      alt: ""
+    },
+    on: {
+      click: _vm.handleDraw
+    }
+  })])]);
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LuckyBox.vue?vue&type=template&id=17b485b9&scoped=true":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LuckyBox.vue?vue&type=template&id=17b485b9&scoped=true ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "lottery-chest"
+  }, [_c("div", {
+    staticClass: "chest-rotate"
+  }, [_c("div", {
+    staticClass: "chest-box"
+  }, [_c("div", {
+    staticClass: "chest",
+    "class": {
+      shake: _vm.shaking,
+      "chest-open": _vm.isopend
+    },
+    on: {
+      click: function click($event) {
+        $event.preventDefault();
+        return _vm.handlerLottery.apply(null, arguments);
+      }
+    }
+  })]), _vm._v(" "), _vm.isopend ? _c("div", {
+    staticClass: "chest-try-again"
+  }, [_c("button", {
+    staticClass: "btn btn-safety-orange text-white",
+    on: {
+      click: _vm.handleTryAgain
+    }
+  }, [_vm._v("Try again")])]) : _vm._e()]), _vm._v(" "), _vm.loading ? _c("div", {
+    staticClass: "lottery-overlayer"
+  }, [_vm._m(0)]) : _vm._e()]);
+};
+var staticRenderFns = exports.staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "spinner-border text-light",
+    attrs: {
+      role: "status"
+    }
+  }, [_c("span", {
+    staticClass: "sr-only"
+  }, [_vm._v("Loading...")])]);
+}];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./resources/apps/web/CartService.js":
+/*!*******************************************!*\
+  !*** ./resources/apps/web/CartService.js ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
 exports["default"] = void 0;
+var _jsMd = __webpack_require__(/*! js-md5 */ "./node_modules/js-md5/src/md5.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -1118,22 +2153,51 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 var CartService = exports["default"] = /*#__PURE__*/function () {
   function CartService() {
     _classCallCheck(this, CartService);
-    this.cartItems = this.getCartItems();
+    this.cartItems = [];
+    try {
+      var cartItems = JSON.parse(localStorage.getItem('cartItems'));
+      if (Array.isArray(cartItems)) {
+        cartItems.forEach(function (item) {
+          Object.defineProperty(item, 'subtotal', {
+            get: function get() {
+              if (item.usePointPurchase) {
+                return 0;
+              }
+              return (Number(this.price) * Number(this.quantity)).toFixed(2);
+            }
+          });
+          Object.defineProperty(item, 'pointTotal', {
+            get: function get() {
+              if (item.usePointPurchase) {
+                return (Number(this.point_price) * Number(this.quantity)).toFixed(2);
+              }
+              return 0;
+            }
+          });
+        });
+        this.cartItems = cartItems;
+      }
+    } catch (e) {}
   }
   _createClass(CartService, [{
     key: "addToCart",
-    value: function addToCart(product, price, quantity) {
-      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-      var addtional_options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
-      this.cartItems.push({
-        product_id: product.id,
-        title: product.title,
-        image: product.image,
-        price: price,
-        quantity: quantity,
-        options: options,
-        addtional_options: addtional_options
+    value: function addToCart(cart_item) {
+      var product_id = cart_item.product_id,
+        options = cart_item.options,
+        additional_options = cart_item.additional_options,
+        quantity = cart_item.quantity,
+        usePointPurchase = cart_item.usePointPurchase;
+      var key = (0, _jsMd.md5)(product_id + JSON.stringify(options) + JSON.stringify(additional_options) + usePointPurchase.toString());
+      var index = this.cartItems.findIndex(function (item) {
+        return item.key === key;
       });
+      if (index !== -1) {
+        this.cartItems[index].quantity += quantity;
+      } else {
+        this.cartItems.push(_objectSpread({
+          key: key
+        }, cart_item));
+      }
       this.updateStorage();
     }
   }, {
@@ -1147,21 +2211,7 @@ var CartService = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "getCartItems",
     value: function getCartItems() {
-      try {
-        var cartItems = JSON.parse(localStorage.getItem('cartItems'));
-        if (Array.isArray(cartItems)) {
-          cartItems.forEach(function (item) {
-            Object.defineProperty(item, 'subtotal', {
-              get: function get() {
-                return (Number(this.price) * Number(this.quantity)).toFixed(2);
-              }
-            });
-          });
-          return cartItems;
-        }
-      } catch (e) {
-        return [];
-      }
+      return this.cartItems;
     }
   }, {
     key: "saveItems",
@@ -1179,6 +2229,14 @@ var CartService = exports["default"] = /*#__PURE__*/function () {
     key: "updateStorage",
     value: function updateStorage() {
       localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
+      var event = new Event('cartChanged');
+      event.count = this.cartItems.length;
+      window.dispatchEvent(event);
+    }
+  }, {
+    key: "getCount",
+    value: function getCount() {
+      return this.cartItems.length;
     }
   }]);
   return CartService;
@@ -1210,12 +2268,7 @@ var httpClient = _axios["default"].create({
   baseURL: "/api/v1",
   // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 0,
-  // request timeout
-  auth: {
-    username: "admin",
-    password: "admin"
-  }
+  timeout: 0 // request timeout
 });
 
 // request interceptor
@@ -1281,7 +2334,7 @@ function (response) {
       window.dispatchEvent(new Event('unauthenticated'));
     }
   }
-  return Promise.reject(error);
+  return Promise.reject(error.response.data);
 });
 var _default = exports["default"] = httpClient;
 
@@ -3250,6 +4303,130 @@ function isnan (val) {
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.close-meta[data-v-1f230444] {\n    position: absolute;\n    color: #ffffff;\n    font-size: 24px;\n    top: 0;\n    right: 16px;\n    padding: 3px;\n    cursor: pointer;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-18.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-18.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-18.use[3]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-18.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-18.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-18.use[3]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "@charset \"UTF-8\";\n.turntable[data-v-d4db50c4] {\n  width: 560px;\n  height: 560px;\n  text-align: center;\n  transform: translateZ(0);\n  position: relative;\n}\n.turntable-container[data-v-d4db50c4] {\n  padding: 2rem 0;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n.turntable .myTurntable[data-v-d4db50c4] {\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 100%;\n  height: 100%;\n}\n.turntable .prize-container[data-v-d4db50c4] {\n  position: absolute;\n  left: 25%;\n  top: 0;\n  width: 50%;\n  height: 50%;\n}\n.turntable .prize-container .item[data-v-d4db50c4] {\n  /*background: pink;*/\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 100%;\n  height: 100%;\n  transform-origin: center bottom;\n}\n.turntable .start-button[data-v-d4db50c4] {\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  transform: translate(-50%, -50%);\n  width: 80px;\n  height: 80px;\n  -o-object-fit: contain;\n     object-fit: contain;\n  cursor: pointer;\n}\n.turntable-name[data-v-d4db50c4] {\n  /*background: pink;*/\n  position: absolute;\n  left: 10px;\n  top: 20px;\n  width: calc(100% - 20px);\n  font-size: 18px;\n  text-align: center;\n  color: #fff;\n}\n.turntable-img[data-v-d4db50c4] {\n  position: absolute;\n  /*要居中就要50% - 宽度 / 2*/\n  left: calc(50% - 40px);\n  top: 60px;\n  width: 80px;\n  height: 60px;\n}\n.turntable-img img[data-v-d4db50c4] {\n  display: inline-block;\n  width: 100%;\n  height: 100%;\n}\n@media (max-width: 768px) {\n.turntable[data-v-d4db50c4] {\n    width: 90vw;\n    height: 90vw;\n}\n}", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/runtime/api.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
+  \*****************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+// eslint-disable-next-line func-names
+module.exports = function (cssWithMappingToString) {
+  var list = []; // return the list of modules as css string
+
+  list.toString = function toString() {
+    return this.map(function (item) {
+      var content = cssWithMappingToString(item);
+
+      if (item[2]) {
+        return "@media ".concat(item[2], " {").concat(content, "}");
+      }
+
+      return content;
+    }).join("");
+  }; // import a list of modules into the list
+  // eslint-disable-next-line func-names
+
+
+  list.i = function (modules, mediaQuery, dedupe) {
+    if (typeof modules === "string") {
+      // eslint-disable-next-line no-param-reassign
+      modules = [[null, modules, ""]];
+    }
+
+    var alreadyImportedModules = {};
+
+    if (dedupe) {
+      for (var i = 0; i < this.length; i++) {
+        // eslint-disable-next-line prefer-destructuring
+        var id = this[i][0];
+
+        if (id != null) {
+          alreadyImportedModules[id] = true;
+        }
+      }
+    }
+
+    for (var _i = 0; _i < modules.length; _i++) {
+      var item = [].concat(modules[_i]);
+
+      if (dedupe && alreadyImportedModules[item[0]]) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      if (mediaQuery) {
+        if (!item[2]) {
+          item[2] = mediaQuery;
+        } else {
+          item[2] = "".concat(mediaQuery, " and ").concat(item[2]);
+        }
+      }
+
+      list.push(item);
+    }
+  };
+
+  return list;
+};
+
+/***/ }),
+
 /***/ "./node_modules/ieee754/index.js":
 /*!***************************************!*\
   !*** ./node_modules/ieee754/index.js ***!
@@ -3359,6 +4536,1427 @@ module.exports = Array.isArray || function (arr) {
 
 /***/ }),
 
+/***/ "./node_modules/js-md5/src/md5.js":
+/*!****************************************!*\
+  !*** ./node_modules/js-md5/src/md5.js ***!
+  \****************************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+/* provided dependency */ var process = __webpack_require__(/*! process/browser.js */ "./node_modules/process/browser.js");
+var __WEBPACK_AMD_DEFINE_RESULT__;/**
+ * [js-md5]{@link https://github.com/emn178/js-md5}
+ *
+ * @namespace md5
+ * @version 0.8.3
+ * @author Chen, Yi-Cyuan [emn178@gmail.com]
+ * @copyright Chen, Yi-Cyuan 2014-2023
+ * @license MIT
+ */
+(function () {
+  'use strict';
+
+  var INPUT_ERROR = 'input is invalid type';
+  var FINALIZE_ERROR = 'finalize already called';
+  var WINDOW = typeof window === 'object';
+  var root = WINDOW ? window : {};
+  if (root.JS_MD5_NO_WINDOW) {
+    WINDOW = false;
+  }
+  var WEB_WORKER = !WINDOW && typeof self === 'object';
+  var NODE_JS = !root.JS_MD5_NO_NODE_JS && typeof process === 'object' && process.versions && process.versions.node;
+  if (NODE_JS) {
+    root = __webpack_require__.g;
+  } else if (WEB_WORKER) {
+    root = self;
+  }
+  var COMMON_JS = !root.JS_MD5_NO_COMMON_JS && "object" === 'object' && module.exports;
+  var AMD =  true && __webpack_require__.amdO;
+  var ARRAY_BUFFER = !root.JS_MD5_NO_ARRAY_BUFFER && typeof ArrayBuffer !== 'undefined';
+  var HEX_CHARS = '0123456789abcdef'.split('');
+  var EXTRA = [128, 32768, 8388608, -2147483648];
+  var SHIFT = [0, 8, 16, 24];
+  var OUTPUT_TYPES = ['hex', 'array', 'digest', 'buffer', 'arrayBuffer', 'base64'];
+  var BASE64_ENCODE_CHAR = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.split('');
+
+  var blocks = [], buffer8;
+  if (ARRAY_BUFFER) {
+    var buffer = new ArrayBuffer(68);
+    buffer8 = new Uint8Array(buffer);
+    blocks = new Uint32Array(buffer);
+  }
+
+  var isArray = Array.isArray;
+  if (root.JS_MD5_NO_NODE_JS || !isArray) {
+    isArray = function (obj) {
+      return Object.prototype.toString.call(obj) === '[object Array]';
+    };
+  }
+
+  var isView = ArrayBuffer.isView;
+  if (ARRAY_BUFFER && (root.JS_MD5_NO_ARRAY_BUFFER_IS_VIEW || !isView)) {
+    isView = function (obj) {
+      return typeof obj === 'object' && obj.buffer && obj.buffer.constructor === ArrayBuffer;
+    };
+  }
+
+  // [message: string, isString: bool]
+  var formatMessage = function (message) {
+    var type = typeof message;
+    if (type === 'string') {
+      return [message, true];
+    }
+    if (type !== 'object' || message === null) {
+      throw new Error(INPUT_ERROR);
+    }
+    if (ARRAY_BUFFER && message.constructor === ArrayBuffer) {
+      return [new Uint8Array(message), false];
+    }
+    if (!isArray(message) && !isView(message)) {
+      throw new Error(INPUT_ERROR);
+    }
+    return [message, false];
+  }
+
+  /**
+   * @method hex
+   * @memberof md5
+   * @description Output hash as hex string
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {String} Hex string
+   * @example
+   * md5.hex('The quick brown fox jumps over the lazy dog');
+   * // equal to
+   * md5('The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method digest
+   * @memberof md5
+   * @description Output hash as bytes array
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Array} Bytes array
+   * @example
+   * md5.digest('The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method array
+   * @memberof md5
+   * @description Output hash as bytes array
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Array} Bytes array
+   * @example
+   * md5.array('The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method arrayBuffer
+   * @memberof md5
+   * @description Output hash as ArrayBuffer
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @example
+   * md5.arrayBuffer('The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method buffer
+   * @deprecated This maybe confuse with Buffer in node.js. Please use arrayBuffer instead.
+   * @memberof md5
+   * @description Output hash as ArrayBuffer
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @example
+   * md5.buffer('The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method base64
+   * @memberof md5
+   * @description Output hash as base64 string
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {String} base64 string
+   * @example
+   * md5.base64('The quick brown fox jumps over the lazy dog');
+   */
+  var createOutputMethod = function (outputType) {
+    return function (message) {
+      return new Md5(true).update(message)[outputType]();
+    };
+  };
+
+  /**
+   * @method create
+   * @memberof md5
+   * @description Create Md5 object
+   * @returns {Md5} Md5 object.
+   * @example
+   * var hash = md5.create();
+   */
+  /**
+   * @method update
+   * @memberof md5
+   * @description Create and update Md5 object
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Md5} Md5 object.
+   * @example
+   * var hash = md5.update('The quick brown fox jumps over the lazy dog');
+   * // equal to
+   * var hash = md5.create();
+   * hash.update('The quick brown fox jumps over the lazy dog');
+   */
+  var createMethod = function () {
+    var method = createOutputMethod('hex');
+    if (NODE_JS) {
+      method = nodeWrap(method);
+    }
+    method.create = function () {
+      return new Md5();
+    };
+    method.update = function (message) {
+      return method.create().update(message);
+    };
+    for (var i = 0; i < OUTPUT_TYPES.length; ++i) {
+      var type = OUTPUT_TYPES[i];
+      method[type] = createOutputMethod(type);
+    }
+    return method;
+  };
+
+  var nodeWrap = function (method) {
+    var crypto = __webpack_require__(/*! crypto */ "?c7e7")
+    var Buffer = (__webpack_require__(/*! buffer */ "?34e4").Buffer);
+    var bufferFrom;
+    if (Buffer.from && !root.JS_MD5_NO_BUFFER_FROM) {
+      bufferFrom = Buffer.from;
+    } else {
+      bufferFrom = function (message) {
+        return new Buffer(message);
+      };
+    }
+    var nodeMethod = function (message) {
+      if (typeof message === 'string') {
+        return crypto.createHash('md5').update(message, 'utf8').digest('hex');
+      } else {
+        if (message === null || message === undefined) {
+          throw new Error(INPUT_ERROR);
+        } else if (message.constructor === ArrayBuffer) {
+          message = new Uint8Array(message);
+        }
+      }
+      if (isArray(message) || isView(message) ||
+        message.constructor === Buffer) {
+        return crypto.createHash('md5').update(bufferFrom(message)).digest('hex');
+      } else {
+        return method(message);
+      }
+    };
+    return nodeMethod;
+  };
+
+  /**
+   * @namespace md5.hmac
+   */
+  /**
+   * @method hex
+   * @memberof md5.hmac
+   * @description Output hash as hex string
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {String} Hex string
+   * @example
+   * md5.hmac.hex('key', 'The quick brown fox jumps over the lazy dog');
+   * // equal to
+   * md5.hmac('key', 'The quick brown fox jumps over the lazy dog');
+   */
+
+  /**
+   * @method digest
+   * @memberof md5.hmac
+   * @description Output hash as bytes array
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Array} Bytes array
+   * @example
+   * md5.hmac.digest('key', 'The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method array
+   * @memberof md5.hmac
+   * @description Output hash as bytes array
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Array} Bytes array
+   * @example
+   * md5.hmac.array('key', 'The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method arrayBuffer
+   * @memberof md5.hmac
+   * @description Output hash as ArrayBuffer
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @example
+   * md5.hmac.arrayBuffer('key', 'The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method buffer
+   * @deprecated This maybe confuse with Buffer in node.js. Please use arrayBuffer instead.
+   * @memberof md5.hmac
+   * @description Output hash as ArrayBuffer
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @example
+   * md5.hmac.buffer('key', 'The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method base64
+   * @memberof md5.hmac
+   * @description Output hash as base64 string
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {String} base64 string
+   * @example
+   * md5.hmac.base64('key', 'The quick brown fox jumps over the lazy dog');
+   */
+  var createHmacOutputMethod = function (outputType) {
+    return function (key, message) {
+      return new HmacMd5(key, true).update(message)[outputType]();
+    };
+  };
+
+  /**
+   * @method create
+   * @memberof md5.hmac
+   * @description Create HmacMd5 object
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @returns {HmacMd5} HmacMd5 object.
+   * @example
+   * var hash = md5.hmac.create('key');
+   */
+  /**
+   * @method update
+   * @memberof md5.hmac
+   * @description Create and update HmacMd5 object
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {HmacMd5} HmacMd5 object.
+   * @example
+   * var hash = md5.hmac.update('key', 'The quick brown fox jumps over the lazy dog');
+   * // equal to
+   * var hash = md5.hmac.create('key');
+   * hash.update('The quick brown fox jumps over the lazy dog');
+   */
+  var createHmacMethod = function () {
+    var method = createHmacOutputMethod('hex');
+    method.create = function (key) {
+      return new HmacMd5(key);
+    };
+    method.update = function (key, message) {
+      return method.create(key).update(message);
+    };
+    for (var i = 0; i < OUTPUT_TYPES.length; ++i) {
+      var type = OUTPUT_TYPES[i];
+      method[type] = createHmacOutputMethod(type);
+    }
+    return method;
+  };
+
+  /**
+   * Md5 class
+   * @class Md5
+   * @description This is internal class.
+   * @see {@link md5.create}
+   */
+  function Md5(sharedMemory) {
+    if (sharedMemory) {
+      blocks[0] = blocks[16] = blocks[1] = blocks[2] = blocks[3] =
+      blocks[4] = blocks[5] = blocks[6] = blocks[7] =
+      blocks[8] = blocks[9] = blocks[10] = blocks[11] =
+      blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
+      this.blocks = blocks;
+      this.buffer8 = buffer8;
+    } else {
+      if (ARRAY_BUFFER) {
+        var buffer = new ArrayBuffer(68);
+        this.buffer8 = new Uint8Array(buffer);
+        this.blocks = new Uint32Array(buffer);
+      } else {
+        this.blocks = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      }
+    }
+    this.h0 = this.h1 = this.h2 = this.h3 = this.start = this.bytes = this.hBytes = 0;
+    this.finalized = this.hashed = false;
+    this.first = true;
+  }
+
+  /**
+   * @method update
+   * @memberof Md5
+   * @instance
+   * @description Update hash
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Md5} Md5 object.
+   * @see {@link md5.update}
+   */
+  Md5.prototype.update = function (message) {
+    if (this.finalized) {
+      throw new Error(FINALIZE_ERROR);
+    }
+
+    var result = formatMessage(message);
+    message = result[0];
+    var isString = result[1];
+    var code, index = 0, i, length = message.length, blocks = this.blocks;
+    var buffer8 = this.buffer8;
+
+    while (index < length) {
+      if (this.hashed) {
+        this.hashed = false;
+        blocks[0] = blocks[16];
+        blocks[16] = blocks[1] = blocks[2] = blocks[3] =
+        blocks[4] = blocks[5] = blocks[6] = blocks[7] =
+        blocks[8] = blocks[9] = blocks[10] = blocks[11] =
+        blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
+      }
+
+      if (isString) {
+        if (ARRAY_BUFFER) {
+          for (i = this.start; index < length && i < 64; ++index) {
+            code = message.charCodeAt(index);
+            if (code < 0x80) {
+              buffer8[i++] = code;
+            } else if (code < 0x800) {
+              buffer8[i++] = 0xc0 | (code >>> 6);
+              buffer8[i++] = 0x80 | (code & 0x3f);
+            } else if (code < 0xd800 || code >= 0xe000) {
+              buffer8[i++] = 0xe0 | (code >>> 12);
+              buffer8[i++] = 0x80 | ((code >>> 6) & 0x3f);
+              buffer8[i++] = 0x80 | (code & 0x3f);
+            } else {
+              code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
+              buffer8[i++] = 0xf0 | (code >>> 18);
+              buffer8[i++] = 0x80 | ((code >>> 12) & 0x3f);
+              buffer8[i++] = 0x80 | ((code >>> 6) & 0x3f);
+              buffer8[i++] = 0x80 | (code & 0x3f);
+            }
+          }
+        } else {
+          for (i = this.start; index < length && i < 64; ++index) {
+            code = message.charCodeAt(index);
+            if (code < 0x80) {
+              blocks[i >>> 2] |= code << SHIFT[i++ & 3];
+            } else if (code < 0x800) {
+              blocks[i >>> 2] |= (0xc0 | (code >>> 6)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+            } else if (code < 0xd800 || code >= 0xe000) {
+              blocks[i >>> 2] |= (0xe0 | (code >>> 12)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | ((code >>> 6) & 0x3f)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+            } else {
+              code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
+              blocks[i >>> 2] |= (0xf0 | (code >>> 18)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | ((code >>> 12) & 0x3f)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | ((code >>> 6) & 0x3f)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+            }
+          }
+        }
+      } else {
+        if (ARRAY_BUFFER) {
+          for (i = this.start; index < length && i < 64; ++index) {
+            buffer8[i++] = message[index];
+          }
+        } else {
+          for (i = this.start; index < length && i < 64; ++index) {
+            blocks[i >>> 2] |= message[index] << SHIFT[i++ & 3];
+          }
+        }
+      }
+      this.lastByteIndex = i;
+      this.bytes += i - this.start;
+      if (i >= 64) {
+        this.start = i - 64;
+        this.hash();
+        this.hashed = true;
+      } else {
+        this.start = i;
+      }
+    }
+    if (this.bytes > 4294967295) {
+      this.hBytes += this.bytes / 4294967296 << 0;
+      this.bytes = this.bytes % 4294967296;
+    }
+    return this;
+  };
+
+  Md5.prototype.finalize = function () {
+    if (this.finalized) {
+      return;
+    }
+    this.finalized = true;
+    var blocks = this.blocks, i = this.lastByteIndex;
+    blocks[i >>> 2] |= EXTRA[i & 3];
+    if (i >= 56) {
+      if (!this.hashed) {
+        this.hash();
+      }
+      blocks[0] = blocks[16];
+      blocks[16] = blocks[1] = blocks[2] = blocks[3] =
+      blocks[4] = blocks[5] = blocks[6] = blocks[7] =
+      blocks[8] = blocks[9] = blocks[10] = blocks[11] =
+      blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
+    }
+    blocks[14] = this.bytes << 3;
+    blocks[15] = this.hBytes << 3 | this.bytes >>> 29;
+    this.hash();
+  };
+
+  Md5.prototype.hash = function () {
+    var a, b, c, d, bc, da, blocks = this.blocks;
+
+    if (this.first) {
+      a = blocks[0] - 680876937;
+      a = (a << 7 | a >>> 25) - 271733879 << 0;
+      d = (-1732584194 ^ a & 2004318071) + blocks[1] - 117830708;
+      d = (d << 12 | d >>> 20) + a << 0;
+      c = (-271733879 ^ (d & (a ^ -271733879))) + blocks[2] - 1126478375;
+      c = (c << 17 | c >>> 15) + d << 0;
+      b = (a ^ (c & (d ^ a))) + blocks[3] - 1316259209;
+      b = (b << 22 | b >>> 10) + c << 0;
+    } else {
+      a = this.h0;
+      b = this.h1;
+      c = this.h2;
+      d = this.h3;
+      a += (d ^ (b & (c ^ d))) + blocks[0] - 680876936;
+      a = (a << 7 | a >>> 25) + b << 0;
+      d += (c ^ (a & (b ^ c))) + blocks[1] - 389564586;
+      d = (d << 12 | d >>> 20) + a << 0;
+      c += (b ^ (d & (a ^ b))) + blocks[2] + 606105819;
+      c = (c << 17 | c >>> 15) + d << 0;
+      b += (a ^ (c & (d ^ a))) + blocks[3] - 1044525330;
+      b = (b << 22 | b >>> 10) + c << 0;
+    }
+
+    a += (d ^ (b & (c ^ d))) + blocks[4] - 176418897;
+    a = (a << 7 | a >>> 25) + b << 0;
+    d += (c ^ (a & (b ^ c))) + blocks[5] + 1200080426;
+    d = (d << 12 | d >>> 20) + a << 0;
+    c += (b ^ (d & (a ^ b))) + blocks[6] - 1473231341;
+    c = (c << 17 | c >>> 15) + d << 0;
+    b += (a ^ (c & (d ^ a))) + blocks[7] - 45705983;
+    b = (b << 22 | b >>> 10) + c << 0;
+    a += (d ^ (b & (c ^ d))) + blocks[8] + 1770035416;
+    a = (a << 7 | a >>> 25) + b << 0;
+    d += (c ^ (a & (b ^ c))) + blocks[9] - 1958414417;
+    d = (d << 12 | d >>> 20) + a << 0;
+    c += (b ^ (d & (a ^ b))) + blocks[10] - 42063;
+    c = (c << 17 | c >>> 15) + d << 0;
+    b += (a ^ (c & (d ^ a))) + blocks[11] - 1990404162;
+    b = (b << 22 | b >>> 10) + c << 0;
+    a += (d ^ (b & (c ^ d))) + blocks[12] + 1804603682;
+    a = (a << 7 | a >>> 25) + b << 0;
+    d += (c ^ (a & (b ^ c))) + blocks[13] - 40341101;
+    d = (d << 12 | d >>> 20) + a << 0;
+    c += (b ^ (d & (a ^ b))) + blocks[14] - 1502002290;
+    c = (c << 17 | c >>> 15) + d << 0;
+    b += (a ^ (c & (d ^ a))) + blocks[15] + 1236535329;
+    b = (b << 22 | b >>> 10) + c << 0;
+    a += (c ^ (d & (b ^ c))) + blocks[1] - 165796510;
+    a = (a << 5 | a >>> 27) + b << 0;
+    d += (b ^ (c & (a ^ b))) + blocks[6] - 1069501632;
+    d = (d << 9 | d >>> 23) + a << 0;
+    c += (a ^ (b & (d ^ a))) + blocks[11] + 643717713;
+    c = (c << 14 | c >>> 18) + d << 0;
+    b += (d ^ (a & (c ^ d))) + blocks[0] - 373897302;
+    b = (b << 20 | b >>> 12) + c << 0;
+    a += (c ^ (d & (b ^ c))) + blocks[5] - 701558691;
+    a = (a << 5 | a >>> 27) + b << 0;
+    d += (b ^ (c & (a ^ b))) + blocks[10] + 38016083;
+    d = (d << 9 | d >>> 23) + a << 0;
+    c += (a ^ (b & (d ^ a))) + blocks[15] - 660478335;
+    c = (c << 14 | c >>> 18) + d << 0;
+    b += (d ^ (a & (c ^ d))) + blocks[4] - 405537848;
+    b = (b << 20 | b >>> 12) + c << 0;
+    a += (c ^ (d & (b ^ c))) + blocks[9] + 568446438;
+    a = (a << 5 | a >>> 27) + b << 0;
+    d += (b ^ (c & (a ^ b))) + blocks[14] - 1019803690;
+    d = (d << 9 | d >>> 23) + a << 0;
+    c += (a ^ (b & (d ^ a))) + blocks[3] - 187363961;
+    c = (c << 14 | c >>> 18) + d << 0;
+    b += (d ^ (a & (c ^ d))) + blocks[8] + 1163531501;
+    b = (b << 20 | b >>> 12) + c << 0;
+    a += (c ^ (d & (b ^ c))) + blocks[13] - 1444681467;
+    a = (a << 5 | a >>> 27) + b << 0;
+    d += (b ^ (c & (a ^ b))) + blocks[2] - 51403784;
+    d = (d << 9 | d >>> 23) + a << 0;
+    c += (a ^ (b & (d ^ a))) + blocks[7] + 1735328473;
+    c = (c << 14 | c >>> 18) + d << 0;
+    b += (d ^ (a & (c ^ d))) + blocks[12] - 1926607734;
+    b = (b << 20 | b >>> 12) + c << 0;
+    bc = b ^ c;
+    a += (bc ^ d) + blocks[5] - 378558;
+    a = (a << 4 | a >>> 28) + b << 0;
+    d += (bc ^ a) + blocks[8] - 2022574463;
+    d = (d << 11 | d >>> 21) + a << 0;
+    da = d ^ a;
+    c += (da ^ b) + blocks[11] + 1839030562;
+    c = (c << 16 | c >>> 16) + d << 0;
+    b += (da ^ c) + blocks[14] - 35309556;
+    b = (b << 23 | b >>> 9) + c << 0;
+    bc = b ^ c;
+    a += (bc ^ d) + blocks[1] - 1530992060;
+    a = (a << 4 | a >>> 28) + b << 0;
+    d += (bc ^ a) + blocks[4] + 1272893353;
+    d = (d << 11 | d >>> 21) + a << 0;
+    da = d ^ a;
+    c += (da ^ b) + blocks[7] - 155497632;
+    c = (c << 16 | c >>> 16) + d << 0;
+    b += (da ^ c) + blocks[10] - 1094730640;
+    b = (b << 23 | b >>> 9) + c << 0;
+    bc = b ^ c;
+    a += (bc ^ d) + blocks[13] + 681279174;
+    a = (a << 4 | a >>> 28) + b << 0;
+    d += (bc ^ a) + blocks[0] - 358537222;
+    d = (d << 11 | d >>> 21) + a << 0;
+    da = d ^ a;
+    c += (da ^ b) + blocks[3] - 722521979;
+    c = (c << 16 | c >>> 16) + d << 0;
+    b += (da ^ c) + blocks[6] + 76029189;
+    b = (b << 23 | b >>> 9) + c << 0;
+    bc = b ^ c;
+    a += (bc ^ d) + blocks[9] - 640364487;
+    a = (a << 4 | a >>> 28) + b << 0;
+    d += (bc ^ a) + blocks[12] - 421815835;
+    d = (d << 11 | d >>> 21) + a << 0;
+    da = d ^ a;
+    c += (da ^ b) + blocks[15] + 530742520;
+    c = (c << 16 | c >>> 16) + d << 0;
+    b += (da ^ c) + blocks[2] - 995338651;
+    b = (b << 23 | b >>> 9) + c << 0;
+    a += (c ^ (b | ~d)) + blocks[0] - 198630844;
+    a = (a << 6 | a >>> 26) + b << 0;
+    d += (b ^ (a | ~c)) + blocks[7] + 1126891415;
+    d = (d << 10 | d >>> 22) + a << 0;
+    c += (a ^ (d | ~b)) + blocks[14] - 1416354905;
+    c = (c << 15 | c >>> 17) + d << 0;
+    b += (d ^ (c | ~a)) + blocks[5] - 57434055;
+    b = (b << 21 | b >>> 11) + c << 0;
+    a += (c ^ (b | ~d)) + blocks[12] + 1700485571;
+    a = (a << 6 | a >>> 26) + b << 0;
+    d += (b ^ (a | ~c)) + blocks[3] - 1894986606;
+    d = (d << 10 | d >>> 22) + a << 0;
+    c += (a ^ (d | ~b)) + blocks[10] - 1051523;
+    c = (c << 15 | c >>> 17) + d << 0;
+    b += (d ^ (c | ~a)) + blocks[1] - 2054922799;
+    b = (b << 21 | b >>> 11) + c << 0;
+    a += (c ^ (b | ~d)) + blocks[8] + 1873313359;
+    a = (a << 6 | a >>> 26) + b << 0;
+    d += (b ^ (a | ~c)) + blocks[15] - 30611744;
+    d = (d << 10 | d >>> 22) + a << 0;
+    c += (a ^ (d | ~b)) + blocks[6] - 1560198380;
+    c = (c << 15 | c >>> 17) + d << 0;
+    b += (d ^ (c | ~a)) + blocks[13] + 1309151649;
+    b = (b << 21 | b >>> 11) + c << 0;
+    a += (c ^ (b | ~d)) + blocks[4] - 145523070;
+    a = (a << 6 | a >>> 26) + b << 0;
+    d += (b ^ (a | ~c)) + blocks[11] - 1120210379;
+    d = (d << 10 | d >>> 22) + a << 0;
+    c += (a ^ (d | ~b)) + blocks[2] + 718787259;
+    c = (c << 15 | c >>> 17) + d << 0;
+    b += (d ^ (c | ~a)) + blocks[9] - 343485551;
+    b = (b << 21 | b >>> 11) + c << 0;
+
+    if (this.first) {
+      this.h0 = a + 1732584193 << 0;
+      this.h1 = b - 271733879 << 0;
+      this.h2 = c - 1732584194 << 0;
+      this.h3 = d + 271733878 << 0;
+      this.first = false;
+    } else {
+      this.h0 = this.h0 + a << 0;
+      this.h1 = this.h1 + b << 0;
+      this.h2 = this.h2 + c << 0;
+      this.h3 = this.h3 + d << 0;
+    }
+  };
+
+  /**
+   * @method hex
+   * @memberof Md5
+   * @instance
+   * @description Output hash as hex string
+   * @returns {String} Hex string
+   * @see {@link md5.hex}
+   * @example
+   * hash.hex();
+   */
+  Md5.prototype.hex = function () {
+    this.finalize();
+
+    var h0 = this.h0, h1 = this.h1, h2 = this.h2, h3 = this.h3;
+
+    return HEX_CHARS[(h0 >>> 4) & 0x0F] + HEX_CHARS[h0 & 0x0F] +
+      HEX_CHARS[(h0 >>> 12) & 0x0F] + HEX_CHARS[(h0 >>> 8) & 0x0F] +
+      HEX_CHARS[(h0 >>> 20) & 0x0F] + HEX_CHARS[(h0 >>> 16) & 0x0F] +
+      HEX_CHARS[(h0 >>> 28) & 0x0F] + HEX_CHARS[(h0 >>> 24) & 0x0F] +
+      HEX_CHARS[(h1 >>> 4) & 0x0F] + HEX_CHARS[h1 & 0x0F] +
+      HEX_CHARS[(h1 >>> 12) & 0x0F] + HEX_CHARS[(h1 >>> 8) & 0x0F] +
+      HEX_CHARS[(h1 >>> 20) & 0x0F] + HEX_CHARS[(h1 >>> 16) & 0x0F] +
+      HEX_CHARS[(h1 >>> 28) & 0x0F] + HEX_CHARS[(h1 >>> 24) & 0x0F] +
+      HEX_CHARS[(h2 >>> 4) & 0x0F] + HEX_CHARS[h2 & 0x0F] +
+      HEX_CHARS[(h2 >>> 12) & 0x0F] + HEX_CHARS[(h2 >>> 8) & 0x0F] +
+      HEX_CHARS[(h2 >>> 20) & 0x0F] + HEX_CHARS[(h2 >>> 16) & 0x0F] +
+      HEX_CHARS[(h2 >>> 28) & 0x0F] + HEX_CHARS[(h2 >>> 24) & 0x0F] +
+      HEX_CHARS[(h3 >>> 4) & 0x0F] + HEX_CHARS[h3 & 0x0F] +
+      HEX_CHARS[(h3 >>> 12) & 0x0F] + HEX_CHARS[(h3 >>> 8) & 0x0F] +
+      HEX_CHARS[(h3 >>> 20) & 0x0F] + HEX_CHARS[(h3 >>> 16) & 0x0F] +
+      HEX_CHARS[(h3 >>> 28) & 0x0F] + HEX_CHARS[(h3 >>> 24) & 0x0F];
+  };
+
+  /**
+   * @method toString
+   * @memberof Md5
+   * @instance
+   * @description Output hash as hex string
+   * @returns {String} Hex string
+   * @see {@link md5.hex}
+   * @example
+   * hash.toString();
+   */
+  Md5.prototype.toString = Md5.prototype.hex;
+
+  /**
+   * @method digest
+   * @memberof Md5
+   * @instance
+   * @description Output hash as bytes array
+   * @returns {Array} Bytes array
+   * @see {@link md5.digest}
+   * @example
+   * hash.digest();
+   */
+  Md5.prototype.digest = function () {
+    this.finalize();
+
+    var h0 = this.h0, h1 = this.h1, h2 = this.h2, h3 = this.h3;
+    return [
+      h0 & 0xFF, (h0 >>> 8) & 0xFF, (h0 >>> 16) & 0xFF, (h0 >>> 24) & 0xFF,
+      h1 & 0xFF, (h1 >>> 8) & 0xFF, (h1 >>> 16) & 0xFF, (h1 >>> 24) & 0xFF,
+      h2 & 0xFF, (h2 >>> 8) & 0xFF, (h2 >>> 16) & 0xFF, (h2 >>> 24) & 0xFF,
+      h3 & 0xFF, (h3 >>> 8) & 0xFF, (h3 >>> 16) & 0xFF, (h3 >>> 24) & 0xFF
+    ];
+  };
+
+  /**
+   * @method array
+   * @memberof Md5
+   * @instance
+   * @description Output hash as bytes array
+   * @returns {Array} Bytes array
+   * @see {@link md5.array}
+   * @example
+   * hash.array();
+   */
+  Md5.prototype.array = Md5.prototype.digest;
+
+  /**
+   * @method arrayBuffer
+   * @memberof Md5
+   * @instance
+   * @description Output hash as ArrayBuffer
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @see {@link md5.arrayBuffer}
+   * @example
+   * hash.arrayBuffer();
+   */
+  Md5.prototype.arrayBuffer = function () {
+    this.finalize();
+
+    var buffer = new ArrayBuffer(16);
+    var blocks = new Uint32Array(buffer);
+    blocks[0] = this.h0;
+    blocks[1] = this.h1;
+    blocks[2] = this.h2;
+    blocks[3] = this.h3;
+    return buffer;
+  };
+
+  /**
+   * @method buffer
+   * @deprecated This maybe confuse with Buffer in node.js. Please use arrayBuffer instead.
+   * @memberof Md5
+   * @instance
+   * @description Output hash as ArrayBuffer
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @see {@link md5.buffer}
+   * @example
+   * hash.buffer();
+   */
+  Md5.prototype.buffer = Md5.prototype.arrayBuffer;
+
+  /**
+   * @method base64
+   * @memberof Md5
+   * @instance
+   * @description Output hash as base64 string
+   * @returns {String} base64 string
+   * @see {@link md5.base64}
+   * @example
+   * hash.base64();
+   */
+  Md5.prototype.base64 = function () {
+    var v1, v2, v3, base64Str = '', bytes = this.array();
+    for (var i = 0; i < 15;) {
+      v1 = bytes[i++];
+      v2 = bytes[i++];
+      v3 = bytes[i++];
+      base64Str += BASE64_ENCODE_CHAR[v1 >>> 2] +
+        BASE64_ENCODE_CHAR[(v1 << 4 | v2 >>> 4) & 63] +
+        BASE64_ENCODE_CHAR[(v2 << 2 | v3 >>> 6) & 63] +
+        BASE64_ENCODE_CHAR[v3 & 63];
+    }
+    v1 = bytes[i];
+    base64Str += BASE64_ENCODE_CHAR[v1 >>> 2] +
+      BASE64_ENCODE_CHAR[(v1 << 4) & 63] +
+      '==';
+    return base64Str;
+  };
+
+  /**
+   * HmacMd5 class
+   * @class HmacMd5
+   * @extends Md5
+   * @description This is internal class.
+   * @see {@link md5.hmac.create}
+   */
+  function HmacMd5(key, sharedMemory) {
+    var i, result = formatMessage(key);
+    key = result[0];
+    if (result[1]) {
+      var bytes = [], length = key.length, index = 0, code;
+      for (i = 0; i < length; ++i) {
+        code = key.charCodeAt(i);
+        if (code < 0x80) {
+          bytes[index++] = code;
+        } else if (code < 0x800) {
+          bytes[index++] = (0xc0 | (code >>> 6));
+          bytes[index++] = (0x80 | (code & 0x3f));
+        } else if (code < 0xd800 || code >= 0xe000) {
+          bytes[index++] = (0xe0 | (code >>> 12));
+          bytes[index++] = (0x80 | ((code >>> 6) & 0x3f));
+          bytes[index++] = (0x80 | (code & 0x3f));
+        } else {
+          code = 0x10000 + (((code & 0x3ff) << 10) | (key.charCodeAt(++i) & 0x3ff));
+          bytes[index++] = (0xf0 | (code >>> 18));
+          bytes[index++] = (0x80 | ((code >>> 12) & 0x3f));
+          bytes[index++] = (0x80 | ((code >>> 6) & 0x3f));
+          bytes[index++] = (0x80 | (code & 0x3f));
+        }
+      }
+      key = bytes;
+    }
+
+    if (key.length > 64) {
+      key = (new Md5(true)).update(key).array();
+    }
+
+    var oKeyPad = [], iKeyPad = [];
+    for (i = 0; i < 64; ++i) {
+      var b = key[i] || 0;
+      oKeyPad[i] = 0x5c ^ b;
+      iKeyPad[i] = 0x36 ^ b;
+    }
+
+    Md5.call(this, sharedMemory);
+
+    this.update(iKeyPad);
+    this.oKeyPad = oKeyPad;
+    this.inner = true;
+    this.sharedMemory = sharedMemory;
+  }
+  HmacMd5.prototype = new Md5();
+
+  HmacMd5.prototype.finalize = function () {
+    Md5.prototype.finalize.call(this);
+    if (this.inner) {
+      this.inner = false;
+      var innerHash = this.array();
+      Md5.call(this, this.sharedMemory);
+      this.update(this.oKeyPad);
+      this.update(innerHash);
+      Md5.prototype.finalize.call(this);
+    }
+  };
+
+  var exports = createMethod();
+  exports.md5 = exports;
+  exports.md5.hmac = createHmacMethod();
+
+  if (COMMON_JS) {
+    module.exports = exports;
+  } else {
+    /**
+     * @method md5
+     * @description Md5 hash function, export to global in browsers.
+     * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+     * @returns {String} md5 hashes
+     * @example
+     * md5(''); // d41d8cd98f00b204e9800998ecf8427e
+     * md5('The quick brown fox jumps over the lazy dog'); // 9e107d9d372bb6826bd81d3542a419d6
+     * md5('The quick brown fox jumps over the lazy dog.'); // e4d909c290d0fb1ca068ffaddf22cbd0
+     *
+     * // It also supports UTF-8 encoding
+     * md5('中文'); // a7bac2239fcdcb3a067903d8077c4a07
+     *
+     * // It also supports byte `Array`, `Uint8Array`, `ArrayBuffer`
+     * md5([]); // d41d8cd98f00b204e9800998ecf8427e
+     * md5(new Uint8Array([])); // d41d8cd98f00b204e9800998ecf8427e
+     */
+    root.md5 = exports;
+    if (AMD) {
+      !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
+        return exports;
+      }).call(exports, __webpack_require__, exports, module),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    }
+  }
+})();
+
+
+/***/ }),
+
+/***/ "./node_modules/process/browser.js":
+/*!*****************************************!*\
+  !*** ./node_modules/process/browser.js ***!
+  \*****************************************/
+/***/ ((module) => {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_15_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_15_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleBoxApp_vue_vue_type_style_index_0_id_1f230444_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_15_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_15_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleBoxApp_vue_vue_type_style_index_0_id_1f230444_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_15_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_15_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleBoxApp_vue_vue_type_style_index_0_id_1f230444_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-18.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-18.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-18.use[3]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-18.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-18.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-18.use[3]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_18_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_18_use_2_node_modules_sass_loader_dist_cjs_js_clonedRuleSet_18_use_3_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_style_index_0_id_d4db50c4_scoped_true_lang_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-18.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-18.use[2]!../../../../node_modules/sass-loader/dist/cjs.js??clonedRuleSet-18.use[3]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-18.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-18.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-18.use[3]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_18_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_18_use_2_node_modules_sass_loader_dist_cjs_js_clonedRuleSet_18_use_3_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_style_index_0_id_d4db50c4_scoped_true_lang_scss__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_18_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_18_use_2_node_modules_sass_loader_dist_cjs_js_clonedRuleSet_18_use_3_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_style_index_0_id_d4db50c4_scoped_true_lang_scss__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
+  \****************************************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var isOldIE = function isOldIE() {
+  var memo;
+  return function memorize() {
+    if (typeof memo === 'undefined') {
+      // Test for IE <= 9 as proposed by Browserhacks
+      // @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
+      // Tests for existence of standard globals is to allow style-loader
+      // to operate correctly into non-standard environments
+      // @see https://github.com/webpack-contrib/style-loader/issues/177
+      memo = Boolean(window && document && document.all && !window.atob);
+    }
+
+    return memo;
+  };
+}();
+
+var getTarget = function getTarget() {
+  var memo = {};
+  return function memorize(target) {
+    if (typeof memo[target] === 'undefined') {
+      var styleTarget = document.querySelector(target); // Special case to return head of iframe instead of iframe itself
+
+      if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+        try {
+          // This will throw an exception if access to iframe is blocked
+          // due to cross-origin restrictions
+          styleTarget = styleTarget.contentDocument.head;
+        } catch (e) {
+          // istanbul ignore next
+          styleTarget = null;
+        }
+      }
+
+      memo[target] = styleTarget;
+    }
+
+    return memo[target];
+  };
+}();
+
+var stylesInDom = [];
+
+function getIndexByIdentifier(identifier) {
+  var result = -1;
+
+  for (var i = 0; i < stylesInDom.length; i++) {
+    if (stylesInDom[i].identifier === identifier) {
+      result = i;
+      break;
+    }
+  }
+
+  return result;
+}
+
+function modulesToDom(list, options) {
+  var idCountMap = {};
+  var identifiers = [];
+
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var id = options.base ? item[0] + options.base : item[0];
+    var count = idCountMap[id] || 0;
+    var identifier = "".concat(id, " ").concat(count);
+    idCountMap[id] = count + 1;
+    var index = getIndexByIdentifier(identifier);
+    var obj = {
+      css: item[1],
+      media: item[2],
+      sourceMap: item[3]
+    };
+
+    if (index !== -1) {
+      stylesInDom[index].references++;
+      stylesInDom[index].updater(obj);
+    } else {
+      stylesInDom.push({
+        identifier: identifier,
+        updater: addStyle(obj, options),
+        references: 1
+      });
+    }
+
+    identifiers.push(identifier);
+  }
+
+  return identifiers;
+}
+
+function insertStyleElement(options) {
+  var style = document.createElement('style');
+  var attributes = options.attributes || {};
+
+  if (typeof attributes.nonce === 'undefined') {
+    var nonce =  true ? __webpack_require__.nc : 0;
+
+    if (nonce) {
+      attributes.nonce = nonce;
+    }
+  }
+
+  Object.keys(attributes).forEach(function (key) {
+    style.setAttribute(key, attributes[key]);
+  });
+
+  if (typeof options.insert === 'function') {
+    options.insert(style);
+  } else {
+    var target = getTarget(options.insert || 'head');
+
+    if (!target) {
+      throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
+    }
+
+    target.appendChild(style);
+  }
+
+  return style;
+}
+
+function removeStyleElement(style) {
+  // istanbul ignore if
+  if (style.parentNode === null) {
+    return false;
+  }
+
+  style.parentNode.removeChild(style);
+}
+/* istanbul ignore next  */
+
+
+var replaceText = function replaceText() {
+  var textStore = [];
+  return function replace(index, replacement) {
+    textStore[index] = replacement;
+    return textStore.filter(Boolean).join('\n');
+  };
+}();
+
+function applyToSingletonTag(style, index, remove, obj) {
+  var css = remove ? '' : obj.media ? "@media ".concat(obj.media, " {").concat(obj.css, "}") : obj.css; // For old IE
+
+  /* istanbul ignore if  */
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = replaceText(index, css);
+  } else {
+    var cssNode = document.createTextNode(css);
+    var childNodes = style.childNodes;
+
+    if (childNodes[index]) {
+      style.removeChild(childNodes[index]);
+    }
+
+    if (childNodes.length) {
+      style.insertBefore(cssNode, childNodes[index]);
+    } else {
+      style.appendChild(cssNode);
+    }
+  }
+}
+
+function applyToTag(style, options, obj) {
+  var css = obj.css;
+  var media = obj.media;
+  var sourceMap = obj.sourceMap;
+
+  if (media) {
+    style.setAttribute('media', media);
+  } else {
+    style.removeAttribute('media');
+  }
+
+  if (sourceMap && typeof btoa !== 'undefined') {
+    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
+  } // For old IE
+
+  /* istanbul ignore if  */
+
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    while (style.firstChild) {
+      style.removeChild(style.firstChild);
+    }
+
+    style.appendChild(document.createTextNode(css));
+  }
+}
+
+var singleton = null;
+var singletonCounter = 0;
+
+function addStyle(obj, options) {
+  var style;
+  var update;
+  var remove;
+
+  if (options.singleton) {
+    var styleIndex = singletonCounter++;
+    style = singleton || (singleton = insertStyleElement(options));
+    update = applyToSingletonTag.bind(null, style, styleIndex, false);
+    remove = applyToSingletonTag.bind(null, style, styleIndex, true);
+  } else {
+    style = insertStyleElement(options);
+    update = applyToTag.bind(null, style, options);
+
+    remove = function remove() {
+      removeStyleElement(style);
+    };
+  }
+
+  update(obj);
+  return function updateStyle(newObj) {
+    if (newObj) {
+      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap) {
+        return;
+      }
+
+      update(obj = newObj);
+    } else {
+      remove();
+    }
+  };
+}
+
+module.exports = function (list, options) {
+  options = options || {}; // Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+  // tags it will allow on a page
+
+  if (!options.singleton && typeof options.singleton !== 'boolean') {
+    options.singleton = isOldIE();
+  }
+
+  list = list || [];
+  var lastIdentifiers = modulesToDom(list, options);
+  return function update(newList) {
+    newList = newList || [];
+
+    if (Object.prototype.toString.call(newList) !== '[object Array]') {
+      return;
+    }
+
+    for (var i = 0; i < lastIdentifiers.length; i++) {
+      var identifier = lastIdentifiers[i];
+      var index = getIndexByIdentifier(identifier);
+      stylesInDom[index].references--;
+    }
+
+    var newLastIdentifiers = modulesToDom(newList, options);
+
+    for (var _i = 0; _i < lastIdentifiers.length; _i++) {
+      var _identifier = lastIdentifiers[_i];
+
+      var _index = getIndexByIdentifier(_identifier);
+
+      if (stylesInDom[_index].references === 0) {
+        stylesInDom[_index].updater();
+
+        stylesInDom.splice(_index, 1);
+      }
+    }
+
+    lastIdentifiers = newLastIdentifiers;
+  };
+};
+
+/***/ }),
+
 /***/ "./resources/apps/web/components/DialogCart.vue":
 /*!******************************************************!*\
   !*** ./resources/apps/web/components/DialogCart.vue ***!
@@ -3413,15 +6011,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _NoodleBoxApp_vue_vue_type_template_id_1f230444_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./NoodleBoxApp.vue?vue&type=template&id=1f230444&scoped=true */ "./resources/apps/web/components/NoodleBoxApp.vue?vue&type=template&id=1f230444&scoped=true");
 /* harmony import */ var _NoodleBoxApp_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./NoodleBoxApp.vue?vue&type=script&lang=js */ "./resources/apps/web/components/NoodleBoxApp.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _NoodleBoxApp_vue_vue_type_style_index_0_id_1f230444_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css */ "./resources/apps/web/components/NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _NoodleBoxApp_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
   _NoodleBoxApp_vue_vue_type_template_id_1f230444_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
   _NoodleBoxApp_vue_vue_type_template_id_1f230444_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
@@ -3639,6 +6239,288 @@ component.options.__file = "resources/apps/web/components/ProductMetaBoxes.vue"
 
 /***/ }),
 
+/***/ "./resources/apps/web/lottery/DialogLottery.vue":
+/*!******************************************************!*\
+  !*** ./resources/apps/web/lottery/DialogLottery.vue ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _DialogLottery_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _DialogLottery_vue_vue_type_template_id_423d1adb_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DialogLottery.vue?vue&type=template&id=423d1adb&scoped=true */ "./resources/apps/web/lottery/DialogLottery.vue?vue&type=template&id=423d1adb&scoped=true");
+/* harmony import */ var _DialogLottery_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DialogLottery.vue?vue&type=script&lang=js */ "./resources/apps/web/lottery/DialogLottery.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _DialogLottery_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _DialogLottery_vue_vue_type_template_id_423d1adb_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _DialogLottery_vue_vue_type_template_id_423d1adb_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "423d1adb",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/lottery/DialogLottery.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/DialogLotteryCart.vue":
+/*!**********************************************************!*\
+  !*** ./resources/apps/web/lottery/DialogLotteryCart.vue ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _DialogLotteryCart_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _DialogLotteryCart_vue_vue_type_template_id_fee0deca_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DialogLotteryCart.vue?vue&type=template&id=fee0deca&scoped=true */ "./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=template&id=fee0deca&scoped=true");
+/* harmony import */ var _DialogLotteryCart_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DialogLotteryCart.vue?vue&type=script&lang=js */ "./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _DialogLotteryCart_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _DialogLotteryCart_vue_vue_type_template_id_fee0deca_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _DialogLotteryCart_vue_vue_type_template_id_fee0deca_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "fee0deca",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/lottery/DialogLotteryCart.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/DialogPrize.vue":
+/*!****************************************************!*\
+  !*** ./resources/apps/web/lottery/DialogPrize.vue ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _DialogPrize_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _DialogPrize_vue_vue_type_template_id_a1eefcb8_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DialogPrize.vue?vue&type=template&id=a1eefcb8&scoped=true */ "./resources/apps/web/lottery/DialogPrize.vue?vue&type=template&id=a1eefcb8&scoped=true");
+/* harmony import */ var _DialogPrize_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DialogPrize.vue?vue&type=script&lang=js */ "./resources/apps/web/lottery/DialogPrize.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _DialogPrize_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _DialogPrize_vue_vue_type_template_id_a1eefcb8_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _DialogPrize_vue_vue_type_template_id_a1eefcb8_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "a1eefcb8",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/lottery/DialogPrize.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LotteryApp.vue":
+/*!***************************************************!*\
+  !*** ./resources/apps/web/lottery/LotteryApp.vue ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _LotteryApp_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _LotteryApp_vue_vue_type_template_id_05f327e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LotteryApp.vue?vue&type=template&id=05f327e4&scoped=true */ "./resources/apps/web/lottery/LotteryApp.vue?vue&type=template&id=05f327e4&scoped=true");
+/* harmony import */ var _LotteryApp_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LotteryApp.vue?vue&type=script&lang=js */ "./resources/apps/web/lottery/LotteryApp.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _LotteryApp_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _LotteryApp_vue_vue_type_template_id_05f327e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _LotteryApp_vue_vue_type_template_id_05f327e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "05f327e4",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/lottery/LotteryApp.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LotteryLoading.vue":
+/*!*******************************************************!*\
+  !*** ./resources/apps/web/lottery/LotteryLoading.vue ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _LotteryLoading_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _LotteryLoading_vue_vue_type_template_id_276649ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LotteryLoading.vue?vue&type=template&id=276649ae&scoped=true */ "./resources/apps/web/lottery/LotteryLoading.vue?vue&type=template&id=276649ae&scoped=true");
+/* harmony import */ var _LotteryLoading_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LotteryLoading.vue?vue&type=script&lang=js */ "./resources/apps/web/lottery/LotteryLoading.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _LotteryLoading_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _LotteryLoading_vue_vue_type_template_id_276649ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _LotteryLoading_vue_vue_type_template_id_276649ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "276649ae",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/lottery/LotteryLoading.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LotteryTurntable.vue":
+/*!*********************************************************!*\
+  !*** ./resources/apps/web/lottery/LotteryTurntable.vue ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _LotteryTurntable_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _LotteryTurntable_vue_vue_type_template_id_d4db50c4_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LotteryTurntable.vue?vue&type=template&id=d4db50c4&scoped=true */ "./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=template&id=d4db50c4&scoped=true");
+/* harmony import */ var _LotteryTurntable_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LotteryTurntable.vue?vue&type=script&lang=js */ "./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=script&lang=js");
+/* harmony import */ var _LotteryTurntable_vue_vue_type_style_index_0_id_d4db50c4_scoped_true_lang_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss */ "./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _LotteryTurntable_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _LotteryTurntable_vue_vue_type_template_id_d4db50c4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _LotteryTurntable_vue_vue_type_template_id_d4db50c4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "d4db50c4",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/lottery/LotteryTurntable.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LuckyBox.vue":
+/*!*************************************************!*\
+  !*** ./resources/apps/web/lottery/LuckyBox.vue ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _LuckyBox_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _LuckyBox_vue_vue_type_template_id_17b485b9_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./LuckyBox.vue?vue&type=template&id=17b485b9&scoped=true */ "./resources/apps/web/lottery/LuckyBox.vue?vue&type=template&id=17b485b9&scoped=true");
+/* harmony import */ var _LuckyBox_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LuckyBox.vue?vue&type=script&lang=js */ "./resources/apps/web/lottery/LuckyBox.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _LuckyBox_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _LuckyBox_vue_vue_type_template_id_17b485b9_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _LuckyBox_vue_vue_type_template_id_17b485b9_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "17b485b9",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/lottery/LuckyBox.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/apps/web/components/DialogCart.vue?vue&type=script&lang=js":
 /*!******************************************************************************!*\
   !*** ./resources/apps/web/components/DialogCart.vue?vue&type=script&lang=js ***!
@@ -3755,6 +6637,125 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductMetaBoxes_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ProductMetaBoxes.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/ProductMetaBoxes.vue?vue&type=script&lang=js");
  /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ProductMetaBoxes_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/DialogLottery.vue?vue&type=script&lang=js":
+/*!******************************************************************************!*\
+  !*** ./resources/apps/web/lottery/DialogLottery.vue?vue&type=script&lang=js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLottery_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLottery_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogLottery.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLottery.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLottery_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=script&lang=js":
+/*!**********************************************************************************!*\
+  !*** ./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=script&lang=js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLotteryCart_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLotteryCart_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogLotteryCart.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLotteryCart_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/DialogPrize.vue?vue&type=script&lang=js":
+/*!****************************************************************************!*\
+  !*** ./resources/apps/web/lottery/DialogPrize.vue?vue&type=script&lang=js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogPrize_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogPrize_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogPrize.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogPrize.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogPrize_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LotteryApp.vue?vue&type=script&lang=js":
+/*!***************************************************************************!*\
+  !*** ./resources/apps/web/lottery/LotteryApp.vue?vue&type=script&lang=js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryApp_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryApp_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LotteryApp.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryApp.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryApp_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LotteryLoading.vue?vue&type=script&lang=js":
+/*!*******************************************************************************!*\
+  !*** ./resources/apps/web/lottery/LotteryLoading.vue?vue&type=script&lang=js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryLoading_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryLoading_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LotteryLoading.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryLoading.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryLoading_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=script&lang=js":
+/*!*********************************************************************************!*\
+  !*** ./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=script&lang=js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LotteryTurntable.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LuckyBox.vue?vue&type=script&lang=js":
+/*!*************************************************************************!*\
+  !*** ./resources/apps/web/lottery/LuckyBox.vue?vue&type=script&lang=js ***!
+  \*************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LuckyBox_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LuckyBox_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LuckyBox.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LuckyBox.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_LuckyBox_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
@@ -3884,6 +6885,158 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/apps/web/lottery/DialogLottery.vue?vue&type=template&id=423d1adb&scoped=true":
+/*!************************************************************************************************!*\
+  !*** ./resources/apps/web/lottery/DialogLottery.vue?vue&type=template&id=423d1adb&scoped=true ***!
+  \************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLottery_vue_vue_type_template_id_423d1adb_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLottery_vue_vue_type_template_id_423d1adb_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLottery_vue_vue_type_template_id_423d1adb_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLottery_vue_vue_type_template_id_423d1adb_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogLottery.vue?vue&type=template&id=423d1adb&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLottery.vue?vue&type=template&id=423d1adb&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=template&id=fee0deca&scoped=true":
+/*!****************************************************************************************************!*\
+  !*** ./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=template&id=fee0deca&scoped=true ***!
+  \****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLotteryCart_vue_vue_type_template_id_fee0deca_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLotteryCart_vue_vue_type_template_id_fee0deca_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLotteryCart_vue_vue_type_template_id_fee0deca_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogLotteryCart_vue_vue_type_template_id_fee0deca_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogLotteryCart.vue?vue&type=template&id=fee0deca&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogLotteryCart.vue?vue&type=template&id=fee0deca&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/DialogPrize.vue?vue&type=template&id=a1eefcb8&scoped=true":
+/*!**********************************************************************************************!*\
+  !*** ./resources/apps/web/lottery/DialogPrize.vue?vue&type=template&id=a1eefcb8&scoped=true ***!
+  \**********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogPrize_vue_vue_type_template_id_a1eefcb8_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogPrize_vue_vue_type_template_id_a1eefcb8_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogPrize_vue_vue_type_template_id_a1eefcb8_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogPrize_vue_vue_type_template_id_a1eefcb8_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogPrize.vue?vue&type=template&id=a1eefcb8&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/DialogPrize.vue?vue&type=template&id=a1eefcb8&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LotteryApp.vue?vue&type=template&id=05f327e4&scoped=true":
+/*!*********************************************************************************************!*\
+  !*** ./resources/apps/web/lottery/LotteryApp.vue?vue&type=template&id=05f327e4&scoped=true ***!
+  \*********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryApp_vue_vue_type_template_id_05f327e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryApp_vue_vue_type_template_id_05f327e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryApp_vue_vue_type_template_id_05f327e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryApp_vue_vue_type_template_id_05f327e4_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LotteryApp.vue?vue&type=template&id=05f327e4&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryApp.vue?vue&type=template&id=05f327e4&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LotteryLoading.vue?vue&type=template&id=276649ae&scoped=true":
+/*!*************************************************************************************************!*\
+  !*** ./resources/apps/web/lottery/LotteryLoading.vue?vue&type=template&id=276649ae&scoped=true ***!
+  \*************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryLoading_vue_vue_type_template_id_276649ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryLoading_vue_vue_type_template_id_276649ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryLoading_vue_vue_type_template_id_276649ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryLoading_vue_vue_type_template_id_276649ae_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LotteryLoading.vue?vue&type=template&id=276649ae&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryLoading.vue?vue&type=template&id=276649ae&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=template&id=d4db50c4&scoped=true":
+/*!***************************************************************************************************!*\
+  !*** ./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=template&id=d4db50c4&scoped=true ***!
+  \***************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_template_id_d4db50c4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_template_id_d4db50c4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_template_id_d4db50c4_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_template_id_d4db50c4_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LotteryTurntable.vue?vue&type=template&id=d4db50c4&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=template&id=d4db50c4&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LuckyBox.vue?vue&type=template&id=17b485b9&scoped=true":
+/*!*******************************************************************************************!*\
+  !*** ./resources/apps/web/lottery/LuckyBox.vue?vue&type=template&id=17b485b9&scoped=true ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LuckyBox_vue_vue_type_template_id_17b485b9_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LuckyBox_vue_vue_type_template_id_17b485b9_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LuckyBox_vue_vue_type_template_id_17b485b9_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_LuckyBox_vue_vue_type_template_id_17b485b9_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LuckyBox.vue?vue&type=template&id=17b485b9&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LuckyBox.vue?vue&type=template&id=17b485b9&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/components/NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css":
+/*!****************************************************************************************************************!*\
+  !*** ./resources/apps/web/components/NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css ***!
+  \****************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_15_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_15_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleBoxApp_vue_vue_type_style_index_0_id_1f230444_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-15.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-15.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleBoxApp.vue?vue&type=style&index=0&id=1f230444&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss":
+/*!******************************************************************************************************************!*\
+  !*** ./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss ***!
+  \******************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_18_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_18_use_2_node_modules_sass_loader_dist_cjs_js_clonedRuleSet_18_use_3_node_modules_vue_loader_lib_index_js_vue_loader_options_LotteryTurntable_vue_vue_type_style_index_0_id_d4db50c4_scoped_true_lang_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-18.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-18.use[2]!../../../../node_modules/sass-loader/dist/cjs.js??clonedRuleSet-18.use[3]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-18.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-18.use[2]!./node_modules/sass-loader/dist/cjs.js??clonedRuleSet-18.use[3]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/lottery/LotteryTurntable.vue?vue&type=style&index=0&id=d4db50c4&scoped=true&lang=scss");
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js":
 /*!********************************************************************!*\
   !*** ./node_modules/vue-loader/lib/runtime/componentNormalizer.js ***!
@@ -3992,6 +7145,26 @@ function normalizeComponent(
   }
 }
 
+
+/***/ }),
+
+/***/ "?34e4":
+/*!************************!*\
+  !*** buffer (ignored) ***!
+  \************************/
+/***/ (() => {
+
+/* (ignored) */
+
+/***/ }),
+
+/***/ "?c7e7":
+/*!************************!*\
+  !*** crypto (ignored) ***!
+  \************************/
+/***/ (() => {
+
+/* (ignored) */
 
 /***/ }),
 
@@ -7255,7 +10428,7 @@ module.exports = axios;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
+/******/ 			id: moduleId,
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
@@ -7268,6 +10441,23 @@ module.exports = axios;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/amd options */
+/******/ 	(() => {
+/******/ 		__webpack_require__.amdO = {};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -7308,6 +10498,11 @@ module.exports = axios;
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/nonce */
+/******/ 	(() => {
+/******/ 		__webpack_require__.nc = undefined;
+/******/ 	})();
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
@@ -7319,6 +10514,7 @@ var __webpack_exports__ = {};
 
 
 var _NoodleBoxApp = _interopRequireDefault(__webpack_require__(/*! ./components/NoodleBoxApp.vue */ "./resources/apps/web/components/NoodleBoxApp.vue"));
+var _LotteryTurntable = _interopRequireDefault(__webpack_require__(/*! ./lottery/LotteryTurntable.vue */ "./resources/apps/web/lottery/LotteryTurntable.vue"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 new Vue({
   el: '#noodlebox',

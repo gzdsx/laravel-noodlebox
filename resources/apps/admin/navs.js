@@ -108,9 +108,14 @@ export default [
         ]
     },
     {
-        name: '电商',
+        name: '店铺',
         icon: 'bag',
         children: [
+            {
+                name: '店铺设置',
+                path: '/shop/settings',
+                isLink: false
+            },
             {
                 name: '添加产品',
                 path: '/product/new',
@@ -149,6 +154,11 @@ export default [
             {
                 name: '配送员管理',
                 path: '/deliveryers',
+                isLink: false
+            },
+            {
+                name: 'POS机管理',
+                path: '/pos-machines',
                 isLink: false
             },
             {

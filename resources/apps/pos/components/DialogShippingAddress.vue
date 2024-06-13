@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import VueGoogleAutocomplete from "./VueGoogleAutocomplete.vue";
+import VueGoogleAutocomplete from "../../lib/VueGoogleAutocomplete.vue";
 
 export default {
     name: "DialogShippingAddress",

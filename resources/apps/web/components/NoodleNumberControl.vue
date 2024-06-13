@@ -7,8 +7,8 @@
                     class="number-control__input__input"
                     :min="1"
                     :max="100"
-                    v-model="quantity"
-                    @change="onInput"
+                    :value="quantity"
+                    @change="onChange"
             >
         </div>
         <div class="number-control__btn" @click="onIncrease">+</div>
@@ -35,29 +35,33 @@ export default {
                 this.quantity = val;
             }
         },
-        quantity(val) {
-            this.$emit('change', val);
-        }
     },
     methods: {
-        onInput() {
-            if (!/\d+/.test(this.quantity)) {
+        onInput(e) {
+            console.log(e);
+            //this.$emit('input', e);
+            this.quantity = e.target.value;
+        },
+        onChange() {
+            this.quantity = parseInt(this.quantity);
+            if (!/^\d+$/.test(this.quantity)) {
                 this.quantity = 1;
             }
             if (this.quantity < 1) {
                 this.quantity = 1;
             }
             this.$emit('input', this.quantity);
+            this.$emit('change', this.quantity);
         },
         onDecrease() {
             if (this.quantity > 1) {
                 this.quantity--;
-                this.onInput();
+                this.onChange();
             }
         },
         onIncrease() {
             this.quantity++;
-            this.onInput();
+            this.onChange();
         }
     },
     mounted() {

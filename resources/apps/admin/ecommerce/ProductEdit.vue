@@ -53,7 +53,7 @@
                             <el-form-item label="徽章">
                                 <div class="badges-wrapper">
                                     <div class="badge-item" v-for="(badge,idx) in meta_data.badges" :key="idx">
-                                        <img :src="badge.icon" alt="">
+                                        <img :src="badge" alt="">
                                         <i class="el-icon-close delete" @click="meta_data.badges.splice(idx)"></i>
                                     </div>
                                     <div class="badge-item addnew" @click="showBadgePanel=true">
@@ -62,16 +62,29 @@
                                 </div>
                             </el-form-item>
                             <el-form-item label="新品">
-                                <el-radio-group v-model="product.is_new" inline>
-                                    <el-radio :label="1">是</el-radio>
-                                    <el-radio :label="0">否</el-radio>
-                                </el-radio-group>
+                                <el-switch
+                                    v-model="product.is_new"
+                                    :active-value="1"
+                                    :inactive-value="0"
+                                />
                             </el-form-item>
                             <el-form-item label="热销商品">
-                                <el-radio-group v-model="product.is_hot" inline>
-                                    <el-radio :label="1">是</el-radio>
-                                    <el-radio :label="0">否</el-radio>
-                                </el-radio-group>
+                                <el-switch
+                                    v-model="product.is_hot"
+                                    :active-value="1"
+                                    :inactive-value="0"
+                                />
+                            </el-form-item>
+                            <el-form-item label="积分换购">
+                                <el-switch
+                                    v-model="product.allow_point_purchase"
+                                    :active-value="1"
+                                    :inactive-value="0"
+                                />
+                            </el-form-item>
+                            <el-form-item label="积分价格">
+                                <el-input type="number" class="w200" v-model="product.point_price" :min="0"
+                                          :max="99999999"/>
                             </el-form-item>
                         </div>
                     </div>
@@ -180,10 +193,10 @@
                         <el-select v-model="meta_data.spicy" class="w-100" size="medium" placeholder="请选择" clearable>
                             <el-option
                                     v-for="(item,index) in [
-                                        {label:'不辣',value:'none'},
+                                        {label:'不辣',value:''},
                                         {label:'微辣',value:'slightly'},
                                         {label:'中辣',value:'medium'},
-                                        {label:'超级辣',value:'super'},
+                                        {label:'超辣',value:'super'},
                                     ]"
                                     :key="index"
                                     :label="item.label"
@@ -261,7 +274,7 @@ export default {
             images: [],
             content: {},
             meta_data: {
-                spicy: 'none',
+                spicy: '',
                 badges: []
             },
             templateList: [],
@@ -430,7 +443,8 @@ export default {
             }
         },
         onChooseBadges(badges) {
-            this.meta_data.badges = this.meta_data.badges.concat(badges);
+            const icons = badges.map(b => b.icon);
+            this.meta_data.badges = this.meta_data.badges.concat(icons);
         },
         getArray(arr) {
             if (Array.isArray(arr)) {

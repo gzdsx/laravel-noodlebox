@@ -5,6 +5,17 @@
 @section('description', $page->description)
 @section('body-class','page-shop')
 
+@php
+    $products = cache()->rememberForever('front-products',function (){
+        return get_products(['status'=>'onsale','limit'=>1000])->groupBy(function ($item,$key){
+            if ($item->categories->count() > 0){
+                return $item->categories->first()->id;
+            }else{
+                return 0;
+            }
+        });
+    });
+@endphp
 @section('content')
     <section class="swiper-container banner-swiper">
         <div class="swiper" id="bannerSwiper">
@@ -22,7 +33,7 @@
     </section>
     <script>
         (function () {
-            var swiper = new Swiper('#bannerSwiper', {
+            new Swiper('#bannerSwiper', {
                 autoplay: {
                     delay: 3000,
                     disableOnInteraction: false
@@ -39,79 +50,220 @@
             });
         })()
     </script>
+    <div class="shop-pc">
+        <section class="page-section">
+            <div class="container-fluid position-relative">
+                <h5 class="text-center text-turquoise font-weight-bold">
+                    What happens when fresh ingredients meet the
+                    fiery theatre of the wok?
+                </h5>
+                <div class="product-category-circles">
+                    @foreach($categories as $category)
+                        <div class="category-item">
+                            <div class="category-item__icon">
+                                <a href="{{$category->url}}">
+                                    <img src="{{$category->image}}" alt="">
+                                </a>
+                            </div>
+                            <div class="category-item__title">{{$category->name}}</div>
+                        </div>
+                    @endforeach
+                </div>
 
-    @php
-        $products = cache()->rememberForever('front-products',function (){
-            return get_products(['status'=>'onsale','limit'=>1000])->groupBy(function ($item,$key){
-                if ($item->categories->count() > 0){
-                    return $item->categories->first()->id;
-                }else{
-                    return 0;
-                }
-            });
-        });
-    @endphp
-    <section class="page-section">
+                <div class="blank-2"></div>
+                <div class="product-category-tabs-container" id="productTabsPc">
+                    <div class="product-category-tabs" id="tabsPC"></div>
+                </div>
+
+                <div class="product-category-tab-content" id="pcSwiper">
+                    <div class="swiper-wrapper" style="overflow-y: hidden;">
+                        @foreach($categories as $category)
+                            <div class="swiper-slide">
+                                <div class="category-products">
+                                    @if(isset($products[$category->id]))
+                                        @foreach($products[$category->id] as $product)
+                                            <div class="product-item">
+                                                <div class="product-item__image">
+                                                    <img src="{{asset('images/noodlebox/placeholder.png')}}"
+                                                         data-src="{{$product->image}}" class="absolute-fill"
+                                                         alt="">
+                                                    @if($product->icon=='new')
+                                                        <span class="product-icon product-icon__new">new!</span>
+                                                    @endif
+                                                    @if($product->icon=='hot')
+                                                        <span class="product-icon product-icon__hot">hot!</span>
+                                                    @endif
+
+                                                    @if($product->getMeta('spicy'))
+                                                        <span class="product-spicy product-spicy__{{$product->getMeta('spicy')}}"></span>
+                                                    @endif
+                                                </div>
+                                                <div class="product-item__ctx">
+                                                    <div class="product-item__title text-white">{{$product->title}}</div>
+                                                    <div class="product-item__price text-turquoise">
+                                                        <bdi>€</bdi>
+                                                        {{$product->price}}
+                                                    </div>
+                                                    <div>
+                                                        <a class="btn btn-danger add-to-cart"
+                                                           data-id="{{$product->id}}">Add
+                                                            Order</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script>
+            var categories = @json($categories);
+        </script>
+        <script>
+            (function ($) {
+                var swiperInited = false;
+                new Swiper('#pcSwiper', {
+                    loop: true,
+                    setWrapperSize: true,
+                    autoHeight: true,
+                    pagination: {
+                        el: '#tabsPC',
+                        clickable: true,
+                        bulletClass: 'category-tab',
+                        bulletActiveClass: 'active',
+                        renderBullet: function (index, className) {
+                            return '<div class="' + className + '"> <span>' + categories[index].name + '</span></div>';
+                        },
+                    },
+                    on: {
+                        init: function () {
+                            swiperInited = true;
+                        },
+                        slideChange: function () {
+                            //console.log('slideChange');
+                            if (swiperInited) {
+                                $(window).scrollTop($("#bannerSwiper").height());
+                            }
+                        }
+                    },
+                });
+
+                var tabsTop = $('#productTabsPc').offset().top;
+                $(window).on('scroll', function () {
+                    console.log($(window).scrollTop());
+                    if ($(window).scrollTop() > (tabsTop - 104)) {
+                        $('#productTabsPc').addClass('fixed');
+                    } else {
+                        $('#productTabsPc').removeClass('fixed');
+                    }
+                });
+            })(jQuery)
+        </script>
+    </div>
+
+    <section class="shop-mobile">
         <div class="container-fluid">
-            <h5 class="text-center text-turquoise font-weight-bold">What happens when fresh ingredients meet the fiery
-                theatre of the wok?</h5>
-            <div class="product-category-circles">
-                @foreach($categories as $category)
-                    <div class="category-item">
-                        <div class="category-item__icon">
-                            <a href="{{$category->url}}">
-                                <img src="{{$category->image}}" alt="">
-                            </a>
-                        </div>
-                        <div class="category-item__title">{{$category->name}}</div>
-                    </div>
-                @endforeach
+            <div class="product-category-tabs-mobile">
+                <div class="cat-tabs" id="tabsMobile"></div>
             </div>
-            <div class="product-category-tabs">
-                @foreach($categories as $category)
-                    <div class="category-tab{{$loop->index==0 ? ' category-tab__active' : ''}}">
-                        <span>{{$category->name}}</span>
-                    </div>
-                @endforeach
+            <div class="shop-main" id="mobileSwiper">
+                <div class="swiper-wrapper" style="overflow-y: hidden;">
+                    @foreach($categories as $category)
+                        <div class="swiper-slide overflow-hidden">
+                            <div class="product-vertical-list">
+                                @if(isset($products[$category->id]))
+                                    @foreach($products[$category->id] as $product)
+                                        <div class="product-item">
+                                            <div class="product-item__image">
+                                                <div class="product-item__image__image">
+                                                    <img src="{{asset('images/noodlebox/placeholder.png')}}"
+                                                         data-src="{{$product->image}}" class="absolute-fill"
+                                                         alt="">
+                                                </div>
+                                            </div>
+                                            <div class="product-item__ctx">
+                                                <div class="product-item__title text-white">{{$product->title}}</div>
+                                                @if($product->getMeta('badges'))
+                                                    <div class="product-item__badges">
+                                                        @foreach($product->getMeta('badges') as $badge)
+                                                            <img src="{{$badge}}" class="badge-item" alt="">
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div class="product-item__price text-turquoise">
+                                                        <bdi>€</bdi>
+                                                        {{$product->price}}
+                                                    </div>
+                                                    <div>
+                                                        <a class="btn btn-danger add-to-cart"
+                                                           data-id="{{$product->id}}">Add
+                                                            Order</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
 
-            <div class="product-category-tab-content">
-                @foreach($categories as $category)
-                    <div class="product-category-tab-panel">
-                        <div class="category-products">
-                            @if(isset($products[$category->id]))
-                                @foreach($products[$category->id] as $product)
-                                    <div class="product-item">
-                                        <div class="product-item__image">
-                                            <a href="{{$product->url}}">
-                                                <img src="{{asset('images/noodlebox/placeholder.png')}}" data-src="{{$product->image}}" class="absolute-fill" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="product-item__ctx">
-                                            <div class="product-item__title text-white">{{$product->title}}</div>
-                                            <div class="product-item__price text-turquoise">
-                                                <bdi>€</bdi>
-                                                {{$product->price}}
-                                            </div>
-                                            <div>
-                                                <a class="btn btn-danger add-to-cart" data-id="{{$product->id}}">Add Order</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
-            </div>
+            <script>
+                (function ($) {
+                    var tabEl = $('.product-category-tabs-mobile');
+                    var tabsTop = tabEl.offset().top;
+                    $(window).on('scroll', function () {
+                        if ($(window).scrollTop() > 0) {
+                            tabEl.addClass('fixed');
+                        } else {
+                            tabEl.removeClass('fixed');
+                        }
+                    });
+
+                    var tabs = $(".cat-tabs");
+                    var swiperInited = false;
+                    new Swiper('#mobileSwiper', {
+                        loop: true,
+                        setWrapperSize: true,
+                        autoHeight: true,
+                        pagination: {
+                            el: '#tabsMobile',
+                            clickable: true,
+                            bulletClass: 'cat-tab-item',
+                            bulletActiveClass: 'active',
+                            renderBullet: function (index, className) {
+                                return '<div class="' + className + '"> <span>' + categories[index].name + '</span></div>';
+                            },
+                        },
+                        on: {
+                            init: function () {
+                                swiperInited = true;
+                            },
+                            slideChange: function () {
+                                //console.log(this.activeIndex);
+                                var el = $('.cat-tabs .cat-tab-item')[this.activeIndex - 1];
+                                var position = $(el).position();
+                                if (position) {
+                                    tabs[0].scrollLeft = tabs[0].scrollLeft + position.left - tabEl.width() / 2 + $(el).width() / 2;
+                                } else {
+                                    tabs[0].scrollLeft = 0;
+                                }
+
+                                if (swiperInited) {
+                                    $(window).scrollTop($("#bannerSwiper").height() - tabEl.height() + $(".header-mobile").outerHeight());
+                                }
+                            }
+                        }
+                    });
+                })(jQuery)
+            </script>
         </div>
     </section>
-    <script>
-        (function ($) {
-            $(".category-tab").on('click',function () {
-                $(this).addClass('category-tab__active').siblings().removeClass('category-tab__active');
-                $(".product-category-tab-panel").eq($(this).index()).show().siblings().hide();
-            })
-        })(jQuery)
-    </script>
 @stop

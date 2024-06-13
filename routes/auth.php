@@ -17,6 +17,7 @@ Route::group(['namespace' => 'Auth'], function () {
     Route::get('login/appcode', 'LoginController@appcode');
     Route::get('login/chklogin', 'LoginController@chklogin');
     Route::post('login', 'LoginController@login');
+    Route::post('login/sms', 'LoginController@loginWithSms')->name('login.sms');
     Route::get('logout', 'LoginController@logout')->name('logout');
 
     // Registration Routes...

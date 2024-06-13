@@ -6,7 +6,7 @@
                     <input
                             type="text"
                             class="form-control form-control-lg"
-                            placeholder="Phone/Email"
+                            placeholder="Email"
                             required="required"
                             v-model="account"
                     >

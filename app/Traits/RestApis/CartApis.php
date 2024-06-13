@@ -25,11 +25,14 @@ trait CartApis
         });
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $query = $this->repository();
+        if ($request->has('purchase_via')) {
+            $query->where('purchase_via', $request->input('purchase_via', 0));
+        }
         return json_success([
-            'count' => $query->count(),
+            'total' => $query->count(),
             'items' => $query->get()
         ]);
     }
@@ -55,25 +58,37 @@ trait CartApis
         $product_id = $request->input('product_id', 0);
         $quantity = $request->input('quantity', 1);
         $meta_data = $request->input('meta_data', []);
-        $additional_options = $request->input('additional_options', []);
+        $purchase_via = $request->input('purchase_via', 'order');
 
         $product = Product::find($product_id);
-        $key = md5($product_id . json_encode($meta_data) . json_encode($additional_options));
+        if (isset($meta_data['purchase_with_point'])) {
+            $total_points = $product->point_price * $quantity;
+            if ($total_points > $request->user()->points) {
+                abort(422, __('Insufficient points balance'));
+            }
+        }
+
+        $key = md5(json_encode([
+            $product_id,
+            $meta_data
+        ]));
         $cart = $this->repository()->firstOrNew(['product_id' => $product_id]);
-        $cartKey = md5($cart->product_id . json_encode($cart->meta_data) . json_encode($cart->additional_options));
+        $cartKey = md5(json_encode([
+            $cart->product_id,
+            $cart->meta_data
+        ]));
         if ($key == $cartKey) {
             $cart->quantity += $quantity;
             $cart->save();
         } else {
             $cart = $this->repository()->make();
-            $cart->product_id = $product_id;
+            $cart->product_id = $product->id;
             $cart->title = $product->title;
             $cart->image = $product->image;
-            $cart->original_price = $product->price;
             $cart->quantity = $quantity;
             $cart->meta_data = $meta_data;
-            $cart->additional_options = $additional_options;
-            $cart->user_id = Auth::id();
+            $cart->purchase_via = $purchase_via;
+            $cart->user_id = $request->user()->id;
             $cart->save();
         }
 
@@ -100,10 +115,6 @@ trait CartApis
 
         if ($request->has('meta_data')) {
             $cart->meta_data = $request->input('meta_data', []);
-        }
-
-        if ($request->has('additional_options')) {
-            $cart->additional_options = $request->input('additional_options', []);
         }
 
         $cart->save();

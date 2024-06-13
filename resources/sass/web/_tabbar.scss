@@ -1,4 +1,4 @@
-.tabbar{
+.tabbar {
     z-index: 999;
     display: flex;
     box-sizing: content-box;
@@ -10,7 +10,7 @@
     bottom: 0;
     left: 0;
 
-    &-item{
+    &-item {
         flex: 1;
         display: flex;
         flex-direction: column;
@@ -18,17 +18,35 @@
         justify-content: center;
         font-size: 12px;
         color: #ffffff;
+        position: relative;
 
-        &:hover{
+        &:hover {
             text-decoration: none;
         }
 
-        &__icon{
-            font-size: 20px;
+        &__icon {
+            font-size: 24px;
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background-color: #ff0000;
+            color: #ffffff;
+            font-size: 10px;
+            font-style: normal;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            padding: 0;
+            line-height: 20px;
+            border-radius: 10rem;
         }
     }
 
-    &-wrapper{
+    &-wrapper {
         box-sizing: content-box;
         padding-bottom: env(safe-area-inset-bottom);
         height: 50px;
@@ -38,7 +56,7 @@
 }
 
 @media (max-width: 768px) {
-    .tabbar-wrapper{
+    .tabbar-wrapper {
         display: block;
     }
 }

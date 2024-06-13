@@ -31,12 +31,14 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property string|null $payment_method_title
  * @property int $payment_status 支付状态，1=已支付，0=未支付
  * @property \Illuminate\Support\Carbon|null $payment_at 付款时间
+ * @property string $payment_cash_amount
  * @property string $shipping_method 配送方式
  * @property int $shipping_zone_id 配送区域
  * @property string $shipping_total 配送费
  * @property string $shipping_tax
  * @property int $shipping_status 发货状态，0=未发货，1=已发货
  * @property \Illuminate\Support\Carbon|null $shipping_at 发货时间
+ * @property array|null $shipping_lines
  * @property int $buyer_rate 买家评价状态，0=未评价，1=已评价
  * @property int $seller_rate 卖家评价状态，0=未评价，1=已评价
  * @property int $buyer_deleted 买家已删除
@@ -47,9 +49,14 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property array|null $shipping 配送地址
  * @property array|null $billing 账单地址
  * @property int $deliveryer_id 配送员
+ * @property string|null $created_via
+ * @property array|null $meta_data
  * @property string $status 订单状态
+ * @property int $is_modified
+ * @property string|null $short_code
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
+ * @property \Illuminate\Support\Carbon|null $completed_at 完成时间
  * @property-read \App\Models\User|null $buyer
  * @property-read \App\Models\Deliveryer|null $deliveryer
  * @property-read mixed $links
@@ -60,6 +67,7 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderNote> $notes
  * @property-read int|null $notes_count
  * @property-read \App\Models\User|null $seller
+ * @property-read \App\Models\ShippingZone|null $shippingZone
  * @property-read \App\Models\Shop|null $shop
  * @property-read \App\Models\UserTransaction|null $transaction
  * @method static Builder|Order filter(array $input = [], $filter = null)
@@ -75,7 +83,9 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order whereBuyerName($value)
  * @method static Builder|Order whereBuyerNote($value)
  * @method static Builder|Order whereBuyerRate($value)
+ * @method static Builder|Order whereCompletedAt($value)
  * @method static Builder|Order whereCreatedAt($value)
+ * @method static Builder|Order whereCreatedVia($value)
  * @method static Builder|Order whereDeliveryerId($value)
  * @method static Builder|Order whereDiscountLines($value)
  * @method static Builder|Order whereDiscountTax($value)
@@ -83,11 +93,14 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order whereEndsWith(string $column, string $value, string $boolean = 'and')
  * @method static Builder|Order whereFeeLines($value)
  * @method static Builder|Order whereId($value)
+ * @method static Builder|Order whereIsModified($value)
  * @method static Builder|Order whereLike(string $column, string $value, string $boolean = 'and')
+ * @method static Builder|Order whereMetaData($value)
  * @method static Builder|Order whereOrderNo($value)
  * @method static Builder|Order whereOrderType($value)
  * @method static Builder|Order whereOutTradeNo($value)
  * @method static Builder|Order wherePaymentAt($value)
+ * @method static Builder|Order wherePaymentCashAmount($value)
  * @method static Builder|Order wherePaymentMethod($value)
  * @method static Builder|Order wherePaymentMethodTitle($value)
  * @method static Builder|Order wherePaymentStatus($value)
@@ -98,6 +111,7 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order whereSellerRate($value)
  * @method static Builder|Order whereShipping($value)
  * @method static Builder|Order whereShippingAt($value)
+ * @method static Builder|Order whereShippingLines($value)
  * @method static Builder|Order whereShippingMethod($value)
  * @method static Builder|Order whereShippingStatus($value)
  * @method static Builder|Order whereShippingTax($value)
@@ -105,6 +119,7 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order whereShippingZoneId($value)
  * @method static Builder|Order whereShopId($value)
  * @method static Builder|Order whereShopName($value)
+ * @method static Builder|Order whereShortCode($value)
  * @method static Builder|Order whereStatus($value)
  * @method static Builder|Order whereTotal($value)
  * @method static Builder|Order whereTotalTax($value)
@@ -133,14 +148,16 @@ class Order extends Model
     protected $fillable = [
         'id', 'order_no', 'order_type', 'shop_id', 'shop_name', 'buyer_id', 'buyer_name', 'buyer_note',
         'seller_id', 'seller_name', 'discount_total', 'discount_tax', 'total', 'total_tax', 'prices_include_tax',
-        'payment_method', 'payment_method_title', 'payment_status', 'payment_at', 'shipping_method', 'shipping_zone_id',
-        'shipping_total', 'shipping_tax', 'shipping_status', 'shipping_at', 'buyer_rate', 'seller_rate',
-        'buyer_deleted', 'seller_deleted', 'out_trade_no', 'fee_lines', 'discount_lines', 'shipping',
-        'billing', 'deliveryer_id', 'status', 'created_at', 'updated_at'
+        'payment_method', 'payment_method_title', 'payment_status', 'payment_at', 'payment_cash_amount',
+        'shipping_method', 'shipping_zone_id', 'shipping_total', 'shipping_tax', 'shipping_status', 'shipping_at',
+        'buyer_rate', 'seller_rate', 'buyer_deleted', 'seller_deleted', 'out_trade_no', 'fee_lines', 'discount_lines', 'shipping',
+        'billing', 'deliveryer_id', 'status', 'created_at', 'updated_at', 'completed_at', 'is_modified', 'short_code',
+        'meta_data', 'shipping_lines'
     ];
     protected $dates = [
         'payment_at',
-        'shipping_at'
+        'shipping_at',
+        'completed_at'
     ];
     protected $appends = [
         'status_des',
@@ -151,10 +168,12 @@ class Order extends Model
         'fee_lines' => 'array',
         'discount_lines' => 'array',
         'shipping' => 'array',
-        'billing' => 'array'
+        'billing' => 'array',
+        'shipping_lines' => 'json',
+        'meta_data' => 'json'
     ];
 
-    protected $with = ['items', 'buyer', 'seller', 'shop', 'transaction', 'deliveryer'];
+    protected $with = ['items', 'buyer', 'seller', 'shop', 'transaction', 'deliveryer', 'shippingZone'];
 
     public static function boot()
     {
@@ -162,6 +181,14 @@ class Order extends Model
         static::deleting(function (Order $order) {
             $order->items()->delete();
             $order->notes()->delete();
+        });
+
+        static::creating(function ($model) {
+            if (!$model->short_code) {
+                if ($code = Order::findAvalaibleCode()) {
+                    $model->short_code = $code;
+                }
+            }
         });
     }
 
@@ -244,6 +271,11 @@ class Order extends Model
         return $this->belongsTo(Deliveryer::class, 'deliveryer_id', 'id');
     }
 
+    public function shippingZone()
+    {
+        return $this->belongsTo(ShippingZone::class, 'shipping_zone_id', 'id');
+    }
+
     /**
      * @param $order_no
      * @return Builder|Model|Order|object|null
@@ -318,5 +350,26 @@ class Order extends Model
     public function isCancelled()
     {
         return $this->status == self::ORDER_STATUS_CANCELLED;
+    }
+
+    public function markAsCompleted()
+    {
+        $this->forceFill([
+            'status' => self::ORDER_STATUS_COMPLETED,
+            'completed_at' => now()
+        ])->save();
+    }
+
+    public static function findAvalaibleCode()
+    {
+        $exists = false;
+        while (!$exists) {
+            $code = str_pad(rand(0, 9999), 4, '0');
+            if (!static::query()->where('short_code', $code)->whereDate('created_at', now())->exists()) {
+                $exists = true;
+                return $code;
+            }
+        }
+        return false;
     }
 }

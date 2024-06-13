@@ -46,9 +46,10 @@ mix.js('resources/apps/home/app.js', 'public/dist/home').vue();
 mix.js('resources/apps/web/vendor.js', 'public/dist/web').vue();
 mix.js('resources/apps/web/runtime.js', 'public/dist/web').vue();
 mix.js('resources/apps/web/cart.js', 'public/dist/web').vue();
-mix.js('resources/apps/web/metabox.js', 'public/dist/web').vue();
+mix.js('resources/apps/web/product.js', 'public/dist/web').vue();
 mix.js('resources/apps/web/orders.js', 'public/dist/web').vue();
 mix.js('resources/apps/web/checkout.js', 'public/dist/web').vue();
+mix.js('resources/apps/web/lottery/checkout.js', 'public/dist/lottery').vue();
 mix.js('resources/apps/pos/index.js', 'public/dist/pos').vue();
 //sass
 mix.sass('resources/sass/bootstrap.scss', 'public/lib/bootstrap/bootstrap.min.css');

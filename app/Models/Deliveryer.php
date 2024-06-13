@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasDates;
 use App\Models\Traits\HasImageAttribute;
+use App\Models\Traits\HasMetas;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,13 +17,20 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $image 照片
  * @property float $lng 当前位置
  * @property float $lat 当前位置
- * @property string|null $pos pos机
+ * @property string|null $pos
+ * @property string $base_amount
+ * @property string|null $color
  * @property string|null $status 状态
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
+ * @property-read \Illuminate\Support\Collection $meta_data
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeliveryerMeta> $metas
+ * @property-read int|null $metas_count
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereBaseAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereColor($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereImage($value)
@@ -37,7 +45,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Deliveryer extends Model
 {
-    use HasFactory, HasImageAttribute, HasDates;
+    use HasFactory, HasImageAttribute, HasDates, HasMetas;
+
+    const STATUS_ONLINE = 'online';
+    const STATUS_OFFLINE = 'offline';
 
     protected $table = 'deliveryer';
     protected $fillable = [
@@ -47,5 +58,15 @@ class Deliveryer extends Model
         'status',
         'lng',
         'lat',
+        'pos',
+        'base_amount',
+        'color'
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function metas(){
+        return $this->hasMany(DeliveryerMeta::class, 'deliveryer_id');
+    }
 }

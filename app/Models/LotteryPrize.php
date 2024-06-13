@@ -11,14 +11,14 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $id
  * @property string|null $type
- * @property string|null $title
+ * @property string|null $name
  * @property string|null $image
  * @property int|null $points
  * @property int $stock
- * @property float $percent
- * @property int $sort_num
+ * @property float $probability
  * @property int $product_id
  * @property int $status
+ * @property int $sort_num
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize newModelQuery()
@@ -27,13 +27,13 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereImage($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize wherePercent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize wherePoints($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereProbability($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereSortNum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereStock($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereUpdatedAt($value)
  * @mixin \Eloquent
@@ -43,7 +43,7 @@ class LotteryPrize extends Model
     use HasFactory, HasDates;
 
     protected $table = 'lottery_prize';
-    protected $fillable = ['type', 'title', 'image', 'sort_num', 'percent', 'status', 'quantity', 'product_id'];
+    protected $fillable = ['type', 'name', 'image','points', 'stock', 'sort_num', 'probability', 'status', 'product_id'];
 
     public static function boot()
     {

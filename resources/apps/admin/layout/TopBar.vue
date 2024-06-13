@@ -6,23 +6,23 @@
         </div>
         <div class="d-flex column-gap-20">
             <div class="v-dropdown">
-                <el-dropdown>
+                <el-dropdown @command="onCommand">
                     <a class="el-dropdown-link">
                         <img :src="userInfo.avatar" class="avatar" alt="">
                         <span>{{ userInfo.nickname }}</span>
                     </a>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item>
-                            <router-link to="/">{{ $t('topbar.account_set') }}</router-link>
+                        <el-dropdown-item :command="{to:'/'}">
+                            {{ $t('topbar.account_set') }}
                         </el-dropdown-item>
-                        <el-dropdown-item>
-                            <router-link to="/bill">{{ $t('topbar.consumption_details') }}</router-link>
+                        <el-dropdown-item :command="{to:'/bill'}">
+                            {{ $t('topbar.consumption_details') }}
                         </el-dropdown-item>
-                        <el-dropdown-item>
-                            <a href="/" target="_blank">{{ $t('topbar.homepage') }}</a>
+                        <el-dropdown-item :command="{href:'/'}">
+                            {{ $t('topbar.homepage') }}
                         </el-dropdown-item>
-                        <el-dropdown-item divided>
-                            <a @click.prevent="logout">{{ $t('topbar.logout') }}</a>
+                        <el-dropdown-item :command="{event:'logout'}" divided>
+                            {{ $t('topbar.logout') }}
                         </el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
@@ -76,6 +76,19 @@ export default {
                 this.curLang = this.languages[lang];
             });
         },
+        onCommand(cmd) {
+            if (cmd.event === 'logout') {
+                this.logout()
+            }
+
+            if (cmd.to) {
+                this.$router.push(cmd.to);
+            }
+
+            if (cmd.href) {
+                window.open(cmd.href);
+            }
+        }
     },
     mounted() {
         this.curLang = this.languages[this.$lang];

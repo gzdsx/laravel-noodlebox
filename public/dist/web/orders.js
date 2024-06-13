@@ -42,6 +42,12 @@ var _default = exports["default"] = {
     onTabChange: function onTabChange(tab) {
       this.status = tab;
       this.fetchList();
+    },
+    addCart: function addCart(order) {
+      _HttpClient["default"].post("/orders/".concat(order.id, "/purchase")).then(function (response) {
+        //this.$showToast('Order placed successfully');
+        window.location.assign('/cart');
+      });
     }
   },
   mounted: function mounted() {
@@ -109,16 +115,7 @@ exports.staticRenderFns = exports.render = void 0;
 var render = exports.render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "container"
-  }, [_c("order-tabs", {
-    attrs: {
-      "active-tab": _vm.status
-    },
-    on: {
-      change: _vm.onTabChange
-    }
-  }), _vm._v(" "), _c("div", {
+  return _c("div", [_c("div", {
     staticClass: "my-orders"
   }, _vm._l(_vm.orders, function (order, index) {
     return _c("div", {
@@ -147,26 +144,28 @@ var render = exports.render = function render() {
         staticClass: "order-item__title"
       }, [_c("div", {
         staticClass: "title"
-      }, [_vm._v(_vm._s(item.title))]), _vm._v(" "), _c("div", {
-        staticClass: "order-item__metas"
-      }, _vm._l(item.meta_data, function (meta) {
-        return _c("dl", {
-          key: meta.id
-        }, [_c("dt", [_vm._v(_vm._s(meta.key) + ":")]), _vm._v(" "), _c("dd", [_vm._v(_vm._s(meta.value))])]);
-      }), 0)]), _vm._v(" "), _c("div", {
+      }, [_vm._v(_vm._s(item.title))]), _vm._v(" "), item.meta_data && item.meta_data.options ? _c("small", {
+        staticClass: "text-muted"
+      }, [_vm._v("\n                            " + _vm._s(Object.values(item.meta_data.options).join(",")) + "\n                        ")]) : _vm._e(), _vm._v(" "), item.meta_data && item.meta_data.additional_options ? _c("small", {
+        staticClass: "text-muted"
+      }, [_vm._v("\n                            " + _vm._s(item.meta_data.additional_options.join(",")) + "\n                        ")]) : _vm._e(), _vm._v(" "), item.meta_data && item.meta_data.purchase_via ? _c("small", {
+        staticClass: "text-muted"
+      }, [_vm._v("\n                            via " + _vm._s(item.meta_data.purchase_via) + "\n                        ")]) : _vm._e()]), _vm._v(" "), _c("div", {
         staticClass: "order-item__price"
       }, [_c("strong", [_vm._v("€" + _vm._s(item.price))]), _vm._v(" "), _c("span", [_vm._v("x" + _vm._s(item.quantity))])])]);
     }), 0), _vm._v(" "), _c("div", {
       staticClass: "order-item__totals"
     }, [_vm._v("\n                Total: €" + _vm._s(order.total) + " (Shipping Total: €" + _vm._s(order.shipping_total) + ")\n            ")]), _vm._v(" "), _c("div", {
       staticClass: "order-item__footer"
-    }, [_c("a", {
-      staticClass: "btn btn-sm btn-outline-light rounded-pill",
-      attrs: {
-        href: "/orders/" + order.order_id
+    }, [_c("button", {
+      staticClass: "btn btn-outline-light btn-sm",
+      on: {
+        click: function click($event) {
+          return _vm.addCart(order);
+        }
       }
-    }, [_vm._v("View")])])]);
-  }), 0)], 1);
+    }, [_vm._v("Order Again")])])]);
+  }), 0)]);
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -235,12 +234,7 @@ var httpClient = _axios["default"].create({
   baseURL: "/api/v1",
   // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 0,
-  // request timeout
-  auth: {
-    username: "admin",
-    password: "admin"
-  }
+  timeout: 0 // request timeout
 });
 
 // request interceptor
@@ -306,7 +300,7 @@ function (response) {
       window.dispatchEvent(new Event('unauthenticated'));
     }
   }
-  return Promise.reject(error);
+  return Promise.reject(error.response.data);
 });
 var _default = exports["default"] = httpClient;
 

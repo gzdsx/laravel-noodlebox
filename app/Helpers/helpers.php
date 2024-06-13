@@ -242,7 +242,7 @@ function json_success($data = [], $options = JSON_UNESCAPED_UNICODE)
  * @param $errors
  * @return \Illuminate\Http\JsonResponse
  */
-function json_error($message, $code = 500, $errors = null)
+function json_error($message, $code = 422, $errors = null)
 {
     $response = [
         'code' => $code,

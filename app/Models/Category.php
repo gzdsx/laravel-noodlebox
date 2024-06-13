@@ -28,6 +28,8 @@ use Overtrue\LaravelPinyin\Facades\Pinyin;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CategoryMeta> $metas
  * @property-read int|null $metas_count
  * @property-read Category|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read int|null $products_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $siblings
  * @property-read int|null $siblings_count
  * @method static Builder|Category filter(array $input = [], $filter = null)
@@ -117,5 +119,16 @@ class Category extends Model
     public function metas()
     {
         return $this->hasMany(CategoryMeta::class, 'category_id', 'id');
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(
+            Product::class, 'category_relationship',
+            'category_id',
+            'object_id',
+            'id',
+            'id'
+        );
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Controllers\Controller;
+use App\Support\Paypal;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -13,66 +14,10 @@ class PaypalController extends BaseController
     public function createOrder(Request $request)
     {
         try {
-            $client = new Client();
-            $response = $client->request('POST', 'https://api.sandbox.paypal.com/v2/checkout/orders', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . $this->getPaypalToken(),
-                    'PayPal-Request-Id' => '7b92603e-77ed-4896-8e78-5dea2050476a'
-                ],
-                'json' => [
-                    'intent' => 'CAPTURE',
-                    'purchase_units' => [
-                        [
-                            'amount' => [
-                                'value' => '1.00',
-                                'currency_code' => 'EUR'
-                            ],
-                        ],
-                    ],
-                    'payment_source' => [
-                        'paypal' => [
-                            'experience_context' => [
-                                'payment_method_preference' => 'IMMEDIATE_PAYMENT_REQUIRED',
-                                'payment_method_selected' => 'PAYPAL',
-                                'landing_page_type' => 'BILLING',
-                                'user_action' => 'CONTINUE',
-                                'return_url' => 'https://example.com/return',
-                                'cancel_url' => 'https://example.com/cancel'
-                            ],
-                            'name' => [
-                                'given_name' => 'paypal',
-                                'surname' => 'paypal'
-                            ],
-                            'email_address' => 'paypal@example.com',
-                            'phone' => [
-                                'phone_type' => 'MOBILE',
-                                'phone_number' => [
-                                    'national_number' => '18685849696'
-                                ]
-                            ],
-                            'address' => [
-                                'address_line_1' => 'zhong yang da jie',
-                                'address_line_2' => 'line2',
-                                'admin_area_2' => 'qianan',
-                                'admin_area_1' => 'Guizhou',
-                                'postal_code' => '12345',
-                                'country_code' => 'IR'
-                            ]
-                        ],
-//                        'card' => [
-//                            'name' => 'card',
-//                            'number' => '4111111111111111',
-//                            'expiry' => '2021-01',
-//                        ],
-                    ],
-                ],
-            ]);
-
-            $data = json_decode($response->getBody()->getContents());
-            return json_success($data);
+            $json = Paypal::createOrder($request->input('orderData', []));
+            return json_success(json_decode($json));
         } catch (\Exception $e) {
-            return json_error($e->getMessage(), 422);
+            return json_error($e->getMessage(), 500, $request->input('orderData', []));
         }
     }
 

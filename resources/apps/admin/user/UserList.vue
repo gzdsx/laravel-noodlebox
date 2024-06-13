@@ -18,7 +18,7 @@
                 <div class="form-item">
                     <div class="form-item-label">{{ $t('user.phone') }}</div>
                     <div class="form-item-input">
-                        <el-input size="medium" class="w200" clearable v-model="params.phone"/>
+                        <el-input size="medium" class="w200" clearable v-model="params.phone_number"/>
                     </div>
                 </div>
                 <div class="form-item">
@@ -50,13 +50,23 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="nickname" :label="$t('user.nickname')"/>
-                <el-table-column prop="phone" :label="$t('user.phone')"/>
+                <el-table-column prop="phone_number" :label="$t('user.phone')"/>
                 <el-table-column prop="email" :label="$t('user.email')"/>
                 <el-table-column prop="points" width="80" :label="$t('common.points')"/>
                 <el-table-column prop="created_at" width="170" :label="$t('user.regtime')"/>
                 <el-table-column width="100px" :label="$t('common.option')" align="right">
                     <template slot-scope="scope">
-                        <router-link :to="'/user/edit/'+scope.row.id">{{ $t('common.edit') }}</router-link>
+                        <el-dropdown trigger="click" @command="onCommand">
+                            <div class="el-link el-link--primary el-dropdown-link">
+                                <span>{{ $t('common.edit') }}</span>
+                            </div>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item :command="{'act':'edit-profile',user:scope.row}">修改资料
+                                </el-dropdown-item>
+                                <el-dropdown-item :command="{'act':'edit-points',user:scope.row}">修改积分
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
                     </template>
                 </el-table-column>
             </el-table>
@@ -85,12 +95,32 @@
                 />
             </div>
         </div>
+        <el-dialog width="500px" title="Edit Points" closeable
+                   :visible.sync="showDialog"
+                   :close-on-click-modal="false"
+                   :close-on-press-escape="false">
+            <el-form ref="form" size="medium" label-width="80px" width="400px">
+                <el-form-item label="Action">
+                    <el-select v-model="pointData.action" placeholder="Select action">
+                        <el-option label="Add" value="add"/>
+                        <el-option label="Subtract" value="subtract"/>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Amount">
+                    <el-input v-model="pointData.amount" class="w200" type="number" min="0"/>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onExchange">{{ $t('common.submit') }}</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
     </main-layout>
 </template>
 
 <script>
 import UserService from "../utils/UserService";
 import Pagination from "../mixins/Pagination";
+import ApiService from "../utils/ApiService";
 
 export default {
     name: "UserList",
@@ -102,11 +132,15 @@ export default {
                 nickname: '',
                 status: '',
                 email: '',
-                phone: ''
+                phone_number: ''
             },
             amount: 10000,
             showDialog: false,
             user: {},
+            pointData: {
+                action: 'add',
+                amount: 0
+            }
         }
     },
     methods: {
@@ -136,6 +170,33 @@ export default {
                 this.fetchList();
             });
         },
+        onCommand(cmd) {
+            console.log(cmd);
+            switch (cmd.act) {
+                case 'edit-points':
+                    this.onEditPoints(cmd.user);
+                    break;
+                case 'edit-profile':
+                    this.$router.push({name: 'user-edit', params: {id: cmd.user.id}});
+                    break;
+            }
+        },
+        onEditPoints(u) {
+            this.user = u;
+            this.showDialog = true;
+        },
+        onExchange() {
+            let {id} = this.user;
+            ApiService.post('/users/' + id + '/points', this.pointData).then(() => {
+                this.$message.success(this.$t('user.updated'));
+                this.fetchList();
+            }).catch(reason => {
+                console.log(reason);
+                this.$message.error(reason.message);
+            }).finally(() => {
+                this.showDialog = false;
+            });
+        }
     },
     mounted() {
         this.fetchList();

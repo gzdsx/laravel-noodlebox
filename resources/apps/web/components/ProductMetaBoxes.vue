@@ -1,13 +1,25 @@
 <template>
     <div class="product-metabox">
-        <h3>{{ product.title }}</h3>
-        <div class="product-potins">
-            Noodle Box Earn Points : {{ product.points }} Points
+        <div class="product-sticky">
+            <div class="product-thumbnail">
+                <img :src="product.image" alt="">
+            </div>
+            <div class="product-info">
+                <h3 class="product-name">{{ product.title }}</h3>
+                <div class="product-potins">
+                    Earn Points : {{ product.points }} Points
+                </div>
+                <div class="product-price text-bull-cyan" v-if="!usePointPurchase">€{{ finalPrice }}</div>
+            </div>
         </div>
-        <div class="product-price text-bull-cyan">€{{ finalPrice }}</div>
+
         <div class="product-description text-safety-orange" v-if="product.description">
             {{ product.description }}
         </div>
+        <div class="product-badges" v-if="product.meta_data.badges">
+            <img v-for="(b,i) in product.meta_data.badges" :key="i" :src="b" alt="">
+        </div>
+
         <div class="product-variations" v-if="Array.isArray(product.variation_list)">
             <div v-for="(v,i) in product.variation_list" :key="i">
                 <div class="product-variation__name">{{ v.name }}</div>
@@ -39,10 +51,17 @@
             </div>
         </div>
 
+        <div class="mt-4" v-if="product.allow_point_purchase">
+            <label class="text-safety-orange">
+                <input type="checkbox" v-model="usePointPurchase" style="transform: scale(1.5);margin-right: 3px;">
+                <span>Use {{ product.point_price }} Noodle Box Points for purchasing this Product</span>
+            </label>
+        </div>
+
         <div class="product-add-order">
             <noodle-number-control v-model="quantity"/>
             <div>
-                <button class="btn btn-bull-cyan text-white" @click="addToCart">Add Order</button>
+                <button class="btn btn-danger text-white" @click="addToCart">Add Order</button>
             </div>
         </div>
         <div class="product-add-favorite">
@@ -61,6 +80,7 @@ import NoodleNumberControl from "./NoodleNumberControl.vue";
 import NoodleLoading from "./NoodleLoading.vue";
 import DialogCart from "./DialogCart.vue";
 import CartService from "../CartService";
+import HttpClient from "../HttpClient";
 
 export default {
     name: "ProductMetaBoxes",
@@ -71,7 +91,9 @@ export default {
             default: () => {
                 return {
                     variation_list: [],
-                    additional_options: []
+                    additional_options: [],
+                    meta_data: {},
+                    metas: []
                 }
             }
         }
@@ -85,7 +107,8 @@ export default {
             showCart: false,
             loading: false,
             options: {},
-            additional_options: []
+            additional_options: [],
+            usePointPurchase: false,
         }
     },
     computed: {
@@ -128,17 +151,43 @@ export default {
             o.selected = !o.selected;
         },
         addToCart() {
-            let {product, finalPrice, quantity, options, additional_options} = this;
+            let {options, additional_options, usePointPurchase} = this;
+            HttpClient.post('/carts', {
+                product_id: this.product.id,
+                quantity: this.quantity,
+                meta_data: {
+                    options,
+                    additional_options
+                },
+                purchase_via: usePointPurchase ? 'point' : 'order'
+            }).then((res) => {
+                window.dispatchEvent(new Event('cartChanged'));
+                this.$showToast('Added to cart successfully!');
+                this.$emit('added');
+            }).catch(reason => {
+                //console.log(reason);
+                this.$showToast(reason.message);
+            }).finally(() => {
+
+            });
+        },
+        saveToCart() {
+            let {product, finalPrice, quantity, options, additional_options, usePointPurchase} = this;
 
             const cart = new CartService();
-            cart.addToCart(
-                product,
-                finalPrice,
+            cart.addToCart({
+                product_id: product.id,
+                title: product.title,
+                image: product.image,
+                price: finalPrice,
                 quantity,
                 options,
-                additional_options
-            );
+                additional_options,
+                usePointPurchase,
+                point_price: product.point_price,
+            });
             this.$showToast('Added to cart successfully!');
+            this.$emit('added', cart.getCartItems());
         }
     },
     mounted() {

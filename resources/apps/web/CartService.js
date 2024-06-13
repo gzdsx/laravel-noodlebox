@@ -1,18 +1,50 @@
+import {md5} from "js-md5";
+
 export default class CartService {
     constructor() {
-        this.cartItems = this.getCartItems();
+        this.cartItems = [];
+        try {
+            let cartItems = JSON.parse(localStorage.getItem('cartItems'));
+            if (Array.isArray(cartItems)) {
+                cartItems.forEach(item => {
+                    Object.defineProperty(item, 'subtotal', {
+                        get() {
+                            if (item.usePointPurchase) {
+                                return 0;
+                            }
+                            return (Number(this.price) * Number(this.quantity)).toFixed(2);
+                        }
+                    });
+
+                    Object.defineProperty(item, 'pointTotal', {
+                        get() {
+                            if (item.usePointPurchase) {
+                                return (Number(this.point_price) * Number(this.quantity)).toFixed(2);
+                            }
+                            return 0;
+                        }
+                    });
+                });
+
+                this.cartItems = cartItems;
+            }
+        } catch (e) {
+
+        }
     }
 
-    addToCart(product, price, quantity, options = {}, addtional_options = []) {
-        this.cartItems.push({
-            product_id: product.id,
-            title: product.title,
-            image: product.image,
-            price: price,
-            quantity: quantity,
-            options: options,
-            addtional_options: addtional_options
-        });
+    addToCart(cart_item) {
+        let {product_id, options, additional_options, quantity, usePointPurchase} = cart_item;
+        let key = md5(product_id + JSON.stringify(options) + JSON.stringify(additional_options) + usePointPurchase.toString());
+        let index = this.cartItems.findIndex(item => item.key === key);
+        if (index !== -1) {
+            this.cartItems[index].quantity += quantity;
+        } else {
+            this.cartItems.push({
+                key: key,
+                ...cart_item
+            });
+        }
         this.updateStorage();
     }
 
@@ -22,22 +54,7 @@ export default class CartService {
     }
 
     getCartItems() {
-        try {
-            let cartItems = JSON.parse(localStorage.getItem('cartItems'));
-            if (Array.isArray(cartItems)) {
-                cartItems.forEach(item => {
-                    Object.defineProperty(item, 'subtotal', {
-                        get() {
-                            return (Number(this.price) * Number(this.quantity)).toFixed(2);
-                        }
-                    })
-                });
-
-                return cartItems;
-            }
-        } catch (e) {
-            return [];
-        }
+        return this.cartItems;
     }
 
     saveItems(items) {
@@ -52,5 +69,12 @@ export default class CartService {
 
     updateStorage() {
         localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
+        let event = new Event('cartChanged');
+        event.count = this.cartItems.length;
+        window.dispatchEvent(event);
+    }
+
+    getCount() {
+        return this.cartItems.length;
     }
 }

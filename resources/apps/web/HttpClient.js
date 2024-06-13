@@ -4,10 +4,6 @@ const httpClient = axios.create({
     baseURL: "/api/v1", // url = base url + request url
     // withCredentials: true, // send cookies when cross-domain requests
     timeout: 0, // request timeout
-    auth: {
-        username: "admin",
-        password: "admin"
-    }
 });
 
 // request interceptor
@@ -63,7 +59,7 @@ httpClient.interceptors.response.use(
                 window.dispatchEvent(new Event('unauthenticated'));
             }
         }
-        return Promise.reject(error);
+        return Promise.reject(error.response.data);
     },
 );
 

@@ -20,4 +20,21 @@ class OrderController extends BaseController
     {
         return json_success(trans('order.order_statuses'));
     }
+
+    /**
+     * @param Request $request
+     * @param $order_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function notes(Request $request, $order_id)
+    {
+        $order = $this->repository()->findOrFail($order_id);
+        $query = $order->notes();
+        return json_success([
+            'total' => $query->count(),
+            'items' => $query->offset($request->input('offset', 0))
+                ->limit($request->input('limit', 10))
+                ->orderByDesc('created_at')->get()
+        ]);
+    }
 }

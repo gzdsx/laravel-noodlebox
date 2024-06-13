@@ -11,8 +11,9 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $id
  * @property int $user_id
- * @property string|null $title
+ * @property string|null $name
  * @property string|null $image
+ * @property int $points
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User|null $user
@@ -22,7 +23,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereImage($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord wherePoints($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereUserId($value)
  * @mixin \Eloquent
@@ -32,7 +34,8 @@ class LotteryRecord extends Model
     use HasFactory, HasDates;
 
     protected $table = 'lottery_record';
-    protected $fillable = ['user_id', 'title', 'image'];
+    protected $fillable = ['user_id', 'title', 'image', 'points'];
+    protected $with = ['user'];
 
     public function user()
     {

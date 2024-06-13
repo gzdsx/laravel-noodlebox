@@ -1,5 +1,5 @@
 import NoodleBoxApp from "./components/NoodleBoxApp.vue";
-
+import LotteryTurntable from "./lottery/LotteryTurntable.vue";
 new Vue({
     el: '#noodlebox',
     render: function (h) {

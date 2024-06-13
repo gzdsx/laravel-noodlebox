@@ -1,0 +1,76 @@
+.lottery-chest {
+    display: block;
+    margin: 0 auto;
+    padding: 2rem 0;
+
+    &:after {
+        content: " ";
+        display: block;
+        clear: both;
+    }
+
+    .chest-rotate {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        row-gap: 2rem;
+        justify-content: center;
+        align-items: center;
+        padding: 8rem 0;
+
+        &:before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-image: url("#{$image-path}/lottery/chest/light.png");
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: contain;
+            animation: rotate 10s infinite linear;
+            content: " ";
+            display: block;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    }
+
+    .chest-box {
+        display: block;
+        width: 320px;
+        height: 135px;
+        position: relative;
+        z-index: 10;
+
+        .chest {
+            width: 100%;
+            height: 100%;
+            background-image: url("#{$image-path}/lottery/chest/chest-close.png");
+            background-position: 0 0;
+            background-repeat: no-repeat;
+            background-size: 100% auto;
+            cursor: pointer;
+        }
+
+        .shake {
+            animation: shake 1.2s linear forwards;
+        }
+
+        .chest-open {
+            background-image: url("#{$image-path}/lottery/chest/chest-open.png");
+        }
+    }
+
+    .chest-error {
+        text-align: center;
+        color: var(--safety-orange);
+        position: absolute;
+        left: 0;
+        top: 5%;
+        right: 0;
+    }
+
+    .chest-try-again {
+        text-align: center;
+    }
+}

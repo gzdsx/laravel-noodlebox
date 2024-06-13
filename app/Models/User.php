@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasDates;
 use App\Models\Traits\HasMetas;
+use App\Models\Traits\HasMetaValueAttribute;
 use App\Models\Traits\UserHasCarts;
 use App\Models\Traits\UserHasOrders;
 use App\Models\Traits\UserHasPosts;
@@ -19,7 +20,8 @@ use Laravel\Passport\HasApiTokens;
  * @property int $id 主键
  * @property int $gid 管理权限
  * @property string|null $nickname 昵称
- * @property string|null $phone 手机号
+ * @property string|null $national_number 国家代码
+ * @property string|null $phone_number 手机号
  * @property string|null $email 邮箱
  * @property string|null $avatar 头像
  * @property string|null $password 密码
@@ -83,9 +85,10 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereLike(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNameStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereNationalNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePhoneNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePoints($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereStatus($value)
@@ -100,7 +103,7 @@ class User extends Authenticatable
     protected $table = 'user';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'id', 'gid', 'nickname', 'phone', 'email', 'password', 'remember_token',
+        'id', 'gid', 'nickname', 'national_number', 'phone_number', 'email', 'password', 'remember_token',
         'avatar', 'email_status', 'name_status', 'freeze', 'status', 'points'
     ];
     protected $hidden = ['password', 'remember_token'];

@@ -99,15 +99,132 @@
     .menu-user {
         display: flex;
         column-gap: 10px;
+
+        .bi{
+            font-size: 22px;
+        }
+
+        .bi-cart {
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #ff0000;
+            color: #ffffff;
+            font-size: 10px;
+            font-style: normal;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            padding: 0;
+            line-height: 20px;
+            border-radius: 10rem;
+        }
     }
 
     &-wrapper {
         min-height: 94px;
+    }
+
+    &-mobile {
+        display: none;
+        padding: 10px;
+        background-color: #222;
+
+        .header {
+            &-left {
+                flex: 1;
+
+                .logo {
+                    height: 40px;
+                    display: inline-block;
+                }
+            }
+
+            &-title {
+                flex: 1;
+                text-align: center;
+            }
+
+            &-right {
+                flex: 1;
+                text-align: right;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+
+                .bi {
+                    font-size: 40px;
+                    line-height: 1 !important;
+                }
+            }
+        }
+    }
+}
+
+.mobile-nav {
+    &-wrapper {
+        position: absolute;
+        background-color: #222;
+        color: #ffffff;
+        width: 50vw;
+        top: 60px;
+        bottom: 0;
+        left: 0;
+        display: none;
+        padding-top: 2rem;
+    }
+
+    &-open {
+        display: block;
+    }
+
+    &-navs {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+
+        ul.submenu {
+            list-style: none;
+            padding: 0 0 0 1rem;
+            display: none;
+
+            a {
+                font-size: 0.85rem;
+            }
+        }
+
+        li {
+            list-style: none;
+
+            a {
+                display: block;
+                padding: 12px 15px;
+                line-height: 1.2;
+                color: #fefefe;
+
+                &:hover {
+                    text-decoration: none;
+
+                    ul.submenu {
+                        display: block;
+                    }
+                }
+            }
+        }
     }
 }
 
 @media (max-width: 768px) {
     .header-wrapper {
         display: none;
+    }
+
+    .header-mobile {
+        display: flex;
     }
 }

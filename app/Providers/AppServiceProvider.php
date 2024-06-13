@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Support\BulkSMS;
+use App\Support\Paypal;
 use App\Validators\AccountValidator;
 use App\Validators\PhoneValidaotr;
 use App\Validators\PasswordValidator;
@@ -32,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerValidators();
         Paginator::useBootstrap();
 
-        $categories = get_categories(['taxonomy' => 'product', 'excludes' => [15, 221]]);
+        $categories = get_categories(['taxonomy' => 'product', 'parent' => 0, 'excludes' => [15, 221]]);
         View::share([
             'settings' => settings(),
             'categories' => $categories
@@ -59,6 +61,15 @@ class AppServiceProvider extends ServiceProvider
         } elseif ($local = settings('language')) {
             App::setLocale($local);
         }
+
+        if (env('PAYPAL_ENV') == 'sandbox') {
+            Paypal::init(env('PAYPAL_SANDBOX_CLIENT_ID'), env('PAYPAL_SANDBOX_CLIENT_SECRET'), true);
+        } else {
+            Paypal::init(env('PAYPAL_LIVE_CLIENT_ID'), env('PAYPAL_LIVE_CLIENT_SECRET'), false);
+        }
+
+        //注册短信服务
+        BulkSMS::setCredentials(env('BULKSMS_USERNAME'), env('BULKSMS_PASSWORD'));
     }
 
     /**

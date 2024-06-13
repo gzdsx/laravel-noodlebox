@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import VueGoogleAutocomplete from "./VueGoogleAutocomplete";
+import VueGoogleAutocomplete from "../../lib/VueGoogleAutocomplete.vue";
 
 export default {
     name: "DialogCreateCustomer",

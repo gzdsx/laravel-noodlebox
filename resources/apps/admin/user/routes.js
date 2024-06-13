@@ -5,6 +5,6 @@ import UserGroup from "./UserGroup";
 module.exports = [
     {path: '/user/list', component: UserList, meta: {title: '用户管理', group: 'user'}},
     {path: '/user/new', component: UserEdit, meta: {title: '新用户', group: 'user'}},
-    {path: '/user/edit/:uid?', component: UserEdit, meta: {title: '编辑用户', group: 'user'}},
+    {path: '/user/edit/:id?', component: UserEdit, name: 'user-edit', meta: {title: '编辑用户', group: 'user'}},
     {path: '/user/group', component: UserGroup, meta: {title: '分组管理', group: 'user'}},
 ]

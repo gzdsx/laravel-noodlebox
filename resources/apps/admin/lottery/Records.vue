@@ -7,12 +7,17 @@
         <section class="page-section">
             <el-table :data="dataList" v-loading="loading" @selection-change="onSelectionChange">
                 <el-table-column width="40" type="selection"/>
-                <el-table-column prop="user.nickname" label="中奖客户" width="200"/>
-                <el-table-column label="奖品">
+                <el-table-column label="图片" width="100">
                     <template slot-scope="scope">
-                        <strong>{{ scope.row.title }}</strong>
+                        <featured-image :src="scope.row.image" width="60px" height="60px"/>
                     </template>
                 </el-table-column>
+                <el-table-column label="奖品">
+                    <template slot-scope="scope">
+                        <strong>{{ scope.row.name }}</strong>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="user.nickname" label="中奖客户" width="200"/>
                 <el-table-column prop="created_at" label="时间" width="170" align="right"/>
             </el-table>
             <div class="tablenav tablenav-bottom">

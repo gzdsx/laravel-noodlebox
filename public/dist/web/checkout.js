@@ -212,6 +212,395 @@ var version = "8.0.5";
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=script&lang=js":
+/*!**********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=script&lang=js ***!
+  \**********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+var ADDRESS_COMPONENTS = {
+  subpremise: 'short_name',
+  street_number: 'short_name',
+  route: 'long_name',
+  locality: 'long_name',
+  administrative_area_level_1: 'long_name',
+  administrative_area_level_2: 'long_name',
+  country: 'long_name',
+  postal_code: 'short_name',
+  postal_code_prefix: 'long_name',
+  postal_town: 'long_name',
+  neighborhood: 'long_name'
+};
+var CITIES_TYPE = ['locality', "neighborhood", 'administrative_area_level_3'];
+var REGIONS_TYPE = ['locality', 'sublocality', 'postal_code', 'country', 'administrative_area_level_1', 'administrative_area_level_2'];
+
+/*
+  By default, we're only including basic place data because requesting these
+  fields place data is not additionally charged by Google. Please refer to:
+
+  https://developers.google.com/maps/billing/understanding-cost-of-use#basic-data
+*/
+var BASIC_DATA_FIELDS = ['address_components', 'adr_address', 'alt_id', 'formatted_address', 'geometry', 'icon', 'id', 'name', 'business_status', 'photo', 'place_id', 'scope', 'type', 'url', 'utc_offset_minutes', 'vicinity'];
+var _default2 = exports["default"] = {
+  name: 'VueGoogleAutocomplete',
+  props: {
+    id: {
+      type: String,
+      required: true
+    },
+    value: String,
+    classname: String,
+    placeholder: {
+      type: String,
+      "default": 'Start typing'
+    },
+    disabled: {
+      type: Boolean,
+      "default": false
+    },
+    types: {
+      type: String,
+      "default": 'address'
+    },
+    fields: {
+      type: Array,
+      "default": function _default() {
+        return BASIC_DATA_FIELDS;
+      }
+    },
+    country: {
+      type: [String, Array],
+      "default": null
+    },
+    enableGeolocation: {
+      type: Boolean,
+      "default": false
+    },
+    geolocationOptions: {
+      type: Object,
+      "default": null
+    }
+  },
+  data: function data() {
+    return {
+      /**
+       * The Autocomplete object.
+       *
+       * @type {Autocomplete}
+       * @link https://developers.google.com/maps/documentation/javascript/reference#Autocomplete
+       */
+      autocomplete: null,
+      /**
+       * Autocomplete input text
+       * @type {String}
+       */
+      autocompleteText: '',
+      geolocation: {
+        /**
+         * Google Geocoder Objet
+         * @type {Geocoder}
+         * @link https://developers.google.com/maps/documentation/javascript/reference#Geocoder
+         */
+        geocoder: null,
+        /**
+         * Filled after geolocate result
+         * @type {Coordinates}
+         * @link https://developer.mozilla.org/en-US/docs/Web/API/Coordinates
+         */
+        loc: null,
+        /**
+         * Filled after geolocate result
+         * @type {Position}
+         * @link https://developer.mozilla.org/en-US/docs/Web/API/Position
+         */
+        position: null
+      }
+    };
+  },
+  watch: {
+    autocompleteText: function autocompleteText(newVal, oldVal) {
+      this.$emit('inputChange', {
+        newVal: newVal,
+        oldVal: oldVal
+      }, this.id);
+    },
+    country: function country(newVal, oldVal) {
+      this.autocomplete.setComponentRestrictions({
+        country: this.country === null ? [] : this.country
+      });
+    },
+    value: function value(val) {
+      this.autocompleteText = val;
+    }
+  },
+  mounted: function mounted() {
+    var options = {};
+    if (this.types) {
+      options.types = [this.types];
+    }
+    if (this.country) {
+      options.componentRestrictions = {
+        country: this.country
+      };
+    }
+    this.autocomplete = new google.maps.places.Autocomplete(document.getElementById(this.id), options);
+    this.autocomplete.setFields(this.fields);
+    this.autocomplete.addListener('place_changed', this.onPlaceChanged);
+    this.autocompleteText = this.value;
+  },
+  methods: {
+    /**
+     * When a place changed
+     */
+    onPlaceChanged: function onPlaceChanged() {
+      var place = this.autocomplete.getPlace();
+      if (!place.geometry) {
+        // User entered the name of a Place that was not suggested and
+        // pressed the Enter key, or the Place Details request failed.
+        this.$emit('no-results-found', place, this.id);
+        return;
+      }
+      if (place.address_components !== undefined) {
+        // return returnData object and PlaceResult object
+        var formattedPlace = this.formatResult(place);
+        this.$emit('placechanged', formattedPlace, place, this.id);
+
+        // update autocompleteText then emit change event
+        this.autocompleteText = document.getElementById(this.id).value;
+        //this.autocompleteText = formattedPlace.route;
+        //this.onChange()
+      }
+    },
+    /**
+     * When the input gets focus
+     */
+    onFocus: function onFocus() {
+      this.biasAutocompleteLocation();
+      this.$emit('focus');
+    },
+    /**
+     * When the input loses focus
+     */
+    onBlur: function onBlur() {
+      this.$emit('blur');
+    },
+    /**
+     * When the input got changed
+     */
+    onChange: function onChange() {
+      this.$emit('change', this.autocompleteText);
+    },
+    /**
+     * When a key gets pressed
+     * @param  {Event} event A keypress event
+     */
+    onKeyPress: function onKeyPress(event) {
+      this.$emit('keypress', event);
+    },
+    /**
+     * When a keyup occurs
+     * @param  {Event} event A keyup event
+     */
+    onKeyUp: function onKeyUp(event) {
+      this.$emit('keyup', event);
+    },
+    /**
+     * Clear the input
+     */
+    clear: function clear() {
+      this.autocompleteText = '';
+    },
+    /**
+     * Focus the input
+     */
+    focus: function focus() {
+      this.$refs.autocomplete.focus();
+    },
+    /**
+     * Blur the input
+     */
+    blur: function blur() {
+      this.$refs.autocomplete.blur();
+    },
+    /**
+     * Update the value of the input
+     * @param  {String} value
+     */
+    update: function update(value) {
+      this.autocompleteText = value;
+    },
+    /**
+     * Update the coordinates of the input
+     * @param  {Coordinates} value
+     */
+    updateCoordinates: function updateCoordinates(value) {
+      var _this = this;
+      if (!value && !(value.lat || value.lng)) return;
+      if (!this.geolocation.geocoder) this.geolocation.geocoder = new google.maps.Geocoder();
+      this.geolocation.geocoder.geocode({
+        'location': value
+      }, function (results, status) {
+        if (status === 'OK') {
+          results = _this.filterGeocodeResultTypes(results);
+          if (results[0]) {
+            _this.$emit('placechanged', _this.formatResult(results[0]), results[0], _this.id);
+            _this.update(results[0].formatted_address);
+          } else {
+            _this.$emit('error', 'no result for provided coordinates');
+          }
+        } else {
+          _this.$emit('error', 'error getting address from coords');
+        }
+      });
+    },
+    /**
+     * Update location based on navigator geolocation
+     */
+    geolocate: function geolocate() {
+      var _this2 = this;
+      this.updateGeolocation(function (geolocation, position) {
+        _this2.updateCoordinates(geolocation);
+      });
+    },
+    /**
+     * Update internal location from navigator geolocation
+     * @param  {Function} (geolocation, position)
+     */
+    updateGeolocation: function updateGeolocation() {
+      var _this3 = this;
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      if (navigator.geolocation) {
+        var options = {};
+        if (this.geolocationOptions) Object.assign(options, this.geolocationOptions);
+        navigator.geolocation.getCurrentPosition(function (position) {
+          var geolocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          _this3.geolocation.loc = geolocation;
+          _this3.geolocation.position = position;
+          if (callback) callback(geolocation, position);
+        }, function (err) {
+          _this3.$emit('error', 'Cannot get Coordinates from navigator', err);
+        }, options);
+      }
+    },
+    // Bias the autocomplete object to the user's geographical location,
+    // as supplied by the browser's 'navigator.geolocation' object.
+    biasAutocompleteLocation: function biasAutocompleteLocation() {
+      var _this4 = this;
+      if (this.enableGeolocation) {
+        this.updateGeolocation(function (geolocation, position) {
+          var circle = new google.maps.Circle({
+            center: geolocation,
+            radius: position.coords.accuracy
+          });
+          _this4.autocomplete.setBounds(circle.getBounds());
+        });
+      }
+    },
+    /**
+     * Format result from Geo google APIs
+     * @param place
+     * @returns {{formatted output}}
+     */
+    formatResult: function formatResult(place) {
+      var returnData = {};
+      for (var i = 0; i < place.address_components.length; i++) {
+        var addressType = place.address_components[i].types[0];
+        if (ADDRESS_COMPONENTS[addressType]) {
+          var val = place.address_components[i][ADDRESS_COMPONENTS[addressType]];
+          returnData[addressType] = val;
+        }
+      }
+      returnData['latitude'] = place.geometry.location.lat();
+      returnData['longitude'] = place.geometry.location.lng();
+      return returnData;
+    },
+    /**
+     * Extract configured types out of raw result as
+     * Geocode API does not allow to do it
+     * @param results
+     * @returns {GeocoderResult}
+     * @link https://developers.google.com/maps/documentation/javascript/reference#GeocoderResult
+     */
+    filterGeocodeResultTypes: function filterGeocodeResultTypes(results) {
+      if (!results || !this.types) return results;
+      var output = [];
+      var types = [this.types];
+      if (types.includes('(cities)')) types = types.concat(CITIES_TYPE);
+      if (types.includes('(regions)')) types = types.concat(REGIONS_TYPE);
+      var _iterator = _createForOfIteratorHelper(results),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var r = _step.value;
+          var _iterator2 = _createForOfIteratorHelper(r.types),
+            _step2;
+          try {
+            for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+              var t = _step2.value;
+              if (types.includes(t)) {
+                output.push(r);
+                break;
+              }
+            }
+          } catch (err) {
+            _iterator2.e(err);
+          } finally {
+            _iterator2.f();
+          }
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+      return output;
+    }
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckouItems.vue?vue&type=script&lang=js":
+/*!**********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckouItems.vue?vue&type=script&lang=js ***!
+  \**********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _default2 = exports["default"] = {
+  name: "CheckouItems",
+  props: {
+    items: {
+      type: Array,
+      required: true,
+      "default": function _default() {
+        return [];
+      }
+    }
+  }
+};
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=script&lang=js":
 /*!************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=script&lang=js ***!
@@ -221,6 +610,7 @@ var version = "8.0.5";
 "use strict";
 
 
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
@@ -228,18 +618,32 @@ exports["default"] = void 0;
 var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
 var _NoodleContainer = _interopRequireDefault(__webpack_require__(/*! ../components/NoodleContainer.vue */ "./resources/apps/web/components/NoodleContainer.vue"));
 var _PaypalButtons = _interopRequireDefault(__webpack_require__(/*! ./PaypalButtons.vue */ "./resources/apps/web/checkout/PaypalButtons.vue"));
+var _VueGoogleAutocomplete = _interopRequireDefault(__webpack_require__(/*! ../../lib/VueGoogleAutocomplete.vue */ "./resources/apps/lib/VueGoogleAutocomplete.vue"));
 var _CartService = _interopRequireDefault(__webpack_require__(/*! ../CartService */ "./resources/apps/web/CartService.js"));
+var _CheckouItems = _interopRequireDefault(__webpack_require__(/*! ./CheckouItems.vue */ "./resources/apps/web/checkout/CheckouItems.vue"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+var controller = new AbortController();
 var cart = new _CartService["default"]();
 var _default = exports["default"] = {
   name: "NoodleCheckout",
   components: {
+    CheckouItems: _CheckouItems["default"],
     PaypalButtons: _PaypalButtons["default"],
-    NoodleContainer: _NoodleContainer["default"]
+    NoodleContainer: _NoodleContainer["default"],
+    VueGoogleAutocomplete: _VueGoogleAutocomplete["default"]
   },
   data: function data() {
     return {
       cart_items: [],
+      address_list: [],
       payment_method_index: 0,
       shipping_method: 'delivery',
       shipping_zones: [],
@@ -247,7 +651,10 @@ var _default = exports["default"] = {
       shipping: {
         first_name: '',
         last_name: '',
-        phone: '',
+        phone: {
+          national_number: '353',
+          phone_number: ''
+        },
         email: '',
         address_line_1: '',
         address_line_2: '',
@@ -255,7 +662,7 @@ var _default = exports["default"] = {
         city: '',
         state: '',
         country: '',
-        postalcode: ''
+        postal_code: ''
       },
       buyer_note: '',
       payment_methods: [{
@@ -283,7 +690,32 @@ var _default = exports["default"] = {
         address: null,
         message: null
       },
-      loading: false
+      loading: false,
+      formatted_address: '',
+      phone: {
+        national_number: '353',
+        phone_number: '',
+        verified: false
+      },
+      original_phone: {
+        national_number: '353',
+        phone_number: '',
+        verified: false
+      },
+      showCodeInput: false,
+      verificationCode: '',
+      phoneVerified: false,
+      sendingCodeText: 'Get Code',
+      sendingCode: false,
+      points: 0,
+      pointsAccount: {
+        'points': 0,
+        'exchange_rate': 1,
+        'tips': ''
+      },
+      settings: {
+        enable_points_checkout: 'no'
+      }
     };
   },
   computed: {
@@ -305,63 +737,93 @@ var _default = exports["default"] = {
       return method.fee;
     },
     total: function total() {
-      return parseFloat(this.subtotal) + parseFloat(this.shippingFee) + parseFloat(this.paymentFee);
+      return (parseFloat(this.subtotal) + parseFloat(this.shippingFee) + parseFloat(this.paymentFee) - parseFloat(this.pointDiscount)).toFixed(2);
+    },
+    disabledSendCode: function disabledSendCode() {
+      return this.phone.phone_number.length < 5 || this.sendingCode;
+    },
+    pointDiscount: function pointDiscount() {
+      if (this.points > 0) {
+        return (Number(this.points) * Number(this.pointsAccount.exchange_rate)).toFixed(2);
+      }
+      return 0;
     }
   },
+  watch: {},
   methods: {
-    fetchZones: function fetchZones() {
+    fetchData: function fetchData() {
       var _this = this;
-      _HttpClient["default"].get('/shipping-zones').then(function (res) {
-        _this.shipping_zones = res.data.items;
-      })["catch"](function (reason) {})["finally"](function () {});
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var response, shipping;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return _HttpClient["default"].get('/users/addresses');
+            case 2:
+              response = _context.sent;
+              shipping = response.data.shipping;
+              _this.fillShipping(shipping);
+              _context.next = 7;
+              return _HttpClient["default"].get('/shipping-zones');
+            case 7:
+              response = _context.sent;
+              _this.shipping_zones = response.data.items;
+              _this.shipping_zones.map(function (s, i) {
+                if (s.title === shipping.city) {
+                  _this.shipping_zone_index = i;
+                }
+              });
+            case 10:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee);
+      }))();
     },
-    fetchAddress: function fetchAddress() {
-      var _this2 = this;
-      _HttpClient["default"].get('/users/addresses/0').then(function (res) {
-        var address = res.data;
-        _this2.shipping = {
-          first_name: address.first_name,
-          last_name: address.last_name,
-          phone: address.phone,
-          country: address.country,
-          state: address.state,
-          city: address.city,
-          county: address.county,
-          address_line_1: address.address_line_1,
-          address_line_2: address.address_line_2,
-          postalcode: address.postalcode
-        };
-      })["catch"](function (reason) {})["finally"](function () {});
-    },
-    submitOrder: function submitOrder() {
-      var _this3 = this;
+    validateOrder: function validateOrder() {
+      var check = true;
       var cart_items = this.cart_items,
         shipping_method = this.shipping_method,
         shipping = this.shipping,
         buyer_note = this.buyer_note;
       if (!shipping.first_name) {
-        this.errors.name = 'Please enter your name';
+        //this.errors.name = 'Please enter your name';
+        this.$showToast('Please enter your name');
         return false;
-      } else {
-        this.errors.name = null;
       }
       if (!shipping.phone) {
-        this.errors.phone = 'Please enter your phone number';
+        //this.errors.phone = 'Please enter your phone number';
+        this.$showToast('Please enter your phone number');
         return false;
-      } else {
-        this.errors.phone = null;
+      }
+      if (shipping_method === 'delivery') {
+        if (!shipping.address_line_1) {
+          //this.errors.address = 'Please enter your address';
+          this.$showToast('Please enter your address');
+          return false;
+        }
+      }
+      if (!this.phoneVerified) {
+        this.$showToast('Please verify your phone number');
+        return false;
+      }
+      return check;
+    },
+    createOrder: function createOrder() {
+      var _this2 = this;
+      var cart_items = this.cart_items,
+        shipping_method = this.shipping_method,
+        shipping = this.shipping,
+        buyer_note = this.buyer_note;
+      if (!this.validateOrder()) {
+        return false;
       }
       var shipping_zone_id = 0;
       if (shipping_method === 'delivery') {
         var zone = this.shipping_zones[this.shipping_zone_index];
         shipping_zone_id = zone.id;
-        shipping.county = zone.title;
-        if (!shipping.address_line_1) {
-          this.errors.address = 'Please enter your address';
-          return false;
-        } else {
-          this.errors.address = null;
-        }
+        this.shipping.city = zone.title;
       }
       var fee_lines = [];
       var payment_method = '',
@@ -370,7 +832,7 @@ var _default = exports["default"] = {
       if (method) {
         if (method.fee) {
           fee_lines.push({
-            name: 'Payment Fee',
+            name: 'Payment',
             total: 0.5,
             total_tax: 0
           });
@@ -386,11 +848,23 @@ var _default = exports["default"] = {
           title: item.title,
           price: item.price,
           image: item.image,
-          meta_data: item.options
+          meta_data: _objectSpread(_objectSpread({}, item.meta_data), {}, {
+            purchase_via: item.purchase_via
+          }),
+          subtotal: item.subtotal,
+          total: item.subtotal
         };
       });
-      this.loading = true;
-      _HttpClient["default"].post('/orders', {
+      var meta_data = [];
+      if (this.points > 0) {
+        meta_data.push({
+          key: 'cost_points',
+          value: this.points
+        });
+      }
+      this.loading = false;
+      shipping.phone = this.phone;
+      return _HttpClient["default"].post('/orders', {
         shipping_method: shipping_method,
         shipping_zone_id: shipping_zone_id,
         shipping: shipping,
@@ -399,22 +873,371 @@ var _default = exports["default"] = {
         payment_method_title: payment_method_title,
         fee_lines: fee_lines,
         discount_lines: discount_lines,
-        order_items: order_items,
-        billing: shipping
+        billing: shipping,
+        items: order_items,
+        meta_data: meta_data,
+        points: this.points
       }).then(function (res) {
-        window.location.assign(res.data.approval_url);
-      })["catch"](function (reason) {})["finally"](function () {
-        _this3.loading = false;
+        cart.clearCart();
+        window.location.assign(res.data.links[1].href);
+      })["catch"](function (reason) {
+        console.log(reason.message);
+      })["finally"](function () {
+        _this2.loading = false;
+      });
+    },
+    createPaypalOrder: function createPaypalOrder(data, actions) {
+      //console.log(actions);
+      if (!this.validateOrder()) {
+        return Promise.reject();
+      }
+      var total = this.total,
+        shipping = this.shipping,
+        cart_items = this.cart_items,
+        subtotal = this.subtotal,
+        shippingFee = this.shippingFee,
+        paymentFee = this.paymentFee;
+      var items = cart_items.map(function (item) {
+        return {
+          name: item.title,
+          unit_amount: {
+            currency_code: 'EUR',
+            value: item.price
+          },
+          quantity: item.quantity
+          //sku: item.id,
+          //image_url: item.image,
+        };
+      });
+
+      return _HttpClient["default"].post('/payment/paypal/create-order', {
+        orderData: {
+          intent: 'CAPTURE',
+          purchase_units: [{
+            amount: {
+              value: total.toString(),
+              currency_code: 'EUR',
+              breakdown: {
+                item_total: {
+                  currency_code: 'EUR',
+                  value: subtotal.toString()
+                },
+                shipping: {
+                  currency_code: 'EUR',
+                  value: shippingFee.toString()
+                },
+                handling: {
+                  currency_code: 'EUR',
+                  value: paymentFee.toString()
+                }
+              }
+            },
+            items: items
+          }],
+          payment_source: {
+            // card: {
+            //     number: '4111111111111111',
+            //     expiry: '01/2023',
+            //     cvv: '123',
+            //     name: 'John Doe',
+            //     billing_address: {
+            //         address_line_1: '123 Main St',
+            //         address_line_2: 'Apt 2',
+            //         admin_area_2: 'San Francisco',
+            //         admin_area_1: 'CA',
+            //         postal_code: '94105',
+            //         country_code: 'US'
+            //     }
+            // },
+            paypal: {
+              email_address: '',
+              name: {
+                given_name: shipping.first_name,
+                surname: shipping.last_name
+              },
+              address: {
+                address_line_1: shipping.address_line_1,
+                address_line_2: shipping.address_line_2,
+                admin_area_2: shipping.city,
+                admin_area_1: shipping.state,
+                postal_code: shipping.postalcode,
+                country_code: 'IR'
+              },
+              // phone: {
+              //     phone_type: 'MOBILE',
+              //     phone_number: {
+              //         national_number: ''
+              //     },
+              // },
+              experience_context: {
+                brand_name: 'Noodlebox',
+                landing_page_type: 'LOGIN',
+                user_action: 'PAY_NOW'
+                //return_url: 'https://example.com/return',
+                //cancel_url: 'https://example.com/cancel',
+              }
+            }
+          }
+        }
+      }).then(function (response) {
+        return response.data.id;
       });
     },
     metaValue: function metaValue(options) {
       return Object.values(options).join(',');
+    },
+    getShippingAddress: function getShippingAddress(addressData, placeResultData, id) {
+      var _this3 = this;
+      console.log(addressData);
+      console.log(placeResultData);
+      var subpremise = addressData.subpremise,
+        street_number = addressData.street_number,
+        route = addressData.route,
+        locality = addressData.locality,
+        country = addressData.country,
+        postal_code = addressData.postal_code,
+        postal_code_prefix = addressData.postal_code_prefix,
+        neighborhood = addressData.neighborhood,
+        administrative_area_level_1 = addressData.administrative_area_level_1,
+        administrative_area_level_2 = addressData.administrative_area_level_2;
+      var formatted_address = placeResultData.formatted_address,
+        address_components = placeResultData.address_components;
+      var check = false;
+      this.shipping_zones.map(function (s, i) {
+        if (formatted_address.indexOf(s.title) !== -1) {
+          check = true;
+          _this3.shipping_zone_index = i;
+          _this3.shipping.city = s.title;
+          _this3.$forceUpdate();
+        }
+      });
+      if (!check) {
+        this.$showToast("This address is not within the delivery range");
+        this.formatted_address = '';
+        return false;
+      }
+      if (country) {
+        this.shipping.country = country;
+      }
+      if (administrative_area_level_1) {
+        this.shipping.state = administrative_area_level_1;
+      }
+
+      // if (locality) {
+      //     this.shipping.city = locality;
+      // } else {
+      //     this.shipping.city = neighborhood;
+      // }
+
+      if (postal_code) {
+        this.shipping.postal_code = postal_code;
+      } else {
+        this.shipping.postal_code = postal_code_prefix;
+      }
+      var address = '',
+        sp = '';
+      if (subpremise) {
+        address += sp + subpremise;
+        sp = ' ';
+      }
+      if (street_number) {
+        address += sp + street_number;
+        sp = ' ';
+      }
+      if (route) {
+        address += sp + route;
+      }
+      if (neighborhood) {
+        address += ',' + neighborhood;
+      }
+      this.shipping.address_line_1 = address;
+      this.$forceUpdate();
+    },
+    addressChange: function addressChange(v) {
+      console.log('change');
+      this.shipping.address_line_1 = v;
+      // this.shipping.address_line_2 = '';
+      // this.shipping.county = '';
+      // this.shipping.city = '';
+      // this.shipping.state = '';
+      // this.shipping.postalcode = '';
+    },
+    fillShipping: function fillShipping(address) {
+      this.shipping = _objectSpread(_objectSpread({}, this.shipping), {}, {
+        first_name: address.first_name,
+        last_name: address.last_name,
+        email: address.email,
+        country: address.country,
+        state: address.state,
+        city: address.city,
+        county: address.county,
+        address_line_1: address.address_line_1,
+        address_line_2: address.address_line_2,
+        postal_code: address.postal_code
+      });
+      if (address.phone) {
+        var _address$phone = address.phone,
+          national_number = _address$phone.national_number,
+          phone_number = _address$phone.phone_number,
+          verified = _address$phone.verified;
+        if (national_number) {
+          this.phone.national_number = national_number;
+        }
+        if (phone_number) {
+          this.phone.phone_number = phone_number;
+        }
+        this.phone.verified = verified ? verified : false;
+        this.original_phone = {
+          national_number: national_number,
+          phone_number: phone_number,
+          verified: verified
+        };
+        this.phoneVerified = verified ? verified : false;
+      }
+      var addressline = address.address_line_1;
+      if (address.city) {
+        addressline += ',' + address.city;
+      }
+      if (address.state) {
+        addressline += ',' + address.state;
+      }
+      if (address.country) {
+        addressline += ',' + address.country;
+      }
+      this.formatted_address = addressline;
+
+      //console.log(address);
+    },
+    onPhoneNumberChange: function onPhoneNumberChange() {
+      var _this4 = this;
+      var _this$phone = this.phone,
+        national_number = _this$phone.national_number,
+        phone_number = _this$phone.phone_number,
+        verified = _this$phone.verified;
+      if (phone_number === this.original_phone.phone_number && national_number === this.original_phone.national_number) {
+        this.phoneVerified = this.original_phone.verified;
+        return;
+      }
+      if (controller) {
+        controller.abort();
+        controller = new AbortController();
+      }
+      _HttpClient["default"].post('phones/check', {
+        phone_number: phone_number,
+        national_number: national_number
+      }, {
+        signal: controller.signal
+      }).then(function (response) {
+        _this4.phoneVerified = response.data;
+      })["catch"](function (e) {
+        console.log(e);
+      });
+    },
+    getPhoneCode: function getPhoneCode() {
+      var _this5 = this;
+      var _this$phone2 = this.phone,
+        phone_number = _this$phone2.phone_number,
+        national_number = _this$phone2.national_number;
+      if (this.sendingCode) {
+        return false;
+      } else {
+        this.sendingCode = true;
+      }
+      var that = this;
+      _HttpClient["default"].post('/sms/send', {
+        phone_number: phone_number,
+        national_number: national_number
+      }).then(function (response) {
+        _this5.$showToast('SMS have sned!');
+        var timer = 60;
+        var interval = setInterval(function () {
+          timer--;
+          _this5.sendingCode = timer > 0;
+          if (timer === 0) {
+            clearInterval(interval);
+          }
+          that.sendingCodeText = timer > 0 ? 'Retrive after ' + timer + 's' : 'Get Code';
+        }, 1000);
+      })["catch"](function (e) {
+        console.log(e);
+        _this5.$showToast(e.message);
+      });
+    },
+    verifyPhoneNumber: function verifyPhoneNumber() {
+      var _this6 = this;
+      var _this$phone3 = this.phone,
+        phone_number = _this$phone3.phone_number,
+        national_number = _this$phone3.national_number;
+      _HttpClient["default"].post('/phones/verify', {
+        phone_number: phone_number,
+        national_number: national_number,
+        vercode: this.verificationCode
+      }).then(function (response) {
+        _this6.$showToast('Phone number verified!');
+        _this6.phoneVerified = true;
+        _this6.showCodeInput = false;
+      })["catch"](function (e) {
+        console.log(e);
+        _this6.$showToast(e.message);
+      });
+    },
+    fetchPointsAccount: function fetchPointsAccount() {
+      var _this7 = this;
+      _HttpClient["default"].get('/my/points').then(function (response) {
+        _this7.pointsAccount = response.data;
+      });
+    },
+    onInputPoints: function onInputPoints(e) {
+      this.points = this.points.replace(/[^0-9]/g, '');
+      if (this.points > this.pointsAccount.points) {
+        this.points = this.pointsAccount.points;
+      }
+    },
+    fetchCheckoutSettings: function fetchCheckoutSettings() {
+      var _this8 = this;
+      _HttpClient["default"].get('/checkout/settings').then(function (response) {
+        _this8.settings = _objectSpread(_objectSpread({}, _this8.settings), response.data);
+      });
+    },
+    fetchCartItems: function fetchCartItems() {
+      var _this9 = this;
+      this.loading = true;
+      _HttpClient["default"].get('/carts').then(function (res) {
+        res.data.items.forEach(function (item) {
+          var meta_data = item.meta_data;
+          if (meta_data) {
+            if (meta_data.options) {
+              item.options = meta_data.options;
+            }
+            if (meta_data.additional_options) {
+              item.additional_options = meta_data.additional_options;
+            }
+          }
+          Object.defineProperty(item, 'subtotal', {
+            get: function get() {
+              return (Number(this.price) * Number(this.quantity)).toFixed(2);
+            }
+          });
+          Object.defineProperty(item, 'pointTotal', {
+            get: function get() {
+              if (this.product) {
+                return (Number(this.product.point_price) * Number(this.quantity)).toFixed(2);
+              }
+              return 0;
+            }
+          });
+        });
+        _this9.cart_items = res.data.items;
+      })["finally"](function () {
+        _this9.loading = false;
+      });
     }
   },
   mounted: function mounted() {
-    this.cart_items = cart.getCartItems();
-    this.fetchZones();
-    this.fetchAddress();
+    this.fetchCartItems();
+    this.fetchData();
+    this.fetchPointsAccount();
+    this.fetchCheckoutSettings();
   }
 };
 
@@ -435,11 +1258,6 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 var _paypalJs = __webpack_require__(/*! @paypal/paypal-js */ "./node_modules/@paypal/paypal-js/dist/esm/paypal-js.js");
-var uuid = _interopRequireWildcard(__webpack_require__(/*! uuid */ "./node_modules/uuid/dist/commonjs-browser/index.js"));
-var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -447,58 +1265,22 @@ var paypal;
 var _default2 = exports["default"] = {
   name: "PaypalButtons",
   props: {
-    order: {
-      type: Object,
+    createOrder: {
+      type: Function,
       "default": function _default() {
-        return {
-          id: '',
-          total: 100,
-          currency: 'EUR',
-          payment_method: 'paypal',
-          payment_method_title: 'PayPal',
-          transaction_id: '',
-          status: 'pending',
-          shipping_lines: [],
-          billing: {
-            first_name: '',
-            last_name: '',
-            company: '',
-            address_1: '',
-            address_2: '',
-            city: '',
-            state: '',
-            postcode: '',
-            country: '',
-            email: '',
-            phone: ''
-          },
-          shipping: {
-            first_name: 'David',
-            last_name: 'Song',
-            company: '',
-            address_1: 'zhongyangdajie',
-            address_2: '',
-            city: 'Guiyang',
-            state: 'Guizhou',
-            postcode: '558300',
-            country: 'China',
-            email: '307718818@qq.com',
-            phone: '18685849696'
-          },
-          line_items: [],
-          meta_data: []
-        };
+        return function () {};
       }
     },
-    card: {
-      type: Object,
+    onApprove: {
+      type: Function,
       "default": function _default() {
-        return {
-          id: uuid.v4(),
-          name: 'card',
-          number: '5298680048963093',
-          expiry: '2024-07'
-        };
+        return function (data, actions) {};
+      }
+    },
+    onCancel: {
+      type: Function,
+      "default": function _default() {
+        return function () {};
       }
     }
   },
@@ -513,40 +1295,92 @@ var _default2 = exports["default"] = {
     }).then(function (paypalObj) {
       paypal = paypalObj;
       _this.$nextTick(function () {
-        var order = _this.order,
+        var orderData = _this.orderData,
           card = _this.card;
-        var shipping = order.shipping;
         paypal.Buttons({
-          createOrder: function () {
-            var _createOrder = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(data, actions) {
-              var response;
+          onInit: function onInit(data, actions) {},
+          onClick: function () {
+            var _onClick = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(data, actions) {
               return _regeneratorRuntime().wrap(function _callee$(_context) {
                 while (1) switch (_context.prev = _context.next) {
                   case 0:
-                    _context.next = 2;
-                    return _HttpClient["default"].post('/payment/paypal/create-order', {
-                      order: order,
-                      card: card
-                    });
-                  case 2:
-                    response = _context.sent;
-                    if (!response.data.id) {
-                      _context.next = 7;
-                      break;
-                    }
-                    return _context.abrupt("return", response.data.id);
-                  case 7:
-                    throw new Error(response.message);
-                  case 8:
                   case "end":
                     return _context.stop();
                 }
               }, _callee);
             }));
-            function createOrder(_x, _x2) {
+            function onClick(_x, _x2) {
+              return _onClick.apply(this, arguments);
+            }
+            return onClick;
+          }(),
+          createOrder: function () {
+            var _createOrder = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(data, actions) {
+              return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+                while (1) switch (_context2.prev = _context2.next) {
+                  case 0:
+                    return _context2.abrupt("return", _this.createOrder(data, actions));
+                  case 1:
+                  case "end":
+                    return _context2.stop();
+                }
+              }, _callee2);
+            }));
+            function createOrder(_x3, _x4) {
               return _createOrder.apply(this, arguments);
             }
             return createOrder;
+          }(),
+          onApprove: function () {
+            var _onApprove = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(data, actions) {
+              return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+                while (1) switch (_context3.prev = _context3.next) {
+                  case 0:
+                    return _context3.abrupt("return", _this.onApprove(data, actions));
+                  case 1:
+                  case "end":
+                    return _context3.stop();
+                }
+              }, _callee3);
+            }));
+            function onApprove(_x5, _x6) {
+              return _onApprove.apply(this, arguments);
+            }
+            return onApprove;
+          }(),
+          onCancel: function () {
+            var _onCancel = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(data, actions) {
+              return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+                while (1) switch (_context4.prev = _context4.next) {
+                  case 0:
+                    return _context4.abrupt("return", _this.onCancel(data, actions));
+                  case 1:
+                  case "end":
+                    return _context4.stop();
+                }
+              }, _callee4);
+            }));
+            function onCancel(_x7, _x8) {
+              return _onCancel.apply(this, arguments);
+            }
+            return onCancel;
+          }(),
+          onError: function () {
+            var _onError = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(err) {
+              return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+                while (1) switch (_context5.prev = _context5.next) {
+                  case 0:
+                    console.log(err);
+                  case 1:
+                  case "end":
+                    return _context5.stop();
+                }
+              }, _callee5);
+            }));
+            function onError(_x9) {
+              return _onError.apply(this, arguments);
+            }
+            return onError;
           }()
         }).render("#paypal-buttons-id")["catch"](function (error) {
           console.error("failed to render the PayPal Buttons", error);
@@ -555,7 +1389,6 @@ var _default2 = exports["default"] = {
     })["catch"](function (error) {
       console.error("failed to load the PayPal JS SDK script", error);
     });
-    console.log(uuid.v4());
   }
 };
 
@@ -586,6 +1419,106 @@ var _default = exports["default"] = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=template&id=1496a5d0":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=template&id=1496a5d0 ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("input", _vm._b({
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.autocompleteText,
+      expression: "autocompleteText"
+    }],
+    ref: "autocomplete",
+    "class": _vm.classname,
+    attrs: {
+      type: "text",
+      id: _vm.id,
+      placeholder: _vm.placeholder,
+      disabled: _vm.disabled
+    },
+    domProps: {
+      value: _vm.autocompleteText
+    },
+    on: {
+      focus: _vm.onFocus,
+      blur: _vm.onBlur,
+      change: _vm.onChange,
+      keypress: _vm.onKeyPress,
+      keyup: _vm.onKeyUp,
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.autocompleteText = $event.target.value;
+      }
+    }
+  }, "input", _vm.$attrs, false));
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckouItems.vue?vue&type=template&id=0dabf81b&scoped=true":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckouItems.vue?vue&type=template&id=0dabf81b&scoped=true ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "order-items"
+  }, [_vm._m(0), _vm._v(" "), _vm._l(_vm.items, function (item, index) {
+    return _c("div", {
+      key: index,
+      staticClass: "order-item"
+    }, [_c("div", {
+      staticClass: "order-item__product"
+    }, [_c("div", {
+      staticClass: "title"
+    }, [_vm._v(_vm._s(item.title) + " x " + _vm._s(item.quantity))]), _vm._v(" "), item.meta_data.options ? _c("div", {
+      staticClass: "additional"
+    }, [_vm._v("\n                " + _vm._s(Object.values(item.meta_data.options).join(", ")) + "\n            ")]) : _vm._e()]), _vm._v(" "), _c("div", {
+      staticClass: "order-item__subtotal"
+    }, [_vm._v("€" + _vm._s(item.subtotal))])]);
+  })], 2);
+};
+var staticRenderFns = exports.staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "order-item"
+  }, [_c("div", {
+    staticClass: "order-item__product order-item__header"
+  }, [_vm._v("Product")]), _vm._v(" "), _c("div", {
+    staticClass: "order-item__subtotal order-item__header"
+  }, [_vm._v("Subtotal")])]);
+}];
+render._withStripped = true;
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=template&id=d10176c4&scoped=true":
 /*!***********************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=template&id=d10176c4&scoped=true ***!
@@ -606,18 +1539,80 @@ var render = exports.render = function render() {
     attrs: {
       loading: _vm.loading
     }
-  }, [_c("div", {
+  }, [_vm.cart_items.length === 0 ? _c("div", {
+    staticClass: "container"
+  }, [_c("h3", {
+    staticClass: "text-center pt-5 pb-5"
+  }, [_vm._v("The cart is empty!")])]) : _c("div", {
     staticClass: "container"
   }, [_c("div", {
     staticClass: "checkout-body"
   }, [_c("div", {
     staticClass: "checkout-col"
   }, [_c("h3", {
-    staticClass: "font-weight-bold"
-  }, [_vm._v("Billing & Shipping")]), _vm._v(" "), _c("div", {
-    staticClass: "form-group"
+    staticClass: "font-weight-bold mb-4"
+  }, [_vm._v("Billing & Shipping")]), _vm._v(" "), _c("h5", {
+    staticClass: "font-weight-bold mb-3"
+  }, [_vm._v("Shipping Method")]), _vm._v(" "), _c("div", {
+    staticClass: "form-group row align-items-center"
   }, [_c("div", {
-    staticClass: "row"
+    staticClass: "col-8 d-flex column-gap-1 align-items-center"
+  }, [_c("label", {
+    staticClass: "label-radio"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.shipping_method,
+      expression: "shipping_method"
+    }],
+    staticClass: "radio",
+    attrs: {
+      type: "radio",
+      value: "delivery"
+    },
+    domProps: {
+      checked: _vm._q(_vm.shipping_method, "delivery")
+    },
+    on: {
+      change: function change($event) {
+        _vm.shipping_method = "delivery";
+      }
+    }
+  }), _vm._v(" "), _c("span", {
+    staticClass: "radio-box"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "text-safety-orange"
+  }, [_vm._v("Delivery")])]), _vm._v(" "), _c("label", {
+    staticClass: "label-radio"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.shipping_method,
+      expression: "shipping_method"
+    }],
+    staticClass: "radio",
+    attrs: {
+      type: "radio",
+      value: "collection"
+    },
+    domProps: {
+      checked: _vm._q(_vm.shipping_method, "collection")
+    },
+    on: {
+      change: function change($event) {
+        _vm.shipping_method = "collection";
+      }
+    }
+  }), _vm._v(" "), _c("span", {
+    staticClass: "radio-box"
+  }), _vm._v(" "), _c("span", {
+    staticClass: "text-safety-orange"
+  }, [_vm._v("Collection")])])])]), _vm._v(" "), _c("h5", {
+    staticClass: "font-weight-bold"
+  }, [_vm._v("Contact Details")]), _vm._v(" "), _c("div", {
+    staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col-md-6"
   }, [_c("div", {
@@ -634,6 +1629,9 @@ var render = exports.render = function render() {
       expression: "shipping.first_name"
     }],
     staticClass: "form-control",
+    "class": {
+      "is-invalid": _vm.errors.name
+    },
     attrs: {
       type: "text",
       placeholder: "Your name"
@@ -661,28 +1659,125 @@ var render = exports.render = function render() {
     staticClass: "form-group__label"
   }, [_vm._v("Phone number"), _c("i", [_vm._v("*")])]), _vm._v(" "), _c("div", {
     staticClass: "form-group__input"
-  }, [_c("input", {
+  }, [_c("div", {
+    staticClass: "input-group"
+  }, [_c("div", {
+    staticClass: "input-group-prepend"
+  }, [_c("select", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.shipping.phone,
-      expression: "shipping.phone"
+      value: _vm.phone.national_number,
+      expression: "phone.national_number"
     }],
     staticClass: "form-control",
+    staticStyle: {
+      "border-right": "0"
+    },
+    on: {
+      change: [function ($event) {
+        var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
+          return o.selected;
+        }).map(function (o) {
+          var val = "_value" in o ? o._value : o.value;
+          return val;
+        });
+        _vm.$set(_vm.phone, "national_number", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, _vm.onPhoneNumberChange]
+    }
+  }, [_c("option", {
+    attrs: {
+      value: "353"
+    }
+  }, [_vm._v("+353")]), _vm._v(" "), _c("option", {
+    attrs: {
+      value: "44"
+    }
+  }, [_vm._v("+44")])])]), _vm._v(" "), _c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.phone.phone_number,
+      expression: "phone.phone_number"
+    }],
+    staticClass: "form-control",
+    "class": {
+      "is-invalid": _vm.errors.phone
+    },
     attrs: {
       type: "text",
       placeholder: "Phone number"
     },
     domProps: {
-      value: _vm.shipping.phone
+      value: _vm.phone.phone_number
+    },
+    on: {
+      input: [function ($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.phone, "phone_number", $event.target.value);
+      }, _vm.onPhoneNumberChange]
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "input-group-append"
+  }, [_vm.phoneVerified ? _c("button", {
+    staticClass: "btn btn-success",
+    attrs: {
+      disabled: ""
+    }
+  }, [_vm._v("Verified\n                                    ")]) : _c("button", {
+    staticClass: "btn btn-danger",
+    on: {
+      click: function click($event) {
+        _vm.showCodeInput = true;
+      }
+    }
+  }, [_vm._v("Verify\n                                    ")])])]), _vm._v(" "), _vm.showCodeInput ? _c("div", {
+    staticClass: "d-flex flex-column mt-2"
+  }, [_c("div", {
+    staticClass: "input-group"
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.verificationCode,
+      expression: "verificationCode"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      maxlength: "6",
+      placeholder: "please enter code"
+    },
+    domProps: {
+      value: _vm.verificationCode
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.shipping, "phone", $event.target.value);
+        _vm.verificationCode = $event.target.value;
       }
     }
-  })]), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("button", {
+    staticClass: "btn btn-secondary",
+    attrs: {
+      disabled: _vm.disabledSendCode
+    },
+    on: {
+      click: _vm.getPhoneCode
+    }
+  }, [_vm._v("\n                                            " + _vm._s(_vm.sendingCodeText) + "\n                                        ")])])]), _vm._v(" "), _c("div", {
+    staticClass: "mt-2"
+  }, [_c("button", {
+    staticClass: "btn btn-primary",
+    attrs: {
+      type: "button",
+      disabled: _vm.verificationCode.length !== 6
+    },
+    on: {
+      click: _vm.verifyPhoneNumber
+    }
+  }, [_vm._v("Submit\n                                    ")])])]) : _vm._e()]), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -690,67 +1785,33 @@ var render = exports.render = function render() {
       expression: "errors.phone"
     }],
     staticClass: "invalid-feedback"
-  }, [_vm._v("Please enter your phone number")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "checkout-section"
-  }, [_c("h5", {
-    staticClass: "font-weight-bold flex-grow-1"
-  }, [_vm._v("Shipping options")]), _vm._v(" "), _c("div", {
-    staticClass: "d-flex column-gap-1 align-items-center"
-  }, [_c("label", {
-    staticClass: "label-radio"
-  }, [_c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.shipping_method,
-      expression: "shipping_method"
-    }],
-    staticClass: "radio",
+  }, [_vm._v(_vm._s(_vm.errors.phone))])])]), _vm._v(" "), _vm.shipping_method === "delivery" ? _c("div", {
+    staticClass: "mt-4"
+  }, [_c("div", {
+    staticClass: "form-group"
+  }, [_c("div", {
+    staticClass: "form-group__label"
+  }, [_vm._v("Address"), _c("i", [_vm._v("*")])]), _vm._v(" "), _c("div", {
+    staticClass: "form-group__input"
+  }, [_c("vue-google-autocomplete", {
     attrs: {
-      type: "radio",
-      value: "delivery"
-    },
-    domProps: {
-      checked: _vm._q(_vm.shipping_method, "delivery")
+      id: "address",
+      classname: "form-control",
+      placeholder: "Please enter 2 or more characters",
+      country: ["irl"],
+      value: _vm.formatted_address
     },
     on: {
-      change: function change($event) {
-        _vm.shipping_method = "delivery";
-      }
+      placechanged: _vm.getShippingAddress,
+      change: _vm.addressChange
     }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "radio-box"
-  }), _vm._v(" "), _c("span", [_vm._v("Delivery")])]), _vm._v(" "), _c("label", {
-    staticClass: "label-radio"
-  }, [_c("input", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.shipping_method,
-      expression: "shipping_method"
-    }],
-    staticClass: "radio",
-    attrs: {
-      type: "radio",
-      value: "collection"
-    },
-    domProps: {
-      checked: _vm._q(_vm.shipping_method, "collection")
-    },
-    on: {
-      change: function change($event) {
-        _vm.shipping_method = "collection";
-      }
-    }
-  }), _vm._v(" "), _c("span", {
-    staticClass: "radio-box"
-  }), _vm._v(" "), _c("span", [_vm._v("Collection")])])])]), _vm._v(" "), _vm.shipping_method === "delivery" ? _c("div", [_c("div", {
+  })], 1)]), _vm._v(" "), _c("div", {
     staticClass: "form-group row"
   }, [_c("div", {
     staticClass: "col"
   }, [_c("div", {
     staticClass: "form-group__label"
-  }, [_vm._v("Town / Area")]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Town/Area")]), _vm._v(" "), _c("div", {
     staticClass: "form-group__input"
   }, [_c("select", {
     directives: [{
@@ -782,51 +1843,32 @@ var render = exports.render = function render() {
     staticClass: "col"
   }, [_c("div", {
     staticClass: "form-group__label"
-  }, [_vm._v("Country/Region")]), _vm._v(" "), _c("div", {
-    staticClass: "form-group__input"
-  }, [_c("h3", {
-    staticClass: "text-safety-orange"
-  }, [_vm._v("Ireland")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group"
-  }, [_c("div", {
-    staticClass: "form-group__label"
-  }, [_vm._v("Street address"), _c("i", [_vm._v("*")])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Eircode")]), _vm._v(" "), _c("div", {
     staticClass: "form-group__input"
   }, [_c("input", {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.shipping.address_line_1,
-      expression: "shipping.address_line_1"
+      value: _vm.shipping.postal_code,
+      expression: "shipping.postal_code"
     }],
     staticClass: "form-control",
     attrs: {
-      type: "text",
-      placeholder: "Please Enter .."
+      type: "text"
     },
     domProps: {
-      value: _vm.shipping.address_line_1
+      value: _vm.shipping.postal_code
     },
     on: {
       input: function input($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.shipping, "address_line_1", $event.target.value);
+        _vm.$set(_vm.shipping, "postal_code", $event.target.value);
       }
     }
-  })]), _vm._v(" "), _c("div", {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: _vm.errors.address,
-      expression: "errors.address"
-    }],
-    staticClass: "invalid-feedback"
-  }, [_vm._v("Please enter your street address")])]), _vm._v(" "), _c("div", {
-    staticClass: "form-group"
-  }, [_c("div", {
-    staticClass: "form-group"
-  }, [_c("div", {
-    staticClass: "form-group__label"
+  })])])])]) : _vm._e(), _vm._v(" "), _c("div", {
+    staticClass: "form-group mt-4"
+  }, [_c("h5", {
+    staticClass: "font-weight-bold"
   }, [_vm._v("Order notes")]), _vm._v(" "), _c("div", {
     staticClass: "form-group__input"
   }, [_c("textarea", {
@@ -851,32 +1893,57 @@ var render = exports.render = function render() {
         _vm.buyer_note = $event.target.value;
       }
     }
-  })])])])]) : _vm._e()]), _vm._v(" "), _c("div", {
+  })])])]), _vm._v(" "), _c("div", {
     staticClass: "checkout-col checkout-order"
   }, [_c("h3", {
     staticClass: "font-weight-bold"
-  }, [_vm._v("You order")]), _vm._v(" "), _c("div", {
-    staticClass: "order-items"
+  }, [_vm._v("You order")]), _vm._v(" "), _c("checkou-items", {
+    attrs: {
+      items: _vm.cart_items
+    }
+  }), _vm._v(" "), _vm.settings.enable_points_checkout === "yes" ? _c("div", {
+    staticClass: "form-group mt-4"
   }, [_c("div", {
-    staticClass: "order-item"
+    staticClass: "form-group__label"
+  }, [_vm._v("Use Points")]), _vm._v(" "), _c("div", {
+    staticClass: "form-group__input"
   }, [_c("div", {
-    staticClass: "order-item__product order-item__header"
-  }, [_vm._v("Product")]), _vm._v(" "), _c("div", {
-    staticClass: "order-item__subtotal order-item__header"
-  }, [_vm._v("Subtotal")])]), _vm._v(" "), _vm._l(_vm.cart_items, function (item, index) {
-    return _c("div", {
-      key: index,
-      staticClass: "order-item"
-    }, [_c("div", {
-      staticClass: "order-item__product"
-    }, [_c("div", {
-      staticClass: "title"
-    }, [_vm._v(_vm._s(item.title) + " x " + _vm._s(item.quantity))]), _vm._v(" "), _c("div", {
-      staticClass: "additional"
-    }, [_vm._v("\n                                " + _vm._s(_vm.metaValue(item.options)) + "\n                            ")])]), _vm._v(" "), _c("div", {
-      staticClass: "order-item__subtotal"
-    }, [_vm._v("€" + _vm._s(item.subtotal))])]);
-  })], 2), _vm._v(" "), _c("div", {
+    staticClass: "input-group",
+    staticStyle: {
+      width: "300px"
+    }
+  }, [_c("input", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.points,
+      expression: "points"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "number"
+    },
+    domProps: {
+      value: _vm.points
+    },
+    on: {
+      input: [function ($event) {
+        if ($event.target.composing) return;
+        _vm.points = $event.target.value;
+      }, _vm.onInputPoints]
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "input-group-append"
+  }, [_c("button", {
+    staticClass: "btn btn-danger",
+    on: {
+      click: function click($event) {
+        _vm.points = _vm.pointsAccount.points;
+      }
+    }
+  }, [_vm._v("Use all points\n                                ")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "text-turquoise mt-2"
+  }, [_vm._v(_vm._s(_vm.pointsAccount.tips))])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "order-totals"
   }, [_c("div", {
     staticClass: "order-total"
@@ -888,22 +1955,28 @@ var render = exports.render = function render() {
     staticClass: "order-total"
   }, [_c("div", {
     staticClass: "order-total__label"
-  }, [_vm._v("Shipping Fee")]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Shipping")]), _vm._v(" "), _c("div", {
     staticClass: "order-total__total"
-  }, [_vm._v("€" + _vm._s(_vm.shippingFee))])]) : _vm._e(), _vm._v(" "), _vm.paymentFee ? _c("div", {
+  }, [_vm._v("+€" + _vm._s(_vm.shippingFee))])]) : _vm._e(), _vm._v(" "), _vm.paymentFee ? _c("div", {
     staticClass: "order-total"
   }, [_c("div", {
     staticClass: "order-total__label"
-  }, [_vm._v("Payment Fee")]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Payment")]), _vm._v(" "), _c("div", {
     staticClass: "order-total__total"
-  }, [_vm._v("€" + _vm._s(_vm.paymentFee))])]) : _vm._e(), _vm._v(" "), _c("div", {
+  }, [_vm._v("+€" + _vm._s(_vm.paymentFee))])]) : _vm._e(), _vm._v(" "), _vm.points > 0 ? _c("div", {
+    staticClass: "order-total"
+  }, [_c("div", {
+    staticClass: "order-total__label"
+  }, [_vm._v("Points")]), _vm._v(" "), _c("div", {
+    staticClass: "order-total__total"
+  }, [_vm._v("-€" + _vm._s(_vm.pointDiscount))])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "order-total"
   }, [_c("div", {
     staticClass: "order-total__label"
   }, [_vm._v("Total")]), _vm._v(" "), _c("div", {
     staticClass: "order-total__total"
   }, [_vm._v("€" + _vm._s(_vm.total))])])]), _vm._v(" "), _c("div", {
-    staticClass: "pay-methods"
+    staticClass: "pay-methods mt-5"
   }, _vm._l(_vm.payment_methods, function (method, index) {
     return _c("div", {
       key: index,
@@ -932,24 +2005,29 @@ var render = exports.render = function render() {
       }
     }), _vm._v(" "), _c("span", {
       staticClass: "radio-box"
-    })]), _vm._v(" "), _c("div", {
-      staticClass: "pay-method__details"
+    }), _vm._v(" "), _c("div", {
+      staticClass: "pay-method__details flex-flow-1"
     }, [_c("div", [_vm._v(_vm._s(method.description))]), _vm._v(" "), _c("div", [_c("img", {
       attrs: {
         src: method.img,
         alt: ""
       }
-    })])])]);
+    })])])])]);
   }), 0), _vm._v(" "), _c("div", {
     staticClass: "form-group mt-5"
-  }, [_vm.payment_method_index === 0 ? _c("paypal-buttons") : _c("button", {
+  }, [_vm.payment_method_index === 0 ? _c("paypal-buttons", {
+    attrs: {
+      "create-order": _vm.createPaypalOrder,
+      "on-approve": _vm.createOrder
+    }
+  }) : _c("button", {
     staticClass: "btn btn-block btn-bull-cyan btn-lg text-white",
     on: {
-      click: _vm.submitOrder
+      click: _vm.createOrder
     }
   }, [_vm._v("Place Order\n                    ")])], 1), _vm._v(" "), _c("p", {
     staticClass: "text-center text-safety-orange"
-  }, [_vm._v("\n                    I’ve read and accept the "), _c("a", [_vm._v("terms & conditions")]), _vm._v(" and "), _c("a", [_vm._v("privacy conditions")])])])])])]);
+  }, [_vm._v("\n                    I’ve read and accept the "), _c("a", [_vm._v("terms & conditions")]), _vm._v(" and "), _c("a", [_vm._v("privacy conditions")])])], 1)])])]);
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -1025,7 +2103,7 @@ render._withStripped = true;
 /*!*******************************************!*\
   !*** ./resources/apps/web/CartService.js ***!
   \*******************************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
@@ -1034,7 +2112,11 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports["default"] = void 0;
+var _jsMd = __webpack_require__(/*! js-md5 */ "./node_modules/js-md5/src/md5.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -1043,22 +2125,51 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 var CartService = exports["default"] = /*#__PURE__*/function () {
   function CartService() {
     _classCallCheck(this, CartService);
-    this.cartItems = this.getCartItems();
+    this.cartItems = [];
+    try {
+      var cartItems = JSON.parse(localStorage.getItem('cartItems'));
+      if (Array.isArray(cartItems)) {
+        cartItems.forEach(function (item) {
+          Object.defineProperty(item, 'subtotal', {
+            get: function get() {
+              if (item.usePointPurchase) {
+                return 0;
+              }
+              return (Number(this.price) * Number(this.quantity)).toFixed(2);
+            }
+          });
+          Object.defineProperty(item, 'pointTotal', {
+            get: function get() {
+              if (item.usePointPurchase) {
+                return (Number(this.point_price) * Number(this.quantity)).toFixed(2);
+              }
+              return 0;
+            }
+          });
+        });
+        this.cartItems = cartItems;
+      }
+    } catch (e) {}
   }
   _createClass(CartService, [{
     key: "addToCart",
-    value: function addToCart(product, price, quantity) {
-      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-      var addtional_options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
-      this.cartItems.push({
-        product_id: product.id,
-        title: product.title,
-        image: product.image,
-        price: price,
-        quantity: quantity,
-        options: options,
-        addtional_options: addtional_options
+    value: function addToCart(cart_item) {
+      var product_id = cart_item.product_id,
+        options = cart_item.options,
+        additional_options = cart_item.additional_options,
+        quantity = cart_item.quantity,
+        usePointPurchase = cart_item.usePointPurchase;
+      var key = (0, _jsMd.md5)(product_id + JSON.stringify(options) + JSON.stringify(additional_options) + usePointPurchase.toString());
+      var index = this.cartItems.findIndex(function (item) {
+        return item.key === key;
       });
+      if (index !== -1) {
+        this.cartItems[index].quantity += quantity;
+      } else {
+        this.cartItems.push(_objectSpread({
+          key: key
+        }, cart_item));
+      }
       this.updateStorage();
     }
   }, {
@@ -1072,21 +2183,7 @@ var CartService = exports["default"] = /*#__PURE__*/function () {
   }, {
     key: "getCartItems",
     value: function getCartItems() {
-      try {
-        var cartItems = JSON.parse(localStorage.getItem('cartItems'));
-        if (Array.isArray(cartItems)) {
-          cartItems.forEach(function (item) {
-            Object.defineProperty(item, 'subtotal', {
-              get: function get() {
-                return (Number(this.price) * Number(this.quantity)).toFixed(2);
-              }
-            });
-          });
-          return cartItems;
-        }
-      } catch (e) {
-        return [];
-      }
+      return this.cartItems;
     }
   }, {
     key: "saveItems",
@@ -1104,6 +2201,14 @@ var CartService = exports["default"] = /*#__PURE__*/function () {
     key: "updateStorage",
     value: function updateStorage() {
       localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
+      var event = new Event('cartChanged');
+      event.count = this.cartItems.length;
+      window.dispatchEvent(event);
+    }
+  }, {
+    key: "getCount",
+    value: function getCount() {
+      return this.cartItems.length;
     }
   }]);
   return CartService;
@@ -1135,12 +2240,7 @@ var httpClient = _axios["default"].create({
   baseURL: "/api/v1",
   // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 0,
-  // request timeout
-  auth: {
-    username: "admin",
-    password: "admin"
-  }
+  timeout: 0 // request timeout
 });
 
 // request interceptor
@@ -1206,7 +2306,7 @@ function (response) {
       window.dispatchEvent(new Event('unauthenticated'));
     }
   }
-  return Promise.reject(error);
+  return Promise.reject(error.response.data);
 });
 var _default = exports["default"] = httpClient;
 
@@ -3284,1010 +4384,1165 @@ module.exports = Array.isArray || function (arr) {
 
 /***/ }),
 
-/***/ "./node_modules/uuid/dist/commonjs-browser/index.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/index.js ***!
-  \**********************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ "./node_modules/js-md5/src/md5.js":
+/*!****************************************!*\
+  !*** ./node_modules/js-md5/src/md5.js ***!
+  \****************************************/
+/***/ ((module, exports, __webpack_require__) => {
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-Object.defineProperty(exports, "NIL", ({
-  enumerable: true,
-  get: function get() {
-    return _nil.default;
-  }
-}));
-Object.defineProperty(exports, "parse", ({
-  enumerable: true,
-  get: function get() {
-    return _parse.default;
-  }
-}));
-Object.defineProperty(exports, "stringify", ({
-  enumerable: true,
-  get: function get() {
-    return _stringify.default;
-  }
-}));
-Object.defineProperty(exports, "v1", ({
-  enumerable: true,
-  get: function get() {
-    return _v.default;
-  }
-}));
-Object.defineProperty(exports, "v3", ({
-  enumerable: true,
-  get: function get() {
-    return _v2.default;
-  }
-}));
-Object.defineProperty(exports, "v4", ({
-  enumerable: true,
-  get: function get() {
-    return _v3.default;
-  }
-}));
-Object.defineProperty(exports, "v5", ({
-  enumerable: true,
-  get: function get() {
-    return _v4.default;
-  }
-}));
-Object.defineProperty(exports, "validate", ({
-  enumerable: true,
-  get: function get() {
-    return _validate.default;
-  }
-}));
-Object.defineProperty(exports, "version", ({
-  enumerable: true,
-  get: function get() {
-    return _version.default;
-  }
-}));
-
-var _v = _interopRequireDefault(__webpack_require__(/*! ./v1.js */ "./node_modules/uuid/dist/commonjs-browser/v1.js"));
-
-var _v2 = _interopRequireDefault(__webpack_require__(/*! ./v3.js */ "./node_modules/uuid/dist/commonjs-browser/v3.js"));
-
-var _v3 = _interopRequireDefault(__webpack_require__(/*! ./v4.js */ "./node_modules/uuid/dist/commonjs-browser/v4.js"));
-
-var _v4 = _interopRequireDefault(__webpack_require__(/*! ./v5.js */ "./node_modules/uuid/dist/commonjs-browser/v5.js"));
-
-var _nil = _interopRequireDefault(__webpack_require__(/*! ./nil.js */ "./node_modules/uuid/dist/commonjs-browser/nil.js"));
-
-var _version = _interopRequireDefault(__webpack_require__(/*! ./version.js */ "./node_modules/uuid/dist/commonjs-browser/version.js"));
-
-var _validate = _interopRequireDefault(__webpack_require__(/*! ./validate.js */ "./node_modules/uuid/dist/commonjs-browser/validate.js"));
-
-var _stringify = _interopRequireDefault(__webpack_require__(/*! ./stringify.js */ "./node_modules/uuid/dist/commonjs-browser/stringify.js"));
-
-var _parse = _interopRequireDefault(__webpack_require__(/*! ./parse.js */ "./node_modules/uuid/dist/commonjs-browser/parse.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/md5.js":
-/*!********************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/md5.js ***!
-  \********************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-/*
- * Browser-compatible JavaScript MD5
+/* provided dependency */ var process = __webpack_require__(/*! process/browser.js */ "./node_modules/process/browser.js");
+var __WEBPACK_AMD_DEFINE_RESULT__;/**
+ * [js-md5]{@link https://github.com/emn178/js-md5}
  *
- * Modification of JavaScript MD5
- * https://github.com/blueimp/JavaScript-MD5
- *
- * Copyright 2011, Sebastian Tschan
- * https://blueimp.net
- *
- * Licensed under the MIT license:
- * https://opensource.org/licenses/MIT
- *
- * Based on
- * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
- * Digest Algorithm, as defined in RFC 1321.
- * Version 2.2 Copyright (C) Paul Johnston 1999 - 2009
- * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
- * Distributed under the BSD License
- * See http://pajhome.org.uk/crypt/md5 for more info.
+ * @namespace md5
+ * @version 0.8.3
+ * @author Chen, Yi-Cyuan [emn178@gmail.com]
+ * @copyright Chen, Yi-Cyuan 2014-2023
+ * @license MIT
  */
-function md5(bytes) {
-  if (typeof bytes === 'string') {
-    const msg = unescape(encodeURIComponent(bytes)); // UTF8 escape
+(function () {
+  'use strict';
 
-    bytes = new Uint8Array(msg.length);
+  var INPUT_ERROR = 'input is invalid type';
+  var FINALIZE_ERROR = 'finalize already called';
+  var WINDOW = typeof window === 'object';
+  var root = WINDOW ? window : {};
+  if (root.JS_MD5_NO_WINDOW) {
+    WINDOW = false;
+  }
+  var WEB_WORKER = !WINDOW && typeof self === 'object';
+  var NODE_JS = !root.JS_MD5_NO_NODE_JS && typeof process === 'object' && process.versions && process.versions.node;
+  if (NODE_JS) {
+    root = __webpack_require__.g;
+  } else if (WEB_WORKER) {
+    root = self;
+  }
+  var COMMON_JS = !root.JS_MD5_NO_COMMON_JS && "object" === 'object' && module.exports;
+  var AMD =  true && __webpack_require__.amdO;
+  var ARRAY_BUFFER = !root.JS_MD5_NO_ARRAY_BUFFER && typeof ArrayBuffer !== 'undefined';
+  var HEX_CHARS = '0123456789abcdef'.split('');
+  var EXTRA = [128, 32768, 8388608, -2147483648];
+  var SHIFT = [0, 8, 16, 24];
+  var OUTPUT_TYPES = ['hex', 'array', 'digest', 'buffer', 'arrayBuffer', 'base64'];
+  var BASE64_ENCODE_CHAR = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'.split('');
 
-    for (let i = 0; i < msg.length; ++i) {
-      bytes[i] = msg.charCodeAt(i);
+  var blocks = [], buffer8;
+  if (ARRAY_BUFFER) {
+    var buffer = new ArrayBuffer(68);
+    buffer8 = new Uint8Array(buffer);
+    blocks = new Uint32Array(buffer);
+  }
+
+  var isArray = Array.isArray;
+  if (root.JS_MD5_NO_NODE_JS || !isArray) {
+    isArray = function (obj) {
+      return Object.prototype.toString.call(obj) === '[object Array]';
+    };
+  }
+
+  var isView = ArrayBuffer.isView;
+  if (ARRAY_BUFFER && (root.JS_MD5_NO_ARRAY_BUFFER_IS_VIEW || !isView)) {
+    isView = function (obj) {
+      return typeof obj === 'object' && obj.buffer && obj.buffer.constructor === ArrayBuffer;
+    };
+  }
+
+  // [message: string, isString: bool]
+  var formatMessage = function (message) {
+    var type = typeof message;
+    if (type === 'string') {
+      return [message, true];
     }
-  }
-
-  return md5ToHexEncodedArray(wordsToMd5(bytesToWords(bytes), bytes.length * 8));
-}
-/*
- * Convert an array of little-endian words to an array of bytes
- */
-
-
-function md5ToHexEncodedArray(input) {
-  const output = [];
-  const length32 = input.length * 32;
-  const hexTab = '0123456789abcdef';
-
-  for (let i = 0; i < length32; i += 8) {
-    const x = input[i >> 5] >>> i % 32 & 0xff;
-    const hex = parseInt(hexTab.charAt(x >>> 4 & 0x0f) + hexTab.charAt(x & 0x0f), 16);
-    output.push(hex);
-  }
-
-  return output;
-}
-/**
- * Calculate output length with padding and bit length
- */
-
-
-function getOutputLength(inputLength8) {
-  return (inputLength8 + 64 >>> 9 << 4) + 14 + 1;
-}
-/*
- * Calculate the MD5 of an array of little-endian words, and a bit length.
- */
-
-
-function wordsToMd5(x, len) {
-  /* append padding */
-  x[len >> 5] |= 0x80 << len % 32;
-  x[getOutputLength(len) - 1] = len;
-  let a = 1732584193;
-  let b = -271733879;
-  let c = -1732584194;
-  let d = 271733878;
-
-  for (let i = 0; i < x.length; i += 16) {
-    const olda = a;
-    const oldb = b;
-    const oldc = c;
-    const oldd = d;
-    a = md5ff(a, b, c, d, x[i], 7, -680876936);
-    d = md5ff(d, a, b, c, x[i + 1], 12, -389564586);
-    c = md5ff(c, d, a, b, x[i + 2], 17, 606105819);
-    b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330);
-    a = md5ff(a, b, c, d, x[i + 4], 7, -176418897);
-    d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426);
-    c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341);
-    b = md5ff(b, c, d, a, x[i + 7], 22, -45705983);
-    a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416);
-    d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417);
-    c = md5ff(c, d, a, b, x[i + 10], 17, -42063);
-    b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162);
-    a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682);
-    d = md5ff(d, a, b, c, x[i + 13], 12, -40341101);
-    c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290);
-    b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329);
-    a = md5gg(a, b, c, d, x[i + 1], 5, -165796510);
-    d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632);
-    c = md5gg(c, d, a, b, x[i + 11], 14, 643717713);
-    b = md5gg(b, c, d, a, x[i], 20, -373897302);
-    a = md5gg(a, b, c, d, x[i + 5], 5, -701558691);
-    d = md5gg(d, a, b, c, x[i + 10], 9, 38016083);
-    c = md5gg(c, d, a, b, x[i + 15], 14, -660478335);
-    b = md5gg(b, c, d, a, x[i + 4], 20, -405537848);
-    a = md5gg(a, b, c, d, x[i + 9], 5, 568446438);
-    d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690);
-    c = md5gg(c, d, a, b, x[i + 3], 14, -187363961);
-    b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501);
-    a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467);
-    d = md5gg(d, a, b, c, x[i + 2], 9, -51403784);
-    c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473);
-    b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734);
-    a = md5hh(a, b, c, d, x[i + 5], 4, -378558);
-    d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463);
-    c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562);
-    b = md5hh(b, c, d, a, x[i + 14], 23, -35309556);
-    a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060);
-    d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353);
-    c = md5hh(c, d, a, b, x[i + 7], 16, -155497632);
-    b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640);
-    a = md5hh(a, b, c, d, x[i + 13], 4, 681279174);
-    d = md5hh(d, a, b, c, x[i], 11, -358537222);
-    c = md5hh(c, d, a, b, x[i + 3], 16, -722521979);
-    b = md5hh(b, c, d, a, x[i + 6], 23, 76029189);
-    a = md5hh(a, b, c, d, x[i + 9], 4, -640364487);
-    d = md5hh(d, a, b, c, x[i + 12], 11, -421815835);
-    c = md5hh(c, d, a, b, x[i + 15], 16, 530742520);
-    b = md5hh(b, c, d, a, x[i + 2], 23, -995338651);
-    a = md5ii(a, b, c, d, x[i], 6, -198630844);
-    d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415);
-    c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905);
-    b = md5ii(b, c, d, a, x[i + 5], 21, -57434055);
-    a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571);
-    d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606);
-    c = md5ii(c, d, a, b, x[i + 10], 15, -1051523);
-    b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799);
-    a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359);
-    d = md5ii(d, a, b, c, x[i + 15], 10, -30611744);
-    c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380);
-    b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649);
-    a = md5ii(a, b, c, d, x[i + 4], 6, -145523070);
-    d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379);
-    c = md5ii(c, d, a, b, x[i + 2], 15, 718787259);
-    b = md5ii(b, c, d, a, x[i + 9], 21, -343485551);
-    a = safeAdd(a, olda);
-    b = safeAdd(b, oldb);
-    c = safeAdd(c, oldc);
-    d = safeAdd(d, oldd);
-  }
-
-  return [a, b, c, d];
-}
-/*
- * Convert an array bytes to an array of little-endian words
- * Characters >255 have their high-byte silently ignored.
- */
-
-
-function bytesToWords(input) {
-  if (input.length === 0) {
-    return [];
-  }
-
-  const length8 = input.length * 8;
-  const output = new Uint32Array(getOutputLength(length8));
-
-  for (let i = 0; i < length8; i += 8) {
-    output[i >> 5] |= (input[i / 8] & 0xff) << i % 32;
-  }
-
-  return output;
-}
-/*
- * Add integers, wrapping at 2^32. This uses 16-bit operations internally
- * to work around bugs in some JS interpreters.
- */
-
-
-function safeAdd(x, y) {
-  const lsw = (x & 0xffff) + (y & 0xffff);
-  const msw = (x >> 16) + (y >> 16) + (lsw >> 16);
-  return msw << 16 | lsw & 0xffff;
-}
-/*
- * Bitwise rotate a 32-bit number to the left.
- */
-
-
-function bitRotateLeft(num, cnt) {
-  return num << cnt | num >>> 32 - cnt;
-}
-/*
- * These functions implement the four basic operations the algorithm uses.
- */
-
-
-function md5cmn(q, a, b, x, s, t) {
-  return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b);
-}
-
-function md5ff(a, b, c, d, x, s, t) {
-  return md5cmn(b & c | ~b & d, a, b, x, s, t);
-}
-
-function md5gg(a, b, c, d, x, s, t) {
-  return md5cmn(b & d | c & ~d, a, b, x, s, t);
-}
-
-function md5hh(a, b, c, d, x, s, t) {
-  return md5cmn(b ^ c ^ d, a, b, x, s, t);
-}
-
-function md5ii(a, b, c, d, x, s, t) {
-  return md5cmn(c ^ (b | ~d), a, b, x, s, t);
-}
-
-var _default = md5;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/native.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/native.js ***!
-  \***********************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-const randomUUID = typeof crypto !== 'undefined' && crypto.randomUUID && crypto.randomUUID.bind(crypto);
-var _default = {
-  randomUUID
-};
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/nil.js":
-/*!********************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/nil.js ***!
-  \********************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-var _default = '00000000-0000-0000-0000-000000000000';
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/parse.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/parse.js ***!
-  \**********************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _validate = _interopRequireDefault(__webpack_require__(/*! ./validate.js */ "./node_modules/uuid/dist/commonjs-browser/validate.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function parse(uuid) {
-  if (!(0, _validate.default)(uuid)) {
-    throw TypeError('Invalid UUID');
-  }
-
-  let v;
-  const arr = new Uint8Array(16); // Parse ########-....-....-....-............
-
-  arr[0] = (v = parseInt(uuid.slice(0, 8), 16)) >>> 24;
-  arr[1] = v >>> 16 & 0xff;
-  arr[2] = v >>> 8 & 0xff;
-  arr[3] = v & 0xff; // Parse ........-####-....-....-............
-
-  arr[4] = (v = parseInt(uuid.slice(9, 13), 16)) >>> 8;
-  arr[5] = v & 0xff; // Parse ........-....-####-....-............
-
-  arr[6] = (v = parseInt(uuid.slice(14, 18), 16)) >>> 8;
-  arr[7] = v & 0xff; // Parse ........-....-....-####-............
-
-  arr[8] = (v = parseInt(uuid.slice(19, 23), 16)) >>> 8;
-  arr[9] = v & 0xff; // Parse ........-....-....-....-############
-  // (Use "/" to avoid 32-bit truncation when bit-shifting high-order bytes)
-
-  arr[10] = (v = parseInt(uuid.slice(24, 36), 16)) / 0x10000000000 & 0xff;
-  arr[11] = v / 0x100000000 & 0xff;
-  arr[12] = v >>> 24 & 0xff;
-  arr[13] = v >>> 16 & 0xff;
-  arr[14] = v >>> 8 & 0xff;
-  arr[15] = v & 0xff;
-  return arr;
-}
-
-var _default = parse;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/regex.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/regex.js ***!
-  \**********************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-var _default = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/rng.js":
-/*!********************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/rng.js ***!
-  \********************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = rng;
-// Unique ID creation requires a high quality random # generator. In the browser we therefore
-// require the crypto API and do not support built-in fallback to lower quality random number
-// generators (like Math.random()).
-let getRandomValues;
-const rnds8 = new Uint8Array(16);
-
-function rng() {
-  // lazy load so that environments that need to polyfill have a chance to do so
-  if (!getRandomValues) {
-    // getRandomValues needs to be invoked in a context where "this" is a Crypto implementation.
-    getRandomValues = typeof crypto !== 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto);
-
-    if (!getRandomValues) {
-      throw new Error('crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported');
+    if (type !== 'object' || message === null) {
+      throw new Error(INPUT_ERROR);
     }
-  }
-
-  return getRandomValues(rnds8);
-}
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/sha1.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/sha1.js ***!
-  \*********************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-// Adapted from Chris Veness' SHA1 code at
-// http://www.movable-type.co.uk/scripts/sha1.html
-function f(s, x, y, z) {
-  switch (s) {
-    case 0:
-      return x & y ^ ~x & z;
-
-    case 1:
-      return x ^ y ^ z;
-
-    case 2:
-      return x & y ^ x & z ^ y & z;
-
-    case 3:
-      return x ^ y ^ z;
-  }
-}
-
-function ROTL(x, n) {
-  return x << n | x >>> 32 - n;
-}
-
-function sha1(bytes) {
-  const K = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6];
-  const H = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0];
-
-  if (typeof bytes === 'string') {
-    const msg = unescape(encodeURIComponent(bytes)); // UTF8 escape
-
-    bytes = [];
-
-    for (let i = 0; i < msg.length; ++i) {
-      bytes.push(msg.charCodeAt(i));
+    if (ARRAY_BUFFER && message.constructor === ArrayBuffer) {
+      return [new Uint8Array(message), false];
     }
-  } else if (!Array.isArray(bytes)) {
-    // Convert Array-like to Array
-    bytes = Array.prototype.slice.call(bytes);
+    if (!isArray(message) && !isView(message)) {
+      throw new Error(INPUT_ERROR);
+    }
+    return [message, false];
   }
 
-  bytes.push(0x80);
-  const l = bytes.length / 4 + 2;
-  const N = Math.ceil(l / 16);
-  const M = new Array(N);
+  /**
+   * @method hex
+   * @memberof md5
+   * @description Output hash as hex string
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {String} Hex string
+   * @example
+   * md5.hex('The quick brown fox jumps over the lazy dog');
+   * // equal to
+   * md5('The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method digest
+   * @memberof md5
+   * @description Output hash as bytes array
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Array} Bytes array
+   * @example
+   * md5.digest('The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method array
+   * @memberof md5
+   * @description Output hash as bytes array
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Array} Bytes array
+   * @example
+   * md5.array('The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method arrayBuffer
+   * @memberof md5
+   * @description Output hash as ArrayBuffer
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @example
+   * md5.arrayBuffer('The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method buffer
+   * @deprecated This maybe confuse with Buffer in node.js. Please use arrayBuffer instead.
+   * @memberof md5
+   * @description Output hash as ArrayBuffer
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @example
+   * md5.buffer('The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method base64
+   * @memberof md5
+   * @description Output hash as base64 string
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {String} base64 string
+   * @example
+   * md5.base64('The quick brown fox jumps over the lazy dog');
+   */
+  var createOutputMethod = function (outputType) {
+    return function (message) {
+      return new Md5(true).update(message)[outputType]();
+    };
+  };
 
-  for (let i = 0; i < N; ++i) {
-    const arr = new Uint32Array(16);
+  /**
+   * @method create
+   * @memberof md5
+   * @description Create Md5 object
+   * @returns {Md5} Md5 object.
+   * @example
+   * var hash = md5.create();
+   */
+  /**
+   * @method update
+   * @memberof md5
+   * @description Create and update Md5 object
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Md5} Md5 object.
+   * @example
+   * var hash = md5.update('The quick brown fox jumps over the lazy dog');
+   * // equal to
+   * var hash = md5.create();
+   * hash.update('The quick brown fox jumps over the lazy dog');
+   */
+  var createMethod = function () {
+    var method = createOutputMethod('hex');
+    if (NODE_JS) {
+      method = nodeWrap(method);
+    }
+    method.create = function () {
+      return new Md5();
+    };
+    method.update = function (message) {
+      return method.create().update(message);
+    };
+    for (var i = 0; i < OUTPUT_TYPES.length; ++i) {
+      var type = OUTPUT_TYPES[i];
+      method[type] = createOutputMethod(type);
+    }
+    return method;
+  };
 
-    for (let j = 0; j < 16; ++j) {
-      arr[j] = bytes[i * 64 + j * 4] << 24 | bytes[i * 64 + j * 4 + 1] << 16 | bytes[i * 64 + j * 4 + 2] << 8 | bytes[i * 64 + j * 4 + 3];
+  var nodeWrap = function (method) {
+    var crypto = __webpack_require__(/*! crypto */ "?c7e7")
+    var Buffer = (__webpack_require__(/*! buffer */ "?34e4").Buffer);
+    var bufferFrom;
+    if (Buffer.from && !root.JS_MD5_NO_BUFFER_FROM) {
+      bufferFrom = Buffer.from;
+    } else {
+      bufferFrom = function (message) {
+        return new Buffer(message);
+      };
+    }
+    var nodeMethod = function (message) {
+      if (typeof message === 'string') {
+        return crypto.createHash('md5').update(message, 'utf8').digest('hex');
+      } else {
+        if (message === null || message === undefined) {
+          throw new Error(INPUT_ERROR);
+        } else if (message.constructor === ArrayBuffer) {
+          message = new Uint8Array(message);
+        }
+      }
+      if (isArray(message) || isView(message) ||
+        message.constructor === Buffer) {
+        return crypto.createHash('md5').update(bufferFrom(message)).digest('hex');
+      } else {
+        return method(message);
+      }
+    };
+    return nodeMethod;
+  };
+
+  /**
+   * @namespace md5.hmac
+   */
+  /**
+   * @method hex
+   * @memberof md5.hmac
+   * @description Output hash as hex string
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {String} Hex string
+   * @example
+   * md5.hmac.hex('key', 'The quick brown fox jumps over the lazy dog');
+   * // equal to
+   * md5.hmac('key', 'The quick brown fox jumps over the lazy dog');
+   */
+
+  /**
+   * @method digest
+   * @memberof md5.hmac
+   * @description Output hash as bytes array
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Array} Bytes array
+   * @example
+   * md5.hmac.digest('key', 'The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method array
+   * @memberof md5.hmac
+   * @description Output hash as bytes array
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Array} Bytes array
+   * @example
+   * md5.hmac.array('key', 'The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method arrayBuffer
+   * @memberof md5.hmac
+   * @description Output hash as ArrayBuffer
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @example
+   * md5.hmac.arrayBuffer('key', 'The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method buffer
+   * @deprecated This maybe confuse with Buffer in node.js. Please use arrayBuffer instead.
+   * @memberof md5.hmac
+   * @description Output hash as ArrayBuffer
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @example
+   * md5.hmac.buffer('key', 'The quick brown fox jumps over the lazy dog');
+   */
+  /**
+   * @method base64
+   * @memberof md5.hmac
+   * @description Output hash as base64 string
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {String} base64 string
+   * @example
+   * md5.hmac.base64('key', 'The quick brown fox jumps over the lazy dog');
+   */
+  var createHmacOutputMethod = function (outputType) {
+    return function (key, message) {
+      return new HmacMd5(key, true).update(message)[outputType]();
+    };
+  };
+
+  /**
+   * @method create
+   * @memberof md5.hmac
+   * @description Create HmacMd5 object
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @returns {HmacMd5} HmacMd5 object.
+   * @example
+   * var hash = md5.hmac.create('key');
+   */
+  /**
+   * @method update
+   * @memberof md5.hmac
+   * @description Create and update HmacMd5 object
+   * @param {String|Array|Uint8Array|ArrayBuffer} key key
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {HmacMd5} HmacMd5 object.
+   * @example
+   * var hash = md5.hmac.update('key', 'The quick brown fox jumps over the lazy dog');
+   * // equal to
+   * var hash = md5.hmac.create('key');
+   * hash.update('The quick brown fox jumps over the lazy dog');
+   */
+  var createHmacMethod = function () {
+    var method = createHmacOutputMethod('hex');
+    method.create = function (key) {
+      return new HmacMd5(key);
+    };
+    method.update = function (key, message) {
+      return method.create(key).update(message);
+    };
+    for (var i = 0; i < OUTPUT_TYPES.length; ++i) {
+      var type = OUTPUT_TYPES[i];
+      method[type] = createHmacOutputMethod(type);
+    }
+    return method;
+  };
+
+  /**
+   * Md5 class
+   * @class Md5
+   * @description This is internal class.
+   * @see {@link md5.create}
+   */
+  function Md5(sharedMemory) {
+    if (sharedMemory) {
+      blocks[0] = blocks[16] = blocks[1] = blocks[2] = blocks[3] =
+      blocks[4] = blocks[5] = blocks[6] = blocks[7] =
+      blocks[8] = blocks[9] = blocks[10] = blocks[11] =
+      blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
+      this.blocks = blocks;
+      this.buffer8 = buffer8;
+    } else {
+      if (ARRAY_BUFFER) {
+        var buffer = new ArrayBuffer(68);
+        this.buffer8 = new Uint8Array(buffer);
+        this.blocks = new Uint32Array(buffer);
+      } else {
+        this.blocks = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      }
+    }
+    this.h0 = this.h1 = this.h2 = this.h3 = this.start = this.bytes = this.hBytes = 0;
+    this.finalized = this.hashed = false;
+    this.first = true;
+  }
+
+  /**
+   * @method update
+   * @memberof Md5
+   * @instance
+   * @description Update hash
+   * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+   * @returns {Md5} Md5 object.
+   * @see {@link md5.update}
+   */
+  Md5.prototype.update = function (message) {
+    if (this.finalized) {
+      throw new Error(FINALIZE_ERROR);
     }
 
-    M[i] = arr;
-  }
-
-  M[N - 1][14] = (bytes.length - 1) * 8 / Math.pow(2, 32);
-  M[N - 1][14] = Math.floor(M[N - 1][14]);
-  M[N - 1][15] = (bytes.length - 1) * 8 & 0xffffffff;
-
-  for (let i = 0; i < N; ++i) {
-    const W = new Uint32Array(80);
-
-    for (let t = 0; t < 16; ++t) {
-      W[t] = M[i][t];
-    }
-
-    for (let t = 16; t < 80; ++t) {
-      W[t] = ROTL(W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16], 1);
-    }
-
-    let a = H[0];
-    let b = H[1];
-    let c = H[2];
-    let d = H[3];
-    let e = H[4];
-
-    for (let t = 0; t < 80; ++t) {
-      const s = Math.floor(t / 20);
-      const T = ROTL(a, 5) + f(s, b, c, d) + e + K[s] + W[t] >>> 0;
-      e = d;
-      d = c;
-      c = ROTL(b, 30) >>> 0;
-      b = a;
-      a = T;
-    }
-
-    H[0] = H[0] + a >>> 0;
-    H[1] = H[1] + b >>> 0;
-    H[2] = H[2] + c >>> 0;
-    H[3] = H[3] + d >>> 0;
-    H[4] = H[4] + e >>> 0;
-  }
-
-  return [H[0] >> 24 & 0xff, H[0] >> 16 & 0xff, H[0] >> 8 & 0xff, H[0] & 0xff, H[1] >> 24 & 0xff, H[1] >> 16 & 0xff, H[1] >> 8 & 0xff, H[1] & 0xff, H[2] >> 24 & 0xff, H[2] >> 16 & 0xff, H[2] >> 8 & 0xff, H[2] & 0xff, H[3] >> 24 & 0xff, H[3] >> 16 & 0xff, H[3] >> 8 & 0xff, H[3] & 0xff, H[4] >> 24 & 0xff, H[4] >> 16 & 0xff, H[4] >> 8 & 0xff, H[4] & 0xff];
-}
-
-var _default = sha1;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/stringify.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/stringify.js ***!
-  \**************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-exports.unsafeStringify = unsafeStringify;
-
-var _validate = _interopRequireDefault(__webpack_require__(/*! ./validate.js */ "./node_modules/uuid/dist/commonjs-browser/validate.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Convert array of 16 byte values to UUID string format of the form:
- * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */
-const byteToHex = [];
-
-for (let i = 0; i < 256; ++i) {
-  byteToHex.push((i + 0x100).toString(16).slice(1));
-}
-
-function unsafeStringify(arr, offset = 0) {
-  // Note: Be careful editing this code!  It's been tuned for performance
-  // and works in ways you may not expect. See https://github.com/uuidjs/uuid/pull/434
-  return byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]];
-}
-
-function stringify(arr, offset = 0) {
-  const uuid = unsafeStringify(arr, offset); // Consistency check for valid UUID.  If this throws, it's likely due to one
-  // of the following:
-  // - One or more input array values don't map to a hex octet (leading to
-  // "undefined" in the uuid)
-  // - Invalid input values for the RFC `version` or `variant` fields
-
-  if (!(0, _validate.default)(uuid)) {
-    throw TypeError('Stringified UUID is invalid');
-  }
-
-  return uuid;
-}
-
-var _default = stringify;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/v1.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/v1.js ***!
-  \*******************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _rng = _interopRequireDefault(__webpack_require__(/*! ./rng.js */ "./node_modules/uuid/dist/commonjs-browser/rng.js"));
-
-var _stringify = __webpack_require__(/*! ./stringify.js */ "./node_modules/uuid/dist/commonjs-browser/stringify.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// **`v1()` - Generate time-based UUID**
-//
-// Inspired by https://github.com/LiosK/UUID.js
-// and http://docs.python.org/library/uuid.html
-let _nodeId;
-
-let _clockseq; // Previous uuid creation time
-
-
-let _lastMSecs = 0;
-let _lastNSecs = 0; // See https://github.com/uuidjs/uuid for API details
-
-function v1(options, buf, offset) {
-  let i = buf && offset || 0;
-  const b = buf || new Array(16);
-  options = options || {};
-  let node = options.node || _nodeId;
-  let clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq; // node and clockseq need to be initialized to random values if they're not
-  // specified.  We do this lazily to minimize issues related to insufficient
-  // system entropy.  See #189
-
-  if (node == null || clockseq == null) {
-    const seedBytes = options.random || (options.rng || _rng.default)();
-
-    if (node == null) {
-      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-      node = _nodeId = [seedBytes[0] | 0x01, seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]];
-    }
-
-    if (clockseq == null) {
-      // Per 4.2.2, randomize (14 bit) clockseq
-      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
-    }
-  } // UUID timestamps are 100 nano-second units since the Gregorian epoch,
-  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
-  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
-  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-
-
-  let msecs = options.msecs !== undefined ? options.msecs : Date.now(); // Per 4.2.1.2, use count of uuid's generated during the current clock
-  // cycle to simulate higher resolution clock
-
-  let nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1; // Time since last uuid creation (in msecs)
-
-  const dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 10000; // Per 4.2.1.2, Bump clockseq on clock regression
-
-  if (dt < 0 && options.clockseq === undefined) {
-    clockseq = clockseq + 1 & 0x3fff;
-  } // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
-  // time interval
-
-
-  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
-    nsecs = 0;
-  } // Per 4.2.1.2 Throw error if too many uuids are requested
-
-
-  if (nsecs >= 10000) {
-    throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
-  }
-
-  _lastMSecs = msecs;
-  _lastNSecs = nsecs;
-  _clockseq = clockseq; // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
-
-  msecs += 12219292800000; // `time_low`
-
-  const tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
-  b[i++] = tl >>> 24 & 0xff;
-  b[i++] = tl >>> 16 & 0xff;
-  b[i++] = tl >>> 8 & 0xff;
-  b[i++] = tl & 0xff; // `time_mid`
-
-  const tmh = msecs / 0x100000000 * 10000 & 0xfffffff;
-  b[i++] = tmh >>> 8 & 0xff;
-  b[i++] = tmh & 0xff; // `time_high_and_version`
-
-  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
-
-  b[i++] = tmh >>> 16 & 0xff; // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-
-  b[i++] = clockseq >>> 8 | 0x80; // `clock_seq_low`
-
-  b[i++] = clockseq & 0xff; // `node`
-
-  for (let n = 0; n < 6; ++n) {
-    b[i + n] = node[n];
-  }
-
-  return buf || (0, _stringify.unsafeStringify)(b);
-}
-
-var _default = v1;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/v3.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/v3.js ***!
-  \*******************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _v = _interopRequireDefault(__webpack_require__(/*! ./v35.js */ "./node_modules/uuid/dist/commonjs-browser/v35.js"));
-
-var _md = _interopRequireDefault(__webpack_require__(/*! ./md5.js */ "./node_modules/uuid/dist/commonjs-browser/md5.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const v3 = (0, _v.default)('v3', 0x30, _md.default);
-var _default = v3;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/v35.js":
-/*!********************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/v35.js ***!
-  \********************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports.URL = exports.DNS = void 0;
-exports["default"] = v35;
-
-var _stringify = __webpack_require__(/*! ./stringify.js */ "./node_modules/uuid/dist/commonjs-browser/stringify.js");
-
-var _parse = _interopRequireDefault(__webpack_require__(/*! ./parse.js */ "./node_modules/uuid/dist/commonjs-browser/parse.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function stringToBytes(str) {
-  str = unescape(encodeURIComponent(str)); // UTF8 escape
-
-  const bytes = [];
-
-  for (let i = 0; i < str.length; ++i) {
-    bytes.push(str.charCodeAt(i));
-  }
-
-  return bytes;
-}
-
-const DNS = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
-exports.DNS = DNS;
-const URL = '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
-exports.URL = URL;
-
-function v35(name, version, hashfunc) {
-  function generateUUID(value, namespace, buf, offset) {
-    var _namespace;
-
-    if (typeof value === 'string') {
-      value = stringToBytes(value);
-    }
-
-    if (typeof namespace === 'string') {
-      namespace = (0, _parse.default)(namespace);
-    }
-
-    if (((_namespace = namespace) === null || _namespace === void 0 ? void 0 : _namespace.length) !== 16) {
-      throw TypeError('Namespace must be array-like (16 iterable integer values, 0-255)');
-    } // Compute hash of namespace and value, Per 4.3
-    // Future: Use spread syntax when supported on all platforms, e.g. `bytes =
-    // hashfunc([...namespace, ... value])`
-
-
-    let bytes = new Uint8Array(16 + value.length);
-    bytes.set(namespace);
-    bytes.set(value, namespace.length);
-    bytes = hashfunc(bytes);
-    bytes[6] = bytes[6] & 0x0f | version;
-    bytes[8] = bytes[8] & 0x3f | 0x80;
-
-    if (buf) {
-      offset = offset || 0;
-
-      for (let i = 0; i < 16; ++i) {
-        buf[offset + i] = bytes[i];
+    var result = formatMessage(message);
+    message = result[0];
+    var isString = result[1];
+    var code, index = 0, i, length = message.length, blocks = this.blocks;
+    var buffer8 = this.buffer8;
+
+    while (index < length) {
+      if (this.hashed) {
+        this.hashed = false;
+        blocks[0] = blocks[16];
+        blocks[16] = blocks[1] = blocks[2] = blocks[3] =
+        blocks[4] = blocks[5] = blocks[6] = blocks[7] =
+        blocks[8] = blocks[9] = blocks[10] = blocks[11] =
+        blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
       }
 
-      return buf;
+      if (isString) {
+        if (ARRAY_BUFFER) {
+          for (i = this.start; index < length && i < 64; ++index) {
+            code = message.charCodeAt(index);
+            if (code < 0x80) {
+              buffer8[i++] = code;
+            } else if (code < 0x800) {
+              buffer8[i++] = 0xc0 | (code >>> 6);
+              buffer8[i++] = 0x80 | (code & 0x3f);
+            } else if (code < 0xd800 || code >= 0xe000) {
+              buffer8[i++] = 0xe0 | (code >>> 12);
+              buffer8[i++] = 0x80 | ((code >>> 6) & 0x3f);
+              buffer8[i++] = 0x80 | (code & 0x3f);
+            } else {
+              code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
+              buffer8[i++] = 0xf0 | (code >>> 18);
+              buffer8[i++] = 0x80 | ((code >>> 12) & 0x3f);
+              buffer8[i++] = 0x80 | ((code >>> 6) & 0x3f);
+              buffer8[i++] = 0x80 | (code & 0x3f);
+            }
+          }
+        } else {
+          for (i = this.start; index < length && i < 64; ++index) {
+            code = message.charCodeAt(index);
+            if (code < 0x80) {
+              blocks[i >>> 2] |= code << SHIFT[i++ & 3];
+            } else if (code < 0x800) {
+              blocks[i >>> 2] |= (0xc0 | (code >>> 6)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+            } else if (code < 0xd800 || code >= 0xe000) {
+              blocks[i >>> 2] |= (0xe0 | (code >>> 12)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | ((code >>> 6) & 0x3f)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+            } else {
+              code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
+              blocks[i >>> 2] |= (0xf0 | (code >>> 18)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | ((code >>> 12) & 0x3f)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | ((code >>> 6) & 0x3f)) << SHIFT[i++ & 3];
+              blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+            }
+          }
+        }
+      } else {
+        if (ARRAY_BUFFER) {
+          for (i = this.start; index < length && i < 64; ++index) {
+            buffer8[i++] = message[index];
+          }
+        } else {
+          for (i = this.start; index < length && i < 64; ++index) {
+            blocks[i >>> 2] |= message[index] << SHIFT[i++ & 3];
+          }
+        }
+      }
+      this.lastByteIndex = i;
+      this.bytes += i - this.start;
+      if (i >= 64) {
+        this.start = i - 64;
+        this.hash();
+        this.hashed = true;
+      } else {
+        this.start = i;
+      }
+    }
+    if (this.bytes > 4294967295) {
+      this.hBytes += this.bytes / 4294967296 << 0;
+      this.bytes = this.bytes % 4294967296;
+    }
+    return this;
+  };
+
+  Md5.prototype.finalize = function () {
+    if (this.finalized) {
+      return;
+    }
+    this.finalized = true;
+    var blocks = this.blocks, i = this.lastByteIndex;
+    blocks[i >>> 2] |= EXTRA[i & 3];
+    if (i >= 56) {
+      if (!this.hashed) {
+        this.hash();
+      }
+      blocks[0] = blocks[16];
+      blocks[16] = blocks[1] = blocks[2] = blocks[3] =
+      blocks[4] = blocks[5] = blocks[6] = blocks[7] =
+      blocks[8] = blocks[9] = blocks[10] = blocks[11] =
+      blocks[12] = blocks[13] = blocks[14] = blocks[15] = 0;
+    }
+    blocks[14] = this.bytes << 3;
+    blocks[15] = this.hBytes << 3 | this.bytes >>> 29;
+    this.hash();
+  };
+
+  Md5.prototype.hash = function () {
+    var a, b, c, d, bc, da, blocks = this.blocks;
+
+    if (this.first) {
+      a = blocks[0] - 680876937;
+      a = (a << 7 | a >>> 25) - 271733879 << 0;
+      d = (-1732584194 ^ a & 2004318071) + blocks[1] - 117830708;
+      d = (d << 12 | d >>> 20) + a << 0;
+      c = (-271733879 ^ (d & (a ^ -271733879))) + blocks[2] - 1126478375;
+      c = (c << 17 | c >>> 15) + d << 0;
+      b = (a ^ (c & (d ^ a))) + blocks[3] - 1316259209;
+      b = (b << 22 | b >>> 10) + c << 0;
+    } else {
+      a = this.h0;
+      b = this.h1;
+      c = this.h2;
+      d = this.h3;
+      a += (d ^ (b & (c ^ d))) + blocks[0] - 680876936;
+      a = (a << 7 | a >>> 25) + b << 0;
+      d += (c ^ (a & (b ^ c))) + blocks[1] - 389564586;
+      d = (d << 12 | d >>> 20) + a << 0;
+      c += (b ^ (d & (a ^ b))) + blocks[2] + 606105819;
+      c = (c << 17 | c >>> 15) + d << 0;
+      b += (a ^ (c & (d ^ a))) + blocks[3] - 1044525330;
+      b = (b << 22 | b >>> 10) + c << 0;
     }
 
-    return (0, _stringify.unsafeStringify)(bytes);
-  } // Function#name is not settable on some platforms (#270)
+    a += (d ^ (b & (c ^ d))) + blocks[4] - 176418897;
+    a = (a << 7 | a >>> 25) + b << 0;
+    d += (c ^ (a & (b ^ c))) + blocks[5] + 1200080426;
+    d = (d << 12 | d >>> 20) + a << 0;
+    c += (b ^ (d & (a ^ b))) + blocks[6] - 1473231341;
+    c = (c << 17 | c >>> 15) + d << 0;
+    b += (a ^ (c & (d ^ a))) + blocks[7] - 45705983;
+    b = (b << 22 | b >>> 10) + c << 0;
+    a += (d ^ (b & (c ^ d))) + blocks[8] + 1770035416;
+    a = (a << 7 | a >>> 25) + b << 0;
+    d += (c ^ (a & (b ^ c))) + blocks[9] - 1958414417;
+    d = (d << 12 | d >>> 20) + a << 0;
+    c += (b ^ (d & (a ^ b))) + blocks[10] - 42063;
+    c = (c << 17 | c >>> 15) + d << 0;
+    b += (a ^ (c & (d ^ a))) + blocks[11] - 1990404162;
+    b = (b << 22 | b >>> 10) + c << 0;
+    a += (d ^ (b & (c ^ d))) + blocks[12] + 1804603682;
+    a = (a << 7 | a >>> 25) + b << 0;
+    d += (c ^ (a & (b ^ c))) + blocks[13] - 40341101;
+    d = (d << 12 | d >>> 20) + a << 0;
+    c += (b ^ (d & (a ^ b))) + blocks[14] - 1502002290;
+    c = (c << 17 | c >>> 15) + d << 0;
+    b += (a ^ (c & (d ^ a))) + blocks[15] + 1236535329;
+    b = (b << 22 | b >>> 10) + c << 0;
+    a += (c ^ (d & (b ^ c))) + blocks[1] - 165796510;
+    a = (a << 5 | a >>> 27) + b << 0;
+    d += (b ^ (c & (a ^ b))) + blocks[6] - 1069501632;
+    d = (d << 9 | d >>> 23) + a << 0;
+    c += (a ^ (b & (d ^ a))) + blocks[11] + 643717713;
+    c = (c << 14 | c >>> 18) + d << 0;
+    b += (d ^ (a & (c ^ d))) + blocks[0] - 373897302;
+    b = (b << 20 | b >>> 12) + c << 0;
+    a += (c ^ (d & (b ^ c))) + blocks[5] - 701558691;
+    a = (a << 5 | a >>> 27) + b << 0;
+    d += (b ^ (c & (a ^ b))) + blocks[10] + 38016083;
+    d = (d << 9 | d >>> 23) + a << 0;
+    c += (a ^ (b & (d ^ a))) + blocks[15] - 660478335;
+    c = (c << 14 | c >>> 18) + d << 0;
+    b += (d ^ (a & (c ^ d))) + blocks[4] - 405537848;
+    b = (b << 20 | b >>> 12) + c << 0;
+    a += (c ^ (d & (b ^ c))) + blocks[9] + 568446438;
+    a = (a << 5 | a >>> 27) + b << 0;
+    d += (b ^ (c & (a ^ b))) + blocks[14] - 1019803690;
+    d = (d << 9 | d >>> 23) + a << 0;
+    c += (a ^ (b & (d ^ a))) + blocks[3] - 187363961;
+    c = (c << 14 | c >>> 18) + d << 0;
+    b += (d ^ (a & (c ^ d))) + blocks[8] + 1163531501;
+    b = (b << 20 | b >>> 12) + c << 0;
+    a += (c ^ (d & (b ^ c))) + blocks[13] - 1444681467;
+    a = (a << 5 | a >>> 27) + b << 0;
+    d += (b ^ (c & (a ^ b))) + blocks[2] - 51403784;
+    d = (d << 9 | d >>> 23) + a << 0;
+    c += (a ^ (b & (d ^ a))) + blocks[7] + 1735328473;
+    c = (c << 14 | c >>> 18) + d << 0;
+    b += (d ^ (a & (c ^ d))) + blocks[12] - 1926607734;
+    b = (b << 20 | b >>> 12) + c << 0;
+    bc = b ^ c;
+    a += (bc ^ d) + blocks[5] - 378558;
+    a = (a << 4 | a >>> 28) + b << 0;
+    d += (bc ^ a) + blocks[8] - 2022574463;
+    d = (d << 11 | d >>> 21) + a << 0;
+    da = d ^ a;
+    c += (da ^ b) + blocks[11] + 1839030562;
+    c = (c << 16 | c >>> 16) + d << 0;
+    b += (da ^ c) + blocks[14] - 35309556;
+    b = (b << 23 | b >>> 9) + c << 0;
+    bc = b ^ c;
+    a += (bc ^ d) + blocks[1] - 1530992060;
+    a = (a << 4 | a >>> 28) + b << 0;
+    d += (bc ^ a) + blocks[4] + 1272893353;
+    d = (d << 11 | d >>> 21) + a << 0;
+    da = d ^ a;
+    c += (da ^ b) + blocks[7] - 155497632;
+    c = (c << 16 | c >>> 16) + d << 0;
+    b += (da ^ c) + blocks[10] - 1094730640;
+    b = (b << 23 | b >>> 9) + c << 0;
+    bc = b ^ c;
+    a += (bc ^ d) + blocks[13] + 681279174;
+    a = (a << 4 | a >>> 28) + b << 0;
+    d += (bc ^ a) + blocks[0] - 358537222;
+    d = (d << 11 | d >>> 21) + a << 0;
+    da = d ^ a;
+    c += (da ^ b) + blocks[3] - 722521979;
+    c = (c << 16 | c >>> 16) + d << 0;
+    b += (da ^ c) + blocks[6] + 76029189;
+    b = (b << 23 | b >>> 9) + c << 0;
+    bc = b ^ c;
+    a += (bc ^ d) + blocks[9] - 640364487;
+    a = (a << 4 | a >>> 28) + b << 0;
+    d += (bc ^ a) + blocks[12] - 421815835;
+    d = (d << 11 | d >>> 21) + a << 0;
+    da = d ^ a;
+    c += (da ^ b) + blocks[15] + 530742520;
+    c = (c << 16 | c >>> 16) + d << 0;
+    b += (da ^ c) + blocks[2] - 995338651;
+    b = (b << 23 | b >>> 9) + c << 0;
+    a += (c ^ (b | ~d)) + blocks[0] - 198630844;
+    a = (a << 6 | a >>> 26) + b << 0;
+    d += (b ^ (a | ~c)) + blocks[7] + 1126891415;
+    d = (d << 10 | d >>> 22) + a << 0;
+    c += (a ^ (d | ~b)) + blocks[14] - 1416354905;
+    c = (c << 15 | c >>> 17) + d << 0;
+    b += (d ^ (c | ~a)) + blocks[5] - 57434055;
+    b = (b << 21 | b >>> 11) + c << 0;
+    a += (c ^ (b | ~d)) + blocks[12] + 1700485571;
+    a = (a << 6 | a >>> 26) + b << 0;
+    d += (b ^ (a | ~c)) + blocks[3] - 1894986606;
+    d = (d << 10 | d >>> 22) + a << 0;
+    c += (a ^ (d | ~b)) + blocks[10] - 1051523;
+    c = (c << 15 | c >>> 17) + d << 0;
+    b += (d ^ (c | ~a)) + blocks[1] - 2054922799;
+    b = (b << 21 | b >>> 11) + c << 0;
+    a += (c ^ (b | ~d)) + blocks[8] + 1873313359;
+    a = (a << 6 | a >>> 26) + b << 0;
+    d += (b ^ (a | ~c)) + blocks[15] - 30611744;
+    d = (d << 10 | d >>> 22) + a << 0;
+    c += (a ^ (d | ~b)) + blocks[6] - 1560198380;
+    c = (c << 15 | c >>> 17) + d << 0;
+    b += (d ^ (c | ~a)) + blocks[13] + 1309151649;
+    b = (b << 21 | b >>> 11) + c << 0;
+    a += (c ^ (b | ~d)) + blocks[4] - 145523070;
+    a = (a << 6 | a >>> 26) + b << 0;
+    d += (b ^ (a | ~c)) + blocks[11] - 1120210379;
+    d = (d << 10 | d >>> 22) + a << 0;
+    c += (a ^ (d | ~b)) + blocks[2] + 718787259;
+    c = (c << 15 | c >>> 17) + d << 0;
+    b += (d ^ (c | ~a)) + blocks[9] - 343485551;
+    b = (b << 21 | b >>> 11) + c << 0;
 
+    if (this.first) {
+      this.h0 = a + 1732584193 << 0;
+      this.h1 = b - 271733879 << 0;
+      this.h2 = c - 1732584194 << 0;
+      this.h3 = d + 271733878 << 0;
+      this.first = false;
+    } else {
+      this.h0 = this.h0 + a << 0;
+      this.h1 = this.h1 + b << 0;
+      this.h2 = this.h2 + c << 0;
+      this.h3 = this.h3 + d << 0;
+    }
+  };
 
-  try {
-    generateUUID.name = name; // eslint-disable-next-line no-empty
-  } catch (err) {} // For CommonJS default export support
+  /**
+   * @method hex
+   * @memberof Md5
+   * @instance
+   * @description Output hash as hex string
+   * @returns {String} Hex string
+   * @see {@link md5.hex}
+   * @example
+   * hash.hex();
+   */
+  Md5.prototype.hex = function () {
+    this.finalize();
 
+    var h0 = this.h0, h1 = this.h1, h2 = this.h2, h3 = this.h3;
 
-  generateUUID.DNS = DNS;
-  generateUUID.URL = URL;
-  return generateUUID;
-}
+    return HEX_CHARS[(h0 >>> 4) & 0x0F] + HEX_CHARS[h0 & 0x0F] +
+      HEX_CHARS[(h0 >>> 12) & 0x0F] + HEX_CHARS[(h0 >>> 8) & 0x0F] +
+      HEX_CHARS[(h0 >>> 20) & 0x0F] + HEX_CHARS[(h0 >>> 16) & 0x0F] +
+      HEX_CHARS[(h0 >>> 28) & 0x0F] + HEX_CHARS[(h0 >>> 24) & 0x0F] +
+      HEX_CHARS[(h1 >>> 4) & 0x0F] + HEX_CHARS[h1 & 0x0F] +
+      HEX_CHARS[(h1 >>> 12) & 0x0F] + HEX_CHARS[(h1 >>> 8) & 0x0F] +
+      HEX_CHARS[(h1 >>> 20) & 0x0F] + HEX_CHARS[(h1 >>> 16) & 0x0F] +
+      HEX_CHARS[(h1 >>> 28) & 0x0F] + HEX_CHARS[(h1 >>> 24) & 0x0F] +
+      HEX_CHARS[(h2 >>> 4) & 0x0F] + HEX_CHARS[h2 & 0x0F] +
+      HEX_CHARS[(h2 >>> 12) & 0x0F] + HEX_CHARS[(h2 >>> 8) & 0x0F] +
+      HEX_CHARS[(h2 >>> 20) & 0x0F] + HEX_CHARS[(h2 >>> 16) & 0x0F] +
+      HEX_CHARS[(h2 >>> 28) & 0x0F] + HEX_CHARS[(h2 >>> 24) & 0x0F] +
+      HEX_CHARS[(h3 >>> 4) & 0x0F] + HEX_CHARS[h3 & 0x0F] +
+      HEX_CHARS[(h3 >>> 12) & 0x0F] + HEX_CHARS[(h3 >>> 8) & 0x0F] +
+      HEX_CHARS[(h3 >>> 20) & 0x0F] + HEX_CHARS[(h3 >>> 16) & 0x0F] +
+      HEX_CHARS[(h3 >>> 28) & 0x0F] + HEX_CHARS[(h3 >>> 24) & 0x0F];
+  };
 
-/***/ }),
+  /**
+   * @method toString
+   * @memberof Md5
+   * @instance
+   * @description Output hash as hex string
+   * @returns {String} Hex string
+   * @see {@link md5.hex}
+   * @example
+   * hash.toString();
+   */
+  Md5.prototype.toString = Md5.prototype.hex;
 
-/***/ "./node_modules/uuid/dist/commonjs-browser/v4.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/v4.js ***!
-  \*******************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+  /**
+   * @method digest
+   * @memberof Md5
+   * @instance
+   * @description Output hash as bytes array
+   * @returns {Array} Bytes array
+   * @see {@link md5.digest}
+   * @example
+   * hash.digest();
+   */
+  Md5.prototype.digest = function () {
+    this.finalize();
 
-"use strict";
+    var h0 = this.h0, h1 = this.h1, h2 = this.h2, h3 = this.h3;
+    return [
+      h0 & 0xFF, (h0 >>> 8) & 0xFF, (h0 >>> 16) & 0xFF, (h0 >>> 24) & 0xFF,
+      h1 & 0xFF, (h1 >>> 8) & 0xFF, (h1 >>> 16) & 0xFF, (h1 >>> 24) & 0xFF,
+      h2 & 0xFF, (h2 >>> 8) & 0xFF, (h2 >>> 16) & 0xFF, (h2 >>> 24) & 0xFF,
+      h3 & 0xFF, (h3 >>> 8) & 0xFF, (h3 >>> 16) & 0xFF, (h3 >>> 24) & 0xFF
+    ];
+  };
 
+  /**
+   * @method array
+   * @memberof Md5
+   * @instance
+   * @description Output hash as bytes array
+   * @returns {Array} Bytes array
+   * @see {@link md5.array}
+   * @example
+   * hash.array();
+   */
+  Md5.prototype.array = Md5.prototype.digest;
 
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
+  /**
+   * @method arrayBuffer
+   * @memberof Md5
+   * @instance
+   * @description Output hash as ArrayBuffer
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @see {@link md5.arrayBuffer}
+   * @example
+   * hash.arrayBuffer();
+   */
+  Md5.prototype.arrayBuffer = function () {
+    this.finalize();
 
-var _native = _interopRequireDefault(__webpack_require__(/*! ./native.js */ "./node_modules/uuid/dist/commonjs-browser/native.js"));
+    var buffer = new ArrayBuffer(16);
+    var blocks = new Uint32Array(buffer);
+    blocks[0] = this.h0;
+    blocks[1] = this.h1;
+    blocks[2] = this.h2;
+    blocks[3] = this.h3;
+    return buffer;
+  };
 
-var _rng = _interopRequireDefault(__webpack_require__(/*! ./rng.js */ "./node_modules/uuid/dist/commonjs-browser/rng.js"));
+  /**
+   * @method buffer
+   * @deprecated This maybe confuse with Buffer in node.js. Please use arrayBuffer instead.
+   * @memberof Md5
+   * @instance
+   * @description Output hash as ArrayBuffer
+   * @returns {ArrayBuffer} ArrayBuffer
+   * @see {@link md5.buffer}
+   * @example
+   * hash.buffer();
+   */
+  Md5.prototype.buffer = Md5.prototype.arrayBuffer;
 
-var _stringify = __webpack_require__(/*! ./stringify.js */ "./node_modules/uuid/dist/commonjs-browser/stringify.js");
+  /**
+   * @method base64
+   * @memberof Md5
+   * @instance
+   * @description Output hash as base64 string
+   * @returns {String} base64 string
+   * @see {@link md5.base64}
+   * @example
+   * hash.base64();
+   */
+  Md5.prototype.base64 = function () {
+    var v1, v2, v3, base64Str = '', bytes = this.array();
+    for (var i = 0; i < 15;) {
+      v1 = bytes[i++];
+      v2 = bytes[i++];
+      v3 = bytes[i++];
+      base64Str += BASE64_ENCODE_CHAR[v1 >>> 2] +
+        BASE64_ENCODE_CHAR[(v1 << 4 | v2 >>> 4) & 63] +
+        BASE64_ENCODE_CHAR[(v2 << 2 | v3 >>> 6) & 63] +
+        BASE64_ENCODE_CHAR[v3 & 63];
+    }
+    v1 = bytes[i];
+    base64Str += BASE64_ENCODE_CHAR[v1 >>> 2] +
+      BASE64_ENCODE_CHAR[(v1 << 4) & 63] +
+      '==';
+    return base64Str;
+  };
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function v4(options, buf, offset) {
-  if (_native.default.randomUUID && !buf && !options) {
-    return _native.default.randomUUID();
-  }
-
-  options = options || {};
-
-  const rnds = options.random || (options.rng || _rng.default)(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-
-
-  rnds[6] = rnds[6] & 0x0f | 0x40;
-  rnds[8] = rnds[8] & 0x3f | 0x80; // Copy bytes to buffer, if provided
-
-  if (buf) {
-    offset = offset || 0;
-
-    for (let i = 0; i < 16; ++i) {
-      buf[offset + i] = rnds[i];
+  /**
+   * HmacMd5 class
+   * @class HmacMd5
+   * @extends Md5
+   * @description This is internal class.
+   * @see {@link md5.hmac.create}
+   */
+  function HmacMd5(key, sharedMemory) {
+    var i, result = formatMessage(key);
+    key = result[0];
+    if (result[1]) {
+      var bytes = [], length = key.length, index = 0, code;
+      for (i = 0; i < length; ++i) {
+        code = key.charCodeAt(i);
+        if (code < 0x80) {
+          bytes[index++] = code;
+        } else if (code < 0x800) {
+          bytes[index++] = (0xc0 | (code >>> 6));
+          bytes[index++] = (0x80 | (code & 0x3f));
+        } else if (code < 0xd800 || code >= 0xe000) {
+          bytes[index++] = (0xe0 | (code >>> 12));
+          bytes[index++] = (0x80 | ((code >>> 6) & 0x3f));
+          bytes[index++] = (0x80 | (code & 0x3f));
+        } else {
+          code = 0x10000 + (((code & 0x3ff) << 10) | (key.charCodeAt(++i) & 0x3ff));
+          bytes[index++] = (0xf0 | (code >>> 18));
+          bytes[index++] = (0x80 | ((code >>> 12) & 0x3f));
+          bytes[index++] = (0x80 | ((code >>> 6) & 0x3f));
+          bytes[index++] = (0x80 | (code & 0x3f));
+        }
+      }
+      key = bytes;
     }
 
-    return buf;
+    if (key.length > 64) {
+      key = (new Md5(true)).update(key).array();
+    }
+
+    var oKeyPad = [], iKeyPad = [];
+    for (i = 0; i < 64; ++i) {
+      var b = key[i] || 0;
+      oKeyPad[i] = 0x5c ^ b;
+      iKeyPad[i] = 0x36 ^ b;
+    }
+
+    Md5.call(this, sharedMemory);
+
+    this.update(iKeyPad);
+    this.oKeyPad = oKeyPad;
+    this.inner = true;
+    this.sharedMemory = sharedMemory;
   }
+  HmacMd5.prototype = new Md5();
 
-  return (0, _stringify.unsafeStringify)(rnds);
-}
+  HmacMd5.prototype.finalize = function () {
+    Md5.prototype.finalize.call(this);
+    if (this.inner) {
+      this.inner = false;
+      var innerHash = this.array();
+      Md5.call(this, this.sharedMemory);
+      this.update(this.oKeyPad);
+      this.update(innerHash);
+      Md5.prototype.finalize.call(this);
+    }
+  };
 
-var _default = v4;
-exports["default"] = _default;
+  var exports = createMethod();
+  exports.md5 = exports;
+  exports.md5.hmac = createHmacMethod();
 
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/v5.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/v5.js ***!
-  \*******************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _v = _interopRequireDefault(__webpack_require__(/*! ./v35.js */ "./node_modules/uuid/dist/commonjs-browser/v35.js"));
-
-var _sha = _interopRequireDefault(__webpack_require__(/*! ./sha1.js */ "./node_modules/uuid/dist/commonjs-browser/sha1.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const v5 = (0, _v.default)('v5', 0x50, _sha.default);
-var _default = v5;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/validate.js":
-/*!*************************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/validate.js ***!
-  \*************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _regex = _interopRequireDefault(__webpack_require__(/*! ./regex.js */ "./node_modules/uuid/dist/commonjs-browser/regex.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function validate(uuid) {
-  return typeof uuid === 'string' && _regex.default.test(uuid);
-}
-
-var _default = validate;
-exports["default"] = _default;
-
-/***/ }),
-
-/***/ "./node_modules/uuid/dist/commonjs-browser/version.js":
-/*!************************************************************!*\
-  !*** ./node_modules/uuid/dist/commonjs-browser/version.js ***!
-  \************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports["default"] = void 0;
-
-var _validate = _interopRequireDefault(__webpack_require__(/*! ./validate.js */ "./node_modules/uuid/dist/commonjs-browser/validate.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function version(uuid) {
-  if (!(0, _validate.default)(uuid)) {
-    throw TypeError('Invalid UUID');
+  if (COMMON_JS) {
+    module.exports = exports;
+  } else {
+    /**
+     * @method md5
+     * @description Md5 hash function, export to global in browsers.
+     * @param {String|Array|Uint8Array|ArrayBuffer} message message to hash
+     * @returns {String} md5 hashes
+     * @example
+     * md5(''); // d41d8cd98f00b204e9800998ecf8427e
+     * md5('The quick brown fox jumps over the lazy dog'); // 9e107d9d372bb6826bd81d3542a419d6
+     * md5('The quick brown fox jumps over the lazy dog.'); // e4d909c290d0fb1ca068ffaddf22cbd0
+     *
+     * // It also supports UTF-8 encoding
+     * md5('中文'); // a7bac2239fcdcb3a067903d8077c4a07
+     *
+     * // It also supports byte `Array`, `Uint8Array`, `ArrayBuffer`
+     * md5([]); // d41d8cd98f00b204e9800998ecf8427e
+     * md5(new Uint8Array([])); // d41d8cd98f00b204e9800998ecf8427e
+     */
+    root.md5 = exports;
+    if (AMD) {
+      !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
+        return exports;
+      }).call(exports, __webpack_require__, exports, module),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+    }
   }
+})();
 
-  return parseInt(uuid.slice(14, 15), 16);
+
+/***/ }),
+
+/***/ "./node_modules/process/browser.js":
+/*!*****************************************!*\
+  !*** ./node_modules/process/browser.js ***!
+  \*****************************************/
+/***/ ((module) => {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
 }
 
-var _default = version;
-exports["default"] = _default;
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+
+/***/ "./resources/apps/lib/VueGoogleAutocomplete.vue":
+/*!******************************************************!*\
+  !*** ./resources/apps/lib/VueGoogleAutocomplete.vue ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _VueGoogleAutocomplete_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _VueGoogleAutocomplete_vue_vue_type_template_id_1496a5d0__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./VueGoogleAutocomplete.vue?vue&type=template&id=1496a5d0 */ "./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=template&id=1496a5d0");
+/* harmony import */ var _VueGoogleAutocomplete_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./VueGoogleAutocomplete.vue?vue&type=script&lang=js */ "./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _VueGoogleAutocomplete_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _VueGoogleAutocomplete_vue_vue_type_template_id_1496a5d0__WEBPACK_IMPORTED_MODULE_0__.render,
+  _VueGoogleAutocomplete_vue_vue_type_template_id_1496a5d0__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/lib/VueGoogleAutocomplete.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/apps/web/checkout/CheckouItems.vue":
+/*!******************************************************!*\
+  !*** ./resources/apps/web/checkout/CheckouItems.vue ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _CheckouItems_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _CheckouItems_vue_vue_type_template_id_0dabf81b_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CheckouItems.vue?vue&type=template&id=0dabf81b&scoped=true */ "./resources/apps/web/checkout/CheckouItems.vue?vue&type=template&id=0dabf81b&scoped=true");
+/* harmony import */ var _CheckouItems_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CheckouItems.vue?vue&type=script&lang=js */ "./resources/apps/web/checkout/CheckouItems.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _CheckouItems_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _CheckouItems_vue_vue_type_template_id_0dabf81b_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _CheckouItems_vue_vue_type_template_id_0dabf81b_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "0dabf81b",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/checkout/CheckouItems.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
 
 /***/ }),
 
@@ -4411,6 +5666,40 @@ component.options.__file = "resources/apps/web/components/NoodleContainer.vue"
 
 /***/ }),
 
+/***/ "./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=script&lang=js":
+/*!******************************************************************************!*\
+  !*** ./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=script&lang=js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_VueGoogleAutocomplete_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_VueGoogleAutocomplete_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./VueGoogleAutocomplete.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_VueGoogleAutocomplete_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/web/checkout/CheckouItems.vue?vue&type=script&lang=js":
+/*!******************************************************************************!*\
+  !*** ./resources/apps/web/checkout/CheckouItems.vue?vue&type=script&lang=js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckouItems_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckouItems_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckouItems.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckouItems.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckouItems_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=script&lang=js":
 /*!********************************************************************************!*\
   !*** ./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=script&lang=js ***!
@@ -4459,6 +5748,42 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleContainer_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./NoodleContainer.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleContainer.vue?vue&type=script&lang=js");
  /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleContainer_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=template&id=1496a5d0":
+/*!************************************************************************************!*\
+  !*** ./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=template&id=1496a5d0 ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_VueGoogleAutocomplete_vue_vue_type_template_id_1496a5d0__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_VueGoogleAutocomplete_vue_vue_type_template_id_1496a5d0__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_VueGoogleAutocomplete_vue_vue_type_template_id_1496a5d0__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_VueGoogleAutocomplete_vue_vue_type_template_id_1496a5d0__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./VueGoogleAutocomplete.vue?vue&type=template&id=1496a5d0 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/lib/VueGoogleAutocomplete.vue?vue&type=template&id=1496a5d0");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/checkout/CheckouItems.vue?vue&type=template&id=0dabf81b&scoped=true":
+/*!************************************************************************************************!*\
+  !*** ./resources/apps/web/checkout/CheckouItems.vue?vue&type=template&id=0dabf81b&scoped=true ***!
+  \************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckouItems_vue_vue_type_template_id_0dabf81b_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckouItems_vue_vue_type_template_id_0dabf81b_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckouItems_vue_vue_type_template_id_0dabf81b_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckouItems_vue_vue_type_template_id_0dabf81b_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckouItems.vue?vue&type=template&id=0dabf81b&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckouItems.vue?vue&type=template&id=0dabf81b&scoped=true");
+
 
 /***/ }),
 
@@ -4624,6 +5949,26 @@ function normalizeComponent(
   }
 }
 
+
+/***/ }),
+
+/***/ "?34e4":
+/*!************************!*\
+  !*** buffer (ignored) ***!
+  \************************/
+/***/ (() => {
+
+/* (ignored) */
+
+/***/ }),
+
+/***/ "?c7e7":
+/*!************************!*\
+  !*** crypto (ignored) ***!
+  \************************/
+/***/ (() => {
+
+/* (ignored) */
 
 /***/ }),
 
@@ -7900,6 +9245,11 @@ module.exports = axios;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/amd options */
+/******/ 	(() => {
+/******/ 		__webpack_require__.amdO = {};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
