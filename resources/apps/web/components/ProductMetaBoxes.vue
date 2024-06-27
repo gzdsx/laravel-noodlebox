@@ -13,9 +13,7 @@
             </div>
         </div>
 
-        <div class="product-description text-safety-orange" v-if="product.description">
-            {{ product.description }}
-        </div>
+        <div class="product-description text-safety-orange" v-html="product.description" v-if="product.description"></div>
         <div class="product-badges" v-if="product.meta_data.badges">
             <img v-for="(b,i) in product.meta_data.badges" :key="i" :src="b" alt="">
         </div>
@@ -53,8 +51,9 @@
 
         <div class="mt-4" v-if="product.allow_point_purchase">
             <label class="text-safety-orange">
-                <input type="checkbox" v-model="usePointPurchase" style="transform: scale(1.5);margin-right: 3px;">
-                <span>Use {{ product.point_price }} Noodle Box Points for purchasing this Product</span>
+                <input type="checkbox" v-model="usePointPurchase"
+                       style="transform: scale(1.5); margin-right: 3px; margin-left: 6px;">
+                <span>Use {{ totalPoints }} Noodle Box Points for purchasing this Product</span>
             </label>
         </div>
 
@@ -139,6 +138,9 @@ export default {
             this.additional_options = additional_options;
 
             return price.toFixed(2);
+        },
+        totalPoints() {
+            return parseInt(this.product.point_price) * this.quantity;
         }
     },
     methods: {
@@ -165,8 +167,7 @@ export default {
                 this.$showToast('Added to cart successfully!');
                 this.$emit('added');
             }).catch(reason => {
-                //console.log(reason);
-                this.$showToast(reason.message);
+                console.log(reason);
             }).finally(() => {
 
             });

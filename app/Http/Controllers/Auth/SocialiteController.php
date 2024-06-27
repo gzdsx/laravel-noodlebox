@@ -13,6 +13,7 @@ class SocialiteController extends Controller
 {
     public function index(Request $request, $driver)
     {
+        session(['redirect' => url()->previous()]);
         return Socialite::driver($driver)->redirect();
     }
 
@@ -27,7 +28,7 @@ class SocialiteController extends Controller
 
         if ($connect) {
             $user = $connect->user()->firstOrNew();
-            if (!$user->nickname){
+            if (!$user->nickname) {
                 $user->nickname = $oauth_user->getName();
             }
             $user->save();
@@ -48,7 +49,11 @@ class SocialiteController extends Controller
             ]);
         }
 
-        Auth::login($user);
-        return redirect()->intended(session('redirect', url()->previous()));
+        if (!$user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+        }
+
+        Auth::login($user, true);
+        return redirect()->intended(session('redirect', '/my-account'));
     }
 }

@@ -41,12 +41,31 @@
         left: 0;
         top: 50%;
         transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
 
-        img {
-            width: 64px;
-            height: 64px;
-            object-fit: contain;
-            cursor: pointer;
+        &__item{
+            position: relative;
+            img {
+                width: 64px;
+                height: 64px;
+                object-fit: contain;
+                cursor: pointer;
+            }
+
+            .badge {
+                position: absolute;
+                top: -20px;
+                right: -20px;
+                background-color: #ff0000;
+                color: #ffffff;
+                font-size: 10px;
+                font-style: normal;
+                text-align: center;
+                line-height: 20px;
+                border-radius: 10rem;
+                padding: 3px 8px;
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 <template>
     <div class="sku-panel">
-        <vuedraggable class="variation-list__sortable" v-model="variationList" draggable=".sku-draggable"
+        <vuedraggable class="variation-list__sortable" v-model="variationList" @change="onSortChange"
+                      draggable=".sku-draggable"
                       handle=".sku-mover">
             <div class="sku-classify sku-draggable" v-for="(v,index) in variationList" :key="index">
                 <div class="sku-classify-header sku-mover">
@@ -79,7 +80,7 @@ export default {
     name: "VariationPanel",
     components: {DialogChooseVariation},
     props: {
-        variationList: {
+        value: {
             type: Array,
             default: () => []
         }
@@ -87,7 +88,13 @@ export default {
     data() {
         return {
             showDoalog: false,
-            theVariation: {}
+            theVariation: {},
+            variationList: []
+        }
+    },
+    watch: {
+        value(val) {
+            this.variationList = val;
         }
     },
     methods: {
@@ -128,6 +135,9 @@ export default {
                     this.theVariation.options.push({...o});
                 }
             });
+        },
+        onSortChange() {
+            this.$emit('input', this.variationList);
         }
     }
 }

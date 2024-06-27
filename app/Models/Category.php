@@ -73,6 +73,7 @@ class Category extends Model
             if (!$category->slug) {
                 $category->slug = strtolower(Pinyin::permalink($category->name, ''));
             }
+            cache()->forget('front-category-products');
         });
     }
 

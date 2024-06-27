@@ -6,15 +6,14 @@
 @section('body-class','page-shop')
 
 @php
-    $products = cache()->rememberForever('front-products',function (){
-        return get_products(['status'=>'onsale','limit'=>1000])->groupBy(function ($item,$key){
-            if ($item->categories->count() > 0){
-                return $item->categories->first()->id;
-            }else{
-                return 0;
-            }
-        });
-    });
+    $category_products = category()->with(['products'=>function($builder){
+            return $builder->where('status','onsale')
+            ->orderByDesc('sticky')
+            ->orderByDesc('sort_num')
+            ->orderByDesc('created_at');
+        }])->where(['taxonomy'=>'product','parent_id'=>0])
+        ->whereNotIn('id',[15,221])
+        ->orderBy('sort_num')->get();
 @endphp
 @section('content')
     <section class="swiper-container banner-swiper">
@@ -22,7 +21,9 @@
             <div class="swiper-wrapper">
                 @foreach(get_block_items(1) as $image)
                     <div class="swiper-slide slide-image">
-                        <img src="{{ $image->image }}" alt="">
+                        <a href="{{ $image->url }}">
+                            <img src="{{ $image->image }}" alt="">
+                        </a>
                     </div>
                 @endforeach
             </div>
@@ -77,42 +78,40 @@
 
                 <div class="product-category-tab-content" id="pcSwiper">
                     <div class="swiper-wrapper" style="overflow-y: hidden;">
-                        @foreach($categories as $category)
+                        @foreach($category_products as $category)
                             <div class="swiper-slide">
                                 <div class="category-products">
-                                    @if(isset($products[$category->id]))
-                                        @foreach($products[$category->id] as $product)
-                                            <div class="product-item">
-                                                <div class="product-item__image">
-                                                    <img src="{{asset('images/noodlebox/placeholder.png')}}"
-                                                         data-src="{{$product->image}}" class="absolute-fill"
-                                                         alt="">
-                                                    @if($product->icon=='new')
-                                                        <span class="product-icon product-icon__new">new!</span>
-                                                    @endif
-                                                    @if($product->icon=='hot')
-                                                        <span class="product-icon product-icon__hot">hot!</span>
-                                                    @endif
+                                    @foreach($category->products as $product)
+                                        <div class="product-item">
+                                            <div class="product-item__image">
+                                                <img src="{{asset('images/noodlebox/placeholder.png')}}"
+                                                     data-src="{{$product->image}}" class="absolute-fill"
+                                                     alt="">
+                                                @if($product->icon=='new')
+                                                    <span class="product-icon product-icon__new">new!</span>
+                                                @endif
+                                                @if($product->icon=='hot')
+                                                    <span class="product-icon product-icon__hot">hot!</span>
+                                                @endif
 
-                                                    @if($product->getMeta('spicy'))
-                                                        <span class="product-spicy product-spicy__{{$product->getMeta('spicy')}}"></span>
-                                                    @endif
+                                                @if($product->getMeta('spicy'))
+                                                    <span class="product-spicy product-spicy__{{$product->getMeta('spicy')}}"></span>
+                                                @endif
+                                            </div>
+                                            <div class="product-item__ctx">
+                                                <div class="product-item__title text-white">{{$product->title}}</div>
+                                                <div class="product-item__price text-turquoise">
+                                                    <bdi>€</bdi>
+                                                    {{$product->price}}
                                                 </div>
-                                                <div class="product-item__ctx">
-                                                    <div class="product-item__title text-white">{{$product->title}}</div>
-                                                    <div class="product-item__price text-turquoise">
-                                                        <bdi>€</bdi>
-                                                        {{$product->price}}
-                                                    </div>
-                                                    <div>
-                                                        <a class="btn btn-danger add-to-cart"
-                                                           data-id="{{$product->id}}">Add
-                                                            Order</a>
-                                                    </div>
+                                                <div>
+                                                    <a class="btn btn-danger add-to-cart"
+                                                       data-id="{{$product->id}}">Add
+                                                        Order</a>
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    @endif
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
                         @endforeach
@@ -121,7 +120,7 @@
             </div>
         </section>
         <script>
-            var categories = @json($categories);
+            var categories = @json($category_products);
         </script>
         <script>
             (function ($) {
@@ -172,43 +171,51 @@
             </div>
             <div class="shop-main" id="mobileSwiper">
                 <div class="swiper-wrapper" style="overflow-y: hidden;">
-                    @foreach($categories as $category)
+                    @foreach($category_products as $category)
                         <div class="swiper-slide overflow-hidden">
                             <div class="product-vertical-list">
-                                @if(isset($products[$category->id]))
-                                    @foreach($products[$category->id] as $product)
-                                        <div class="product-item">
-                                            <div class="product-item__image">
-                                                <div class="product-item__image__image">
-                                                    <img src="{{asset('images/noodlebox/placeholder.png')}}"
-                                                         data-src="{{$product->image}}" class="absolute-fill"
-                                                         alt="">
-                                                </div>
-                                            </div>
-                                            <div class="product-item__ctx">
-                                                <div class="product-item__title text-white">{{$product->title}}</div>
-                                                @if($product->getMeta('badges'))
-                                                    <div class="product-item__badges">
-                                                        @foreach($product->getMeta('badges') as $badge)
-                                                            <img src="{{$badge}}" class="badge-item" alt="">
-                                                        @endforeach
-                                                    </div>
+                                @foreach($category->products as $product)
+                                    <div class="product-item">
+                                        <div class="product-item__image">
+                                            <div class="product-item__image__image">
+                                                <img src="{{asset('images/noodlebox/placeholder.png')}}"
+                                                     data-src="{{$product->image}}" class="absolute-fill"
+                                                     alt="">
+                                                @if($product->icon=='new')
+                                                    <span class="product-icon product-icon__new">new!</span>
                                                 @endif
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div class="product-item__price text-turquoise">
-                                                        <bdi>€</bdi>
-                                                        {{$product->price}}
-                                                    </div>
-                                                    <div>
-                                                        <a class="btn btn-danger add-to-cart"
-                                                           data-id="{{$product->id}}">Add
-                                                            Order</a>
-                                                    </div>
+                                                @if($product->icon=='hot')
+                                                    <span class="product-icon product-icon__hot">hot!</span>
+                                                @endif
+
+                                                @if($spicy = $product->getMeta('spicy'))
+                                                    <span class="product-spicy product-spicy__{{$spicy}}"></span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="product-item__ctx">
+                                            <div class="product-item__title text-white">{{$product->title}}</div>
+                                            @if($product->getMeta('badges'))
+                                                <div class="product-item__badges">
+                                                    @foreach($product->getMeta('badges') as $badge)
+                                                        <img src="{{$badge}}" class="badge-item" alt="">
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="product-item__price text-turquoise">
+                                                    <bdi>€</bdi>
+                                                    {{$product->price}}
+                                                </div>
+                                                <div>
+                                                    <a class="btn btn-danger add-to-cart"
+                                                       data-id="{{$product->id}}">Add
+                                                        Order</a>
                                                 </div>
                                             </div>
                                         </div>
-                                    @endforeach
-                                @endif
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     @endforeach

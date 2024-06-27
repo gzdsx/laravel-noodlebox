@@ -12,6 +12,9 @@ class BaseController extends Controller
     {
         parent::__construct($request);
         $this->middleware(function ($request, $next) {
+            \View::share([
+                'my' => $request->user()
+            ]);
             return $next($request);
         });
     }

@@ -53,6 +53,14 @@
                     <el-input class="w200" v-model="settings.points_exchange_rate"/>
                     <div class="el-form-tips">1个积分可抵扣的现金金额</div>
                 </el-form-item>
+                <el-form-item label="分享链接奖励积分">
+                    <el-input class="w200" v-model="settings.referral_points"/>
+                    <div class="el-form-tips">分享链接到社交平台奖励积分</div>
+                </el-form-item>
+                <el-form-item label="分享链接描述">
+                    <el-input type="textarea" row="3" class="w500" v-model="settings.referral_link_description"/>
+                    <div class="el-form-tips">分享链接描述文字</div>
+                </el-form-item>
 
                 <el-form-item>
                     <el-button type="primary" size="medium" @click="onSubmit">{{ $t('settings.save') }}</el-button>

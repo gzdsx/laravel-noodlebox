@@ -31,6 +31,18 @@
     <script src="{{asset('lib/swiper/swiper-bundle.min.js?v=8.4.7')}}" type="text/javascript"></script>
     <script src="{{asset('dist/web/vendor.js?v='.appversion())}}" type="text/javascript"></script>
 @yield('scripts')
+    <script>
+        window.noodlebox = {
+            url: "{{url('')}}",
+            locale: "{{app()->getLocale()}}",
+            user:{
+                id:'{{auth()->id()}}',
+                nickname:'{{auth()->check() ? auth()->user()->nickname : ''}}',
+                avatar:'{{auth()->check() ? auth()->user()->avatar : ''}}',
+                points:'{{auth()->check() ? auth()->user()->points : '0'}}'
+            }
+        }
+    </script>
 </head>
 <body class="@yield('body-class','body') mobile-body">
 @yield('header-before')

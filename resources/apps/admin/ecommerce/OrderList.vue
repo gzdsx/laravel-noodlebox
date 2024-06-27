@@ -36,27 +36,25 @@
             </div>
             <el-table :data="dataList" v-loading="loading" @selection-change="onSelectionChange">
                 <el-table-column width="45" type="selection"/>
-                <el-table-column width="220" label="Order">
+                <el-table-column width="auto" label="Order">
                     <template slot-scope="scope">
-                        <div>
+                        <div class="post-column-title">
                             <router-link :to="'/order/detail/' + scope.row.id" target="_blank">
                                 <span class="text-danger font-weight-bold"
                                       v-if="scope.row.is_modified">{{ scope.row.order_no }}</span>
                                 <span class="text-primary" v-else>{{ scope.row.order_no }}</span>
                             </router-link>
                         </div>
-                        <div>{{ scope.row.buyer_name }}</div>
+                        <div class="post-column-actions">
+                            <span>{{ scope.row.buyer_name }}</span>
+                            <span>|</span>
+                            <span><a :href="scope.row.links.invoice" target="_blank">Invoice</a></span>
+                        </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="Created Via" width="120" prop="created_via"/>
                 <el-table-column label="Ship to" width="200">
                     <template slot-scope="scope">
                         <div style="line-height: 1.1"><small>{{ formatAddress(scope.row.shipping) }}</small></div>
-                    </template>
-                </el-table-column>
-                <el-table-column label="Total" width="80">
-                    <template slot-scope="scope">
-                        {{ '€' + scope.row.total }}
                     </template>
                 </el-table-column>
                 <el-table-column label="Status" width="100" prop="status"/>
@@ -67,22 +65,31 @@
                             <span :style="{'color': scope.row.deliveryer.color}">{{ scope.row.deliveryer.name }}</span>
                         </div>
                         <div v-else>----</div>
-                        <div><strong>{{scope.row.short_code}}</strong></div>
+                        <div><strong>{{ scope.row.short_code }}</strong></div>
                     </template>
                 </el-table-column>
                 <el-table-column label="Shipping M" width="100" prop="shipping_method">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.shipping_method=='delivery'">
-                            <div>Delivery</div>
-                            <small>{{ scope.row.shipping_zone.title }}</small>
+                        <div v-if="scope.row.shipping_line">
+                            <div>{{ scope.row.shipping_line.method_title }}</div>
+                            <small>{{ scope.row.shipping_line.zone_title}}</small>
                         </div>
-                        <span v-else>Collection</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="Actions" width="auto" align="right" fixed="right">
+                <el-table-column label="Total" width="80">
                     <template slot-scope="scope">
-                        <el-button size="mini" type="text" @click="onDispose(scope.row)">处理订单</el-button>
-                        <el-button size="mini" type="text" @click="onPrint(scope.row)">Print</el-button>
+                        {{ '€' + scope.row.total }}
+                    </template>
+                </el-table-column>
+                <el-table-column label="Created Via" width="100" prop="created_via"/>
+                <el-table-column label="Actions" width="100" align="right" fixed="right">
+                    <template slot-scope="scope">
+                        <div>
+                            <el-button size="mini" type="text" @click="onDispose(scope.row)">处理订单</el-button>
+                        </div>
+                        <div>
+                            <el-button size="mini" type="text" @click="onPrint(scope.row)">Print</el-button>
+                        </div>
                     </template>
                 </el-table-column>
             </el-table>
@@ -127,7 +134,8 @@ export default {
             },
             showOrderDialog: false,
             currentOrder: {},
-            invoceLink: ''
+            invoceLink: '',
+            interval: null
         }
     },
 
@@ -194,12 +202,24 @@ export default {
             return addressline;
         },
         onPrint(order) {
-            let printWin = window.open(order.links.invoice, '_blank');
-            printWin.print();
+            this.$confirm('是否打印订单?', '提示', {
+                type: 'warning'
+            }).then(() => {
+                ApiService.get('/orders/' + order.id + '/print').then(response => {
+                    this.$message.success('Order print success');
+                }).catch(reason => {
+                    this.$message.error(reason.message);
+                });
+            }).catch(() => {
+
+            });
         }
     },
     mounted() {
         this.fetchList();
+        this.interval = setInterval(() => {
+            this.fetchList();
+        }, 60000);
     },
 }
 </script>

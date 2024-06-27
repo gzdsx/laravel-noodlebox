@@ -1,8 +1,4 @@
 .auth {
-
-}
-
-.auth {
     &-container {
         padding-top: 2rem;
         padding-bottom: 4rem;
@@ -64,20 +60,27 @@
     }
 }
 
-.dialog-login-wapper {
+.dialog-login-container {
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px;
 }
 
 .auth-dialog {
-    max-width: 500px;
-    min-width: 500px;
+    max-width: 400px;
+    min-width: 400px;
 }
 
 .sign-form {
-    display: none;
+    .invalid-feedback {
+        &.show {
+            display: block;
+        }
+    }
+}
 
-    &:first-child {
-        display: block;
+@media (max-width: 768px) {
+    .auth-dialog {
+        max-width: 100%;
+        min-width: auto;
     }
 }

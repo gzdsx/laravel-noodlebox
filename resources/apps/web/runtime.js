@@ -1,11 +1,21 @@
 import NoodleBoxApp from "./components/NoodleBoxApp.vue";
-import LotteryTurntable from "./lottery/LotteryTurntable.vue";
+import LoginApp from "./components/LoginApp.vue";
+import HttpClient from "./HttpClient";
 new Vue({
     el: '#noodlebox',
     render: function (h) {
         return h(NoodleBoxApp)
     }
 });
+
+if (document.getElementById('loginApp')){
+    new Vue({
+        el: '#loginApp',
+        render: function (h) {
+            return h(LoginApp);
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     const config = {
@@ -28,3 +38,16 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(img);
     });
 });
+
+window.addEventListener('cartChanged', (event) => {
+    //console.log(event);
+    if (window.noodlebox.user.id){
+        HttpClient.get('/carts').then(response => {
+            document.querySelectorAll('.cart-count').forEach(item => {
+                item.innerHTML = response.data.total;
+            });
+        });
+    }
+});
+
+window.dispatchEvent(new Event('cartChanged'));

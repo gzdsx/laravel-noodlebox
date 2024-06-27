@@ -109,6 +109,7 @@ trait SoldApis
 
                 $order_notes[] = $content;
                 $order->payment_method = $payment_method;
+                $order->payment_cash_amount = $payment_cash_amount;
                 $is_modified = true;
             }
         }
@@ -155,7 +156,6 @@ trait SoldApis
             $order->discount_lines = $request->input('discount_lines', []);
         }
 
-        $order->short_code = $request->input('short_code', '');
         $order->is_modified = $is_modified;
         $order->save();
 

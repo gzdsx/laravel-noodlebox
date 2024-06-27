@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Support\BulkSMS;
 use App\Support\Paypal;
+use App\Support\PrintNode;
 use App\Validators\AccountValidator;
 use App\Validators\PhoneValidaotr;
 use App\Validators\PasswordValidator;
@@ -70,6 +71,8 @@ class AppServiceProvider extends ServiceProvider
 
         //注册短信服务
         BulkSMS::setCredentials(env('BULKSMS_USERNAME'), env('BULKSMS_PASSWORD'));
+        //注册打印机
+        PrintNode::setApiKey(env('PRINTNODE_API_KEY'));
     }
 
     /**

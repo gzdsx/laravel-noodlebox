@@ -22,7 +22,7 @@ class TradeUtil
      */
     public static function createOrderNo($prefix = '')
     {
-        return $prefix . date('YmdHis') . rand(100, 999) . rand(100, 999);
+        return $prefix . date('YmdHis') . rand(100, 999);
     }
 
     public static function createOutTradeNo($prefix = '')

@@ -162,6 +162,21 @@ export default [
                 isLink: false
             },
             {
+                name: '收银台账',
+                path: '/cashier/transactions',
+                isLink: false
+            },
+            {
+                name: '司机台账',
+                path: '/deliveryer/transactions',
+                isLink: false
+            },
+            {
+                name: '积分记录',
+                path: '/user/point-transactions',
+                isLink: false
+            },
+            {
                 name: '照片墙',
                 path: '/photo-wall',
                 isLink: false

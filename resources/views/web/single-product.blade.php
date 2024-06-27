@@ -2,7 +2,7 @@
 
 @section('title', $product->title)
 @section('keywords', $product->keywords)
-@section('description', $product->description)
+@section('description', strip_tags($product->description))
 @section('body-class','single-product')
 
 @section('scripts')

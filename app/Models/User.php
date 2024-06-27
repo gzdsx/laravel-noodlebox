@@ -9,6 +9,7 @@ use App\Models\Traits\UserHasCarts;
 use App\Models\Traits\UserHasOrders;
 use App\Models\Traits\UserHasPosts;
 use EloquentFilter\Filterable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
@@ -20,17 +21,16 @@ use Laravel\Passport\HasApiTokens;
  * @property int $id 主键
  * @property int $gid 管理权限
  * @property string|null $nickname 昵称
- * @property string|null $national_number 国家代码
- * @property string|null $phone_number 手机号
  * @property string|null $email 邮箱
+ * @property string|null $national_number
+ * @property string|null $phone_number
  * @property string|null $avatar 头像
  * @property string|null $password 密码
  * @property string|null $remember_token
  * @property int $freeze 冻结
- * @property int $email_status 邮箱验证状态
- * @property int $name_status 实名认证状态
  * @property int $status 状态
  * @property int $points 积分
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property-read \App\Models\UserAccount|null $account
@@ -50,6 +50,7 @@ use Laravel\Passport\HasApiTokens;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserCreditCard> $creditCards
  * @property-read int|null $credit_cards_count
  * @property-read \Illuminate\Support\Collection $meta_data
+ * @property mixed $meta_value
  * @property-read array|string|null $status_des
  * @property-read \App\Models\UserGroup|null $group
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserLog> $logs
@@ -78,13 +79,12 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereBeginsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereEndsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|User whereFreeze($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereGid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereLike(string $column, string $value, string $boolean = 'and')
- * @method static \Illuminate\Database\Eloquent\Builder|User whereNameStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNationalNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
@@ -95,20 +95,34 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable, Filterable, HasApiTokens, HasDates, HasMetas;
-    use UserHasPosts, UserHasOrders, UserHasCarts;
+    use UserHasPosts, UserHasOrders, UserHasCarts, HasMetaValueAttribute;
 
     protected $table = 'user';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'id', 'gid', 'nickname', 'national_number', 'phone_number', 'email', 'password', 'remember_token',
-        'avatar', 'email_status', 'name_status', 'freeze', 'status', 'points'
+        'id',
+        'gid',
+        'nickname',
+        'email',
+        'password',
+        'remember_token',
+        'avatar',
+        'freeze',
+        'status',
+        'points',
+        'email_verified_at',
+        'national_number',
+        'phone_number'
     ];
     protected $hidden = ['password', 'remember_token'];
     protected $appends = [
         'status_des'
+    ];
+    protected $casts = [
+        'email_verified_at' => 'datetime',
     ];
 
     public static function boot()
@@ -160,11 +174,6 @@ class User extends Authenticatable
      */
     public function findForPassport($username)
     {
-        $user = $this->where('phone', $username)->first();
-        if ($user) {
-            return $user;
-        }
-
         return $this->where('email', $username)->first();
     }
 

@@ -179,7 +179,7 @@ class Product extends Model
         });
 
         static::saved(function (Product $product) {
-            cache()->forget('front-products');
+            cache()->forget('front-category-products');
             cache()->forget('product-' . $product->id);
         });
 

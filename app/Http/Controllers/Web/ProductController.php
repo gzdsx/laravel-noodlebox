@@ -58,7 +58,7 @@ class ProductController extends BaseController
         $products = Product::filter([
             'category' => $category->id,
             'status' => 'onsale'
-        ])->paginate(50);
+        ])->orderByDesc('sticky')->orderByDesc('sort_num')->orderByDesc('id')->paginate(50);
 
         return view('web.category-product', compact('category', 'products'));
     }

@@ -1,5 +1,5 @@
 <template>
-    <div class="noodle-dialog-wrapper" v-if="show" @click.p.prevent="close" @touchstart.prevent="click">
+    <div class="noodle-dialog-wrapper" v-if="show" @click.prevent="clickOverlayer" @touchstart.prevent="click">
         <div
                 class="noodle-dialog show"
                 :class="[customClass,{'show':showAnimate}]"
@@ -40,6 +40,10 @@ export default {
         customClass: {
             type: String,
             default: ''
+        },
+        closeOnClick: {
+            type: Boolean,
+            default: true
         }
     },
     data() {
@@ -77,6 +81,11 @@ export default {
         },
         click() {
             return false
+        },
+        clickOverlayer() {
+            if (this.closeOnClick) {
+                this.close();
+            }
         }
     },
     created() {

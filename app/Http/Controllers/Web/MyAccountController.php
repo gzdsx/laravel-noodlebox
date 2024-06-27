@@ -9,7 +9,17 @@ class MyAccountController extends BaseController
 {
     public function index(Request $request)
     {
-        $my = $request->user();
-        return view('web.my-account.index', compact('my'));
+        return view('web.my-account.orders', ['nav' => 'order']);
+    }
+
+    public function address(Request $request)
+    {
+
+        return view('web.my-account.address', ['nav' => 'address']);
+    }
+
+    public function points(Request $request)
+    {
+        return view('web.my-account.points', ['nav' => 'points']);
     }
 }

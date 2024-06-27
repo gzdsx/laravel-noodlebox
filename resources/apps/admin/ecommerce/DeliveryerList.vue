@@ -20,7 +20,15 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="phone" width="200" :label="$t('kefu.phone')"/>
-                <el-table-column prop="pos" width="200" label="POS"/>
+                <el-table-column prop="pos" width="200" label="POS">
+                    <template slot-scope="scope">
+                        <div class="column-tags">
+                            <el-tag size="small" v-for="(mac,index) in scope.row.pos_machines" :key="mac.id">
+                                {{ mac.name }}
+                            </el-tag>
+                        </div>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="base_amount" width="100" label="底金"/>
                 <el-table-column prop="status" width="100" :label="$t('状态')"/>
                 <el-table-column width="auto" :label="$t('common.option')" align="right" fixed="right">
@@ -29,8 +37,8 @@
                             $t('common.edit')
                             }}
                         </el-button>
-                        <el-button size="mini" type="text" @click="handlerShowSattlement(scope.row)">结算</el-button>
-                        <el-button size="mini" type="text" @click="handlerShowDetail(scope.row)">账户明细</el-button>
+                        <el-button size="mini" type="text" @click="handleShowSattlement(scope.row)">结算</el-button>
+                        <el-button size="mini" type="text" @click="handleShowDetail(scope.row)">账户明细</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -71,9 +79,10 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="POS机">
-                    <el-select class="w200" v-model="deliveryer.pos" placeholder="请选择">
-                        <el-option v-for="item in posMachineList" :key="item.id" :label="item.name" :value="item.name"/>
-                    </el-select>
+                    <el-checkbox-group v-model="deliveryer.pos_machines">
+                        <el-checkbox v-for="item in posMachineList" :key="item.id" :label="item">{{ item.name }}
+                        </el-checkbox>
+                    </el-checkbox-group>
                 </el-form-item>
                 <el-form-item label="底金">
                     <el-input class="w200" v-model="deliveryer.base_amount"/>
@@ -89,34 +98,41 @@
         </el-dialog>
         <el-dialog :title="$t('Settlement')" closeable :visible.sync="showCheckout" :close-on-click-modal="false"
                    :close-on-press-escape="false">
-            <el-form size="medium" label-width="80px" style="width: 500px;">
-                <el-form-item label="金额">
-                    <el-input class="w200" v-model="transaction.amount">
-                        <span slot="prepend">€</span>
-                    </el-input>
-                </el-form-item>
+            <el-descriptions title="" direction="vertical" :column="4" border>
+                <el-descriptions-item label="底金">{{ transaction.base_total }}</el-descriptions-item>
+                <el-descriptions-item label="配送费">{{ transaction.shipping_total }}</el-descriptions-item>
+                <el-descriptions-item label="收到现金">{{ transaction.cash_total }}</el-descriptions-item>
+                <el-descriptions-item label="在线支付">{{ transaction.online_total }}</el-descriptions-item>
+                <el-descriptions-item label="卡支付">{{ transaction.card_total }}</el-descriptions-item>
+                <el-descriptions-item label="Cost Total">{{ transaction.cost_total }}</el-descriptions-item>
+                <el-descriptions-item label="应交金额">{{ transaction.total }}</el-descriptions-item>
+            </el-descriptions>
+            <el-form size="medium" label-width="60px" style="width: 500px;margin-top: 20px;">
                 <el-form-item label="备注">
                     <el-input type="textarea" rows="3" class="w400" v-model="transaction.note"/>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="w100" @click="onSettlement">{{ $t('common.submit') }}
                     </el-button>
+                    <a class="el-link el-link--primary" @click="handleShowOrders">View Details</a>
                 </el-form-item>
             </el-form>
         </el-dialog>
         <media-dialog v-model="showPicker" @confirm="onSelectImage"/>
-        <deliveryer-transactions :deliveryer="deliveryer" v-model="showTransactions"/>
+        <dialog-deliveryer-transaction :deliveryer="deliveryer" v-model="showTransactions"/>
+        <dialog-deliveryer-orders :deliveryer="deliveryer" v-model="showOrders"/>
     </main-layout>
 </template>
 
 <script>
 import ApiService from "../utils/ApiService";
 import Pagination from "../mixins/Pagination";
-import DeliveryerTransactions from "./DeliveryerTransactions.vue";
+import DialogDeliveryerOrders from "./DialogDeliveryerOrders.vue";
+import DialogDeliveryerTransaction from "./DialogDeliveryerTransaction.vue";
 
 export default {
     name: "DeliveryerList",
-    components: {DeliveryerTransactions},
+    components: {DialogDeliveryerTransaction, DialogDeliveryerOrders},
     mixins: [Pagination],
     data() {
         return {
@@ -128,8 +144,13 @@ export default {
             transaction: {
                 amount: 10,
                 note: '',
+                total: 0,
+                shipping_total: 0,
+                cash_total: 0,
+                cost_total: 0
             },
-            showTransactions: false
+            showTransactions: false,
+            showOrders: false
         }
     },
     methods: {
@@ -137,7 +158,15 @@ export default {
             return '/deliveryers';
         },
         resetData() {
-            this.deliveryer = {};
+            this.deliveryer = {
+                name: '',
+                phone: '',
+                image: '',
+                status: 'online',
+                base_amount: 0,
+                color: '#fff',
+                pos_machines: []
+            };
         },
         onDelete() {
             let ids = this.selectionIds.map((d) => d.id);
@@ -161,14 +190,14 @@ export default {
             }
 
             if (deliveryer.id) {
-                ApiService.put('/deliveryers/' + deliveryer.id, {deliveryer}).then(() => {
+                ApiService.put('/deliveryers/' + deliveryer.id, deliveryer).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
                     this.$message.success(this.$t('kefu.updated'));
                 });
             } else {
-                ApiService.post('/deliveryers', {deliveryer}).then(() => {
+                ApiService.post('/deliveryers', deliveryer).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
@@ -178,40 +207,58 @@ export default {
         },
         onShowAdd() {
             this.resetData();
-            this.showDialog = true;
+            this.fetchPosMachines(() => {
+                this.showDialog = true;
+            });
         },
         onShowEdit(d) {
             this.deliveryer = d;
-            this.showDialog = true;
+            this.fetchPosMachines(() => {
+                this.showDialog = true;
+            });
         },
         onSelectImage(m) {
             this.deliveryer.image = m.src;
         },
-        fetchPosMachines() {
-            ApiService.get('/pos-machines').then((response) => {
-                this.posMachineList = response.data.items;
+        fetchPosMachines(cb) {
+            ApiService.get('/pos-machines?status=idle&is_cashier=0').then((response) => {
+                this.posMachineList = this.deliveryer.pos_machines.concat(response.data.items);
+                if (cb) cb();
             });
         },
         onSettlement() {
             let {id} = this.deliveryer;
-            ApiService.post(`/deliveryers/${id}/transactions`, this.transaction).then(() => {
+            let {total, note} = this.transaction;
+            ApiService.post(`/deliveryers/${id}/transactions`, {amount: total, note}).then(() => {
                 this.fetchList();
                 this.showCheckout = false;
                 this.$message.success('结算成功');
             });
         },
-        handlerShowSattlement(d) {
+        handleShowSattlement(d) {
             this.deliveryer = d;
-            this.showCheckout = true;
+            ApiService.get(`/deliveryers/${d.id}/caculate`).then(response => {
+                this.transaction = {
+                    ...this.transaction,
+                    ...response.data
+                }
+                this.showCheckout = true;
+            }).catch(reason => {
+                this.$message.error(reason.message);
+            }).finally(() => {
+
+            });
         },
-        handlerShowDetail(d) {
+        handleShowDetail(d) {
             this.deliveryer = d;
             this.showTransactions = true;
+        },
+        handleShowOrders() {
+            this.showOrders = true;
         }
     },
     mounted() {
         this.fetchList();
-        this.fetchPosMachines();
     },
 }
 </script>

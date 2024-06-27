@@ -35,41 +35,47 @@ class OrderController extends Controller
         $id = Hashids::decodeHex($hashid);
         $order = Order::findOrFail($id);
 
-        $sort_array = [];
-        $products = Product::whereKey($order->items->pluck('product_id'))->get();
-        foreach ($products as $product) {
-            if (isset($product->categories[0])) {
-                $sort_array[$product->id] = $product->categories[0]['sort_num'] ?? 0;
+        $order_items = $order->items()->with(['product'])->get();
+        $order_items->each(function ($item) {
+            if (isset($item->meta_data['purchase_via']) && $item->meta_data['purchase_via'] == 'lottery') {
+                $item->sort_num = 10000;
             } else {
-                $sort_array[$product->id] = 0;
+                if ($item->product) {
+                    if ($first = $item->product->categories->first()) {
+                        $item->sort_num = $first->sort_num;
+                    } else {
+                        $item->sort_num = 0;
+                    }
+                } else {
+                    $item->sort_num = 0;
+                }
             }
-        }
-
-        $order_items = [];
-        foreach ($order->items as $item) {
-            if (isset($sort_array[$item->product_id])) {
-                $item->sort_num = $sort_array[$item->product_id];
-            } else {
-                $item->sort_num = 0;
-            }
-
-            $order_items[] = $item;
-        }
-
-        usort($order_items, function ($a, $b) {
-            return $a->sort_num - $b->sort_num;
         });
 
-        $subtotal = array_reduce($order_items, function ($carry, $item) {
+        //dd($order_items->toArray());
+
+//        $order_items->sort(function ($a, $b) {
+//            return $b->sort_num - $a->sort_num;
+//        });
+
+        $subtotal = $order_items->reduce(function ($carry, $item) {
             return $carry + $item->price * $item->quantity;
         }, 0);
+
+//        $order_items = $order_items->toArray();
+//        usort($order_items, function ($a, $b) {
+//            return $b['sort_num'] - $a['sort_num'];
+//        });
+
+        $order_items = $order_items->sortBy('sort_num');
 
         //return view('web.invoice', compact('order', 'order_items', 'subtotal'));
 
         $filename = 'invoice-' . $order->order_no . '@' . $order->created_at->format('His') . '.pdf';
         $pdf = \PDF::loadView('web.invoice', compact('order', 'order_items', 'subtotal'));
-        $pdf->setOption('page-width', '142mm');
-        $pdf->setOption('page-height', '460mm');
+        //$pdf->setPaper('letter');
+        $pdf->setOption('page-width', '80mm');
+        $pdf->setOption('page-height', '3276mm');
         $pdf->setOption('disable-smart-shrinking', true);
         $pdf->setOption('margin-left', '4mm');
         $pdf->setOption('margin-right', '4mm');

@@ -2,16 +2,24 @@
 
 namespace App\Http\Controllers\Test;
 
+use App\Events\OrderCreated;
 use App\Http\Controllers\Controller;
 use App\Jobs\SyncUsers;
+use App\Mail\TestMail;
+use App\Models\DeliveryerTransaction;
 use App\Models\Order;
+use App\Models\User;
 use App\Models\UserAddress;
 use App\Support\BulkSMS;
+use App\Support\PrintNode;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Srmklive\PayPal\Facades\PayPal;
 
@@ -19,85 +27,13 @@ class IndexController extends Controller
 {
     public function index(Request $request)
     {
-        //$this->dispatchSync(new SyncUsers(1));
-//        $i = 2;
-//        while ($i < 150) {
-//            $this->dispatch(new SyncUsers($i));
-//            $i++;
-//        }
-//
-//        return 'ok';
+        $time_start = settings('opening_hours_start');
 
-//        try {
-//            $client = new Client();
-//            $response = $client->get('https://noodlebox.ie/wp-json/wp/v2/users', [
-//                'query' => [
-//                    'page' => 1,
-//                    'per_page' => 100,
-//                    'orderby' => 'id',
-//                    'order' => 'asc',
-//                ],
-//                //'auth' => [env('WC_CONSUMER_KEY'), env('WC_CONSUMER_SECRET')],
-//                'headers' => [
-//                    'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0',
-//                    'Accept' => 'application/json'
-//                ],
-//            ]);
-//
-//            $users = json_decode($response->getBody()->getContents());
-//
-//            return $users;
-//        }catch (\Exception $e){
-//            return $e->getMessage();
-//        }
+        //return Carbon::createFromTimeString($time_start)->subDay()->toDateTimeString();
 
-//        foreach (UserAddress::with(['user'])->get() as $item) {
-//            if ($item->user && !$item->user->phone && $item->phone) {
-//                $item->user->phone = $item->phone;
-//                $item->user->save();
-//            }
-//        }
-//
-//        return 'ok';
-
-//        try {
-//            return BulkSMS::sendSms([
-//                'body' => '【NoodleBox】{F0######} is your verification code, please do not disclose it to others.',
-//                'from' => 'NoodleBox',
-//                'to' => [
-//                    'address' => '+353879359054',
-//                    'fields' => ['123456']
-//                ]
-//            ]);
-//        } catch (\Exception $e) {
-//            return $e->getMessage();
-//        }
-
-        //return BulkSMS::showSms('1377020783284461568');
-
-//        foreach (Order::all() as $order) {
-//            $short_code = str_pad(rand(0, 9999), 4, '0');
-//            if ($order->short_code != $short_code) {
-//                $order->short_code = $short_code;
-//                $order->save();
-//            }
-//        }
-
-        $client = new Client();
-        $response = $client->get('https://noodlebox.ie/wp-json/wc/v3/orders/142800', [
-            'auth' => [env('WC_CONSUMER_KEY'), env('WC_CONSUMER_SECRET')],
-            'headers' => [
-                'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0',
-                'Accept' => 'application/json'
-            ],
-        ]);
-
-        return json_decode($response->getBody()->getContents(), true);
-    }
-
-    public function combineAttrs($arr)
-    {
-
+        //User::whereKey(1000000)->update(['password'=>bcrypt('12341234')]);
+        $order = Order::orderByDesc('id')->first();
+        $this->dispatchSync(new OrderCreated($order));
     }
 
     function generateCombinations($options)

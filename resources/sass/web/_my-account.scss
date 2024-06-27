@@ -39,6 +39,10 @@
                     color: #ffffff;
                     fill: #ffffff;
                 }
+
+                &.active {
+                    background-color: #47B394;
+                }
             }
         }
     }
@@ -302,6 +306,33 @@
     }
 }
 
+.my-address-list {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+
+    .my-address-item {
+        background-color: #282828;
+        border-radius: 10px;
+        padding: 1rem;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.my-account-block{
+    background-color: #282828;
+    border-radius: 10px;
+    padding: 1rem;
+    position: relative;
+    margin-bottom: 1rem;
+
+    .referral-link{
+        max-width: 50rem;
+    }
+}
+
 @media (max-width: 768px) {
     .my-account {
         .my-account {
@@ -333,5 +364,34 @@
                 }
             }
         }
+    }
+}
+
+.list-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    td, th {
+        padding: 12px 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        &:first-child {
+            padding-left: 0;
+        }
+    }
+
+    tr:hover {
+        td {
+            background-color: rgba(40, 40, 40, 0.2);
+        }
+    }
+}
+
+.pagination-container {
+    display: block;
+    margin-top: 1rem;
+
+    .page-link {
+        color: #666;
     }
 }

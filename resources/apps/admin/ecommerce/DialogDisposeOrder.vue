@@ -13,21 +13,21 @@
             <el-row :gutter="20" type="flex">
                 <el-col :span="12">
                     <el-form label-width="100px" size="medium" v-loading="loading">
-                        <el-form-item label="配送地址" v-if="order.shipping">
+                        <el-form-item label="配送地址">
                             <div style="line-height: 1.4; padding-top:8px;">
-                                <div>{{ order.shipping.first_name }}</div>
-                                <div>{{ order.shipping.address_line_1 }}</div>
-                                <div v-if="order.shipping.county">{{ order.shipping.county }}</div>
-                                <div v-if="order.shipping.city">{{ order.shipping.city }}</div>
-                                <div v-if="order.shipping.state">{{ order.shipping.state }}</div>
-                                <div v-if="order.shipping.phone">
-                                    <span>+{{ order.shipping.phone.national_number }}</span>
-                                    <span>{{ order.shipping.phone.phone_number }}</span>
+                                <div>{{ shipping.first_name }}</div>
+                                <div>{{ shipping.address_line_1 }}</div>
+                                <div v-if="shipping.county">{{ shipping.county }}</div>
+                                <div v-if="shipping.city">{{ shipping.city }}</div>
+                                <div v-if="shipping.state">{{ shipping.state }}</div>
+                                <div v-if="shipping.phone">
+                                    <span>+{{ shipping.phone.national_number }}</span>
+                                    <span>{{ shipping.phone.phone_number }}</span>
                                 </div>
                             </div>
                         </el-form-item>
                         <el-form-item label="配送方式">
-                            <el-select size="medium" class="w300" v-model="order.shipping_method">
+                            <el-select size="medium" class="w300" v-model="shipping_line.method_id">
                                 <el-option
                                         v-for="(v,k) in shippingMethodList"
                                         :label="v"
@@ -36,8 +36,8 @@
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="配送区域" v-if="order.shipping_method==='delivery'">
-                            <el-select size="medium" class="w300" v-model="order.shipping_zone_id">
+                        <el-form-item label="配送区域" v-if="shipping_line.method_id==='flat_rate'">
+                            <el-select size="medium" class="w300" v-model="shipping_line.zone_id">
                                 <el-option
                                         v-for="(v,k) in shippingZones"
                                         :label="v.title+'(€'+v.fee+')'"
@@ -46,7 +46,7 @@
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="配送员" v-if="order.shipping_method==='delivery'">
+                        <el-form-item label="配送员" v-if="shipping_line.method_id==='flat_rate'">
                             <el-select size="medium" class="w300" v-model="order.deliveryer_id">
                                 <el-option
                                         v-for="(v,k) in deliveryerList"
@@ -55,27 +55,6 @@
                                         :key="k"
                                 />
                             </el-select>
-                        </el-form-item>
-                        <el-form-item label="付款方式">
-                            <el-select size="medium" class="w300" v-model="order.payment_method">
-                                <el-option
-                                        v-for="(v,k) in paymentMethodList"
-                                        :label="v"
-                                        :value="k"
-                                        :key="k"
-                                />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item v-if="order.payment_method==='customize'">
-                            <el-input
-                                    class="w200"
-                                    v-model="order.payment_cash_amount"
-                            >
-                                <span slot="prepend">By Cash</span>
-                            </el-input>
-                            <el-input class="w200" :value="payByCardAmount" readonly>
-                                <span slot="prepend">By Card</span>
-                            </el-input>
                         </el-form-item>
                         <el-form-item label="订单状态">
                             <el-select size="medium" class="w300" v-model="order.status">
@@ -99,9 +78,30 @@
                                 <el-input
                                         class="w300"
                                         type="number"
-                                        v-model="varAmount"
+                                        v-model="meta_data.cost_total"
                                 />
                             </div>
+                        </el-form-item>
+                        <el-form-item label="付款方式">
+                            <el-select size="medium" class="w300" v-model="order.payment_method">
+                                <el-option
+                                        v-for="(v,k) in paymentMethodList"
+                                        :label="v.title"
+                                        :value="v.id"
+                                        :key="k"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item v-if="order.payment_method==='customize'">
+                            <el-input
+                                    class="w200"
+                                    v-model="meta_data.payment_with_cash_value"
+                            >
+                                <span slot="prepend">By Cash</span>
+                            </el-input>
+                            <el-input class="w200" :value="payByCardValue" readonly>
+                                <span slot="prepend">By Card</span>
+                            </el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="onSubmit">提交</el-button>
@@ -122,8 +122,9 @@
                         <el-timeline-item
                                 v-for="(note, index) in order_notes"
                                 :key="index"
-                                :timestamp="note.created_at">
-                            {{ note.content }}
+                                :timestamp="note.created_at"
+                        >
+                            <div class="el-timeline-item__content" v-html="note.content"></div>
                         </el-timeline-item>
                     </el-timeline>
                 </el-col>
@@ -173,15 +174,31 @@ export default {
                 deliveryer_id: ''
             },
             loading: false,
-            paymentMethodList: {
-                'paypal': 'Pay Online',
-                'cash': 'Pay Cash',
-                'card': 'Pay by Card Reader',
-                'customize': 'Customize'
-            },
+            paymentMethodList: [
+                {
+                    id: 'online',
+                    title: 'Pay Online (PayPal & Credit Car)',
+                    fee: 0.5,
+                },
+                {
+                    id: 'card',
+                    title: 'Pay by Card Reader',
+                    fee: 0.5,
+                },
+                {
+                    id: 'cash',
+                    title: 'Pay Cash',
+                    fee: 0.0,
+                },
+                {
+                    id: 'customize',
+                    title: 'Customize',
+                    fee: 0.0,
+                }
+            ],
             shippingMethodList: {
-                'delivery': 'Delivery',
-                'collection': 'Collection',
+                'flat_rate': 'Delivery',
+                'local_pickup': 'Collection',
             },
             shippingZones: [],
             showOrderItem: false,
@@ -189,23 +206,48 @@ export default {
             //newOrderTotal: '0.00',
             order_notes: [],
             calculatorType: '+',
-            varAmount: '0.00',
-            showCalculator: false
+            showCalculator: false,
+            shipping: {},
+            shipping_line: {
+                method_id: 'local_pickup',
+                method_title: 'Collection',
+                total: '0.00',
+                taxes: [],
+                zone_id: 0,
+                zone_title: ''
+            },
+            meta_data: {
+                cost_total: 0,
+                payment_with_cash_value: 0
+            }
         }
     },
     computed: {
-        payByCardAmount() {
-            return (this.order.total - this.order.payment_cash_amount).toFixed(2);
+        payByCardValue() {
+            return (this.newOrderTotal - this.meta_data.payment_with_cash_value).toFixed(2);
         },
         newOrderTotal() {
-            console.log(Number(this.varAmount));
-            return (Number(this.order.total) + Number(this.varAmount)).toFixed(2);
-        }
+            let total = Number(this.order.total) + Number(this.meta_data.cost_total) - Number(this.order.shipping_total);
+            this.shippingZones.filter(item => item.id === this.shipping_line.zone_id).map(item => {
+                total += Number(item.fee);
+            });
+            return total.toFixed(2);
+        },
     },
     watch: {
         value(val) {
             if (val) {
                 this.fetchOrderNotes();
+                let {shipping, shipping_line, metas} = this.order;
+                this.shipping = shipping || {};
+                this.shipping_line = {
+                    ...this.shipping_line,
+                    ...shipping_line
+                }
+
+                metas.map(item => {
+                    this.meta_data[item.meta_key] = item.meta_value;
+                });
             }
         }
     },
@@ -236,44 +278,52 @@ export default {
         onSubmit() {
             let {
                 id,
-                shipping_method,
-                payment_method,
-                shipping_zone_id,
-                payment_cash_amount,
                 status,
-                deliveryer_id,
                 buyer_note,
-                total,
+                deliveryer_id,
                 fee_lines,
-                discount_lines
+                discount_lines,
+                payment_method,
             } = this.order;
-            let cost_fee = Number(this.varAmount);
-            if (cost_fee > 0) {
-                fee_lines.push({
-                    name: 'Cost Fee',
-                    total: cost_fee
-                });
-            } else if (cost_fee < 0) {
-                discount_lines.push({
-                    name: 'Cost Fee',
-                    total: Math.abs(cost_fee)
+            let {shipping_line, newOrderTotal} = this;
+            if (shipping_line.method_id === 'flat_rate') {
+                shipping_line.method_title = 'Delivery';
+                let zone = this.shippingZones.filter(item => item.id === shipping_line.zone_id)[0];
+                if (zone) {
+                    shipping_line.total = zone.fee;
+                    shipping_line.zone_title = zone.title;
+                    shipping_line.zone_id = zone.id;
+                }
+            } else {
+                shipping_line.method_title = 'Collection';
+                shipping_line.total = 0;
+                shipping_line.zone_title = '';
+                shipping_line.zone_id = 0;
+            }
+
+            let payment_method_title = this.paymentMethodList.filter(item => item.id === payment_method)[0].title;
+            let metas = [];
+            this.meta_data.payment_with_card_value = this.payByCardValue;
+            for (let k in this.meta_data) {
+                metas.push({
+                    meta_key: k,
+                    meta_value: this.meta_data[k]
                 });
             }
-            let discount_total = total - this.newOrderTotal;
+
             this.loading = true;
             ApiService.put(`/orders/${id}`, {
-                shipping_method,
+                shipping_line,
                 payment_method,
-                shipping_zone_id,
-                payment_cash_amount,
+                payment_method_title,
                 status,
                 deliveryer_id,
                 buyer_note,
                 fee_lines,
                 discount_lines,
-                total: this.newOrderTotal
+                total: newOrderTotal,
+                metas
             }).then(() => {
-                this.varAmount = 0;
                 this.$message.success('订单已更新');
                 this.$emit('update');
             }).finally(() => {

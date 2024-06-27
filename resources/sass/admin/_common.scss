@@ -424,3 +424,9 @@ input[type="checkbox"]:checked, input[type='radio']:checked {
         display: inline-block;
     }
 }
+
+.column-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}

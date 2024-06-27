@@ -17,9 +17,22 @@ class PosMachineController extends BaseController
     public function index(Request $request)
     {
         $query = $this->repository();
+        if ($status = $request->input('status')) {
+            if ($status === 'online') {
+                $query->whereHas('deliveryer');
+            } else {
+                $query->whereDoesntHave('deliveryer');
+            }
+
+        }
+
+        $request->whenFilled('is_cashier', function ($input) use ($query) {
+            $query->where('is_cashier', $input);
+        });
         return json_success([
             'total' => $query->count(),
-            'items' => $query->offset($request->input('offset', 0))
+            'items' => $query->with(['deliveryer'])
+                ->offset($request->input('offset', 0))
                 ->limit($request->input('limit', 10))
                 ->orderBy('sort_num')->orderBy('id')->get()
         ]);

@@ -122,13 +122,9 @@ export default {
                 let index = this.prizeData.findIndex((item) => item.id === res.data.id);
                 this.rotate(index);
             }).catch(reason => {
-                if (reason.code === 401) {
-                    window.location.assign('/login?redirect=' + location.href);
-                } else {
-                    setTimeout(() => {
-                        this.$emit('error', reason);
-                    }, this.duringTime * 1000);
-                }
+                setTimeout(() => {
+                    this.$emit('error', reason);
+                }, this.duringTime * 1000);
             }).finally(() => {
 
             });

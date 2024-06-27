@@ -43,9 +43,14 @@
                         </div>
                         <div class="order-total">
                             <div class="order-total__label">Shipping</div>
-                            <div class="order-total__value">€{{$order->shipping_total}}
-                                via {{$order->shipping_method}}</div>
+                            <div class="order-total__value">€{{$order->shipping_total}}</div>
                         </div>
+                        @foreach($order->fee_lines as $fee)
+                            <div class="order-total">
+                                <div class="order-total__label">{{$fee['name']??''}}</div>
+                                <div class="order-total__value">€{{$fee['total']??''}}</div>
+                            </div>
+                        @endforeach
                         <div class="order-total">
                             <div class="order-total__label">Total</div>
                             <div class="order-total__value">€{{$order->total}}</div>

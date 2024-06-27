@@ -142,6 +142,10 @@ var _default = exports["default"] = {
     customClass: {
       type: String,
       "default": ''
+    },
+    closeOnClick: {
+      type: Boolean,
+      "default": true
     }
   },
   data: function data() {
@@ -179,6 +183,11 @@ var _default = exports["default"] = {
     },
     click: function click() {
       return false;
+    },
+    clickOverlayer: function clickOverlayer() {
+      if (this.closeOnClick) {
+        this.close();
+      }
     }
   },
   created: function created() {
@@ -214,11 +223,11 @@ exports["default"] = void 0;
 var _default = exports["default"] = {
   name: "NoodleLoading",
   mounted: function mounted() {
-    document.body.appendChild(this.$el);
+    //document.body.appendChild(this.$el);
   },
   destroyed: function destroyed() {
     if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
+      //this.$el.parentNode.removeChild(this.$el);
     }
   }
 };
@@ -410,6 +419,9 @@ var _default2 = exports["default"] = {
       this.options = options;
       this.additional_options = additional_options;
       return price.toFixed(2);
+    },
+    totalPoints: function totalPoints() {
+      return parseInt(this.product.point_price) * this.quantity;
     }
   },
   methods: {
@@ -439,8 +451,7 @@ var _default2 = exports["default"] = {
         _this.$showToast('Added to cart successfully!');
         _this.$emit('added');
       })["catch"](function (reason) {
-        //console.log(reason);
-        _this.$showToast(reason.message);
+        console.log(reason);
       })["finally"](function () {});
     },
     saveToCart: function saveToCart() {
@@ -602,9 +613,8 @@ var render = exports.render = function render() {
     staticClass: "noodle-dialog-wrapper",
     on: {
       click: function click($event) {
-        if (!$event.type.indexOf("key") && _vm._k($event.keyCode, "p", undefined, $event.key, undefined)) return null;
         $event.preventDefault();
-        return _vm.close.apply(null, arguments);
+        return _vm.clickOverlayer.apply(null, arguments);
       },
       touchstart: function touchstart($event) {
         $event.preventDefault();
@@ -797,8 +807,11 @@ var render = exports.render = function render() {
   }, [_vm._v("\n                Earn Points : " + _vm._s(_vm.product.points) + " Points\n            ")]), _vm._v(" "), !_vm.usePointPurchase ? _c("div", {
     staticClass: "product-price text-bull-cyan"
   }, [_vm._v("€" + _vm._s(_vm.finalPrice))]) : _vm._e()])]), _vm._v(" "), _vm.product.description ? _c("div", {
-    staticClass: "product-description text-safety-orange"
-  }, [_vm._v("\n        " + _vm._s(_vm.product.description) + "\n    ")]) : _vm._e(), _vm._v(" "), _vm.product.meta_data.badges ? _c("div", {
+    staticClass: "product-description text-safety-orange",
+    domProps: {
+      innerHTML: _vm._s(_vm.product.description)
+    }
+  }) : _vm._e(), _vm._v(" "), _vm.product.meta_data.badges ? _c("div", {
     staticClass: "product-badges"
   }, _vm._l(_vm.product.meta_data.badges, function (b, i) {
     return _c("img", {
@@ -863,7 +876,8 @@ var render = exports.render = function render() {
     }],
     staticStyle: {
       transform: "scale(1.5)",
-      "margin-right": "3px"
+      "margin-right": "3px",
+      "margin-left": "6px"
     },
     attrs: {
       type: "checkbox"
@@ -889,7 +903,7 @@ var render = exports.render = function render() {
         }
       }
     }
-  }), _vm._v(" "), _c("span", [_vm._v("Use " + _vm._s(_vm.product.point_price) + " Noodle Box Points for purchasing this Product")])])]) : _vm._e(), _vm._v(" "), _c("div", {
+  }), _vm._v(" "), _c("span", [_vm._v("Use " + _vm._s(_vm.totalPoints) + " Noodle Box Points for purchasing this Product")])])]) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "product-add-order"
   }, [_c("noodle-number-control", {
     model: {

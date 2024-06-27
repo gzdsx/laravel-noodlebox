@@ -67,7 +67,7 @@ export default {
             this.$emit('input', false);
         },
         fetchList() {
-            ApiService.get('/products/variations').then(response => {
+            ApiService.get('/products/variations?limit=1000').then(response => {
                 this.variationList = response.data.items;
             }).catch(reason => {
 

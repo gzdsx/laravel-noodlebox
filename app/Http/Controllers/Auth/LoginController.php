@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
-
 use App\Http\Controllers\Controller;
+use App\Models\Captcha;
 use App\Models\User;
 use App\Models\UserPhone;
-use App\Models\Captcha;
-use App\Models\WechatLogin;
+use App\Providers\RouteServiceProvider;
 use App\Traits\Auth\UserLogin;
-use App\Traits\WeChat\WechatDefaultConfig;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -27,62 +25,27 @@ class LoginController extends Controller
     |
     */
 
-    use UserLogin, WechatDefaultConfig;
+    use UserLogin;
 
     /**
-     * Create a new controller instance.
+     * Where to redirect users after login.
      *
-     * @return void
+     * @var string
+     */
+    protected $redirectTo = RouteServiceProvider::HOME;
+
+    /**
+     * @param Request $request
      */
     public function __construct(Request $request)
     {
-        parent::__construct($request);
         $this->middleware('guest')->except('logout');
+        parent::__construct($request);
     }
 
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function index(Request $request)
+    public function index()
     {
-        session(['redirect' => $request->input('redirect', url()->previous())]);
         return view('auth.login');
-    }
-
-    /**
-     * @param Request $request
-     * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
-     */
-    public function appcode(Request $request)
-    {
-
-        if (!$basestr = session('basestr')) {
-            $basestr = Str::uid()->toString();
-            session(['basestr' => $basestr]);
-        }
-
-        WechatLogin::firstOrCreate(['basestr' => $basestr]);
-        return $this->miniProgram()->app_code->getQrCode('/pages/auth/chklogin?basestr=' . $basestr, 140);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function chklogin(Request $request)
-    {
-        if ($basestr = session('basestr')) {
-            $login = WechatLogin::where('basestr', $basestr)->first();
-            if ($login) {
-                if ($login->id) {
-                    Auth::loginUsingId($login->id);
-                    $login->delete();
-                    return json_success(['user' => Auth::user()]);
-                }
-            }
-        }
-
-        return json_success();
     }
 
     public function loginWithSms(Request $request)
@@ -101,6 +64,9 @@ class LoginController extends Controller
         $address = $national_number . ltrim($phone_number, '0');
         if ($captcha = Captcha::wherePhone($address)->orderByDesc('id')->first()) {
             if ($code == $captcha->code) {
+                if (substr($phone_number, 0, 1) != '0') {
+                    $phone_number = '0' . $phone_number;
+                }
                 $attributes = [
                     'phone_number' => $phone_number,
                     'national_number' => $national_number
@@ -109,16 +75,16 @@ class LoginController extends Controller
                 if (!$user = User::where($attributes)->first()) {
                     $user = new User();
                     $user->fill($attributes);
-                    $user->nickname = $phone_number;
+                    $user->nickname = $user->phone_number;
                     $user->save();
                 }
 
                 $user_phone = UserPhone::firstOrCreate($attributes)->firstOrNew();
-                $user_phone->verified = 1;
+                $user_phone->verified_at = now();
                 $user_phone->user()->associate($user);
                 $user_phone->save();
 
-                Auth::loginUsingId($user->id);
+                Auth::loginUsingId($user->id, $request->filled('remember'));
 
                 return json_success();
             }

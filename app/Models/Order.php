@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Models\Traits\HasDates;
+use App\Models\Traits\HasMetas;
+use App\Support\BulkSMS;
+use App\Support\PrintNode;
 use EloquentFilter\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +22,7 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property string|null $shop_name 门店名称
  * @property int $buyer_id 买家ID
  * @property string|null $buyer_name 买家账号
- * @property string|null $buyer_note 买家留言
+ * @property string|null $buyer_note 订单备注
  * @property int $seller_id 卖家ID
  * @property string|null $seller_name 卖家账号
  * @property string $discount_total 优惠金额
@@ -31,14 +34,11 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property string|null $payment_method_title
  * @property int $payment_status 支付状态，1=已支付，0=未支付
  * @property \Illuminate\Support\Carbon|null $payment_at 付款时间
- * @property string $payment_cash_amount
- * @property string $shipping_method 配送方式
- * @property int $shipping_zone_id 配送区域
+ * @property array $shipping_line 配送区域
  * @property string $shipping_total 配送费
  * @property string $shipping_tax
  * @property int $shipping_status 发货状态，0=未发货，1=已发货
  * @property \Illuminate\Support\Carbon|null $shipping_at 发货时间
- * @property array|null $shipping_lines
  * @property int $buyer_rate 买家评价状态，0=未评价，1=已评价
  * @property int $seller_rate 卖家评价状态，0=未评价，1=已评价
  * @property int $buyer_deleted 买家已删除
@@ -50,7 +50,6 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property array|null $billing 账单地址
  * @property int $deliveryer_id 配送员
  * @property string|null $created_via
- * @property array|null $meta_data
  * @property string $status 订单状态
  * @property int $is_modified
  * @property string|null $short_code
@@ -60,10 +59,13 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property-read \App\Models\User|null $buyer
  * @property-read \App\Models\Deliveryer|null $deliveryer
  * @property-read mixed $links
+ * @property-read \Illuminate\Support\Collection $meta_data
  * @property-read array|\Illuminate\Contracts\Translation\Translator|string|null $pay_status_des
  * @property-read mixed|null $status_des
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderItem> $items
  * @property-read int|null $items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderMeta> $metas
+ * @property-read int|null $metas_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderNote> $notes
  * @property-read int|null $notes_count
  * @property-read \App\Models\User|null $seller
@@ -95,12 +97,10 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order whereId($value)
  * @method static Builder|Order whereIsModified($value)
  * @method static Builder|Order whereLike(string $column, string $value, string $boolean = 'and')
- * @method static Builder|Order whereMetaData($value)
  * @method static Builder|Order whereOrderNo($value)
  * @method static Builder|Order whereOrderType($value)
  * @method static Builder|Order whereOutTradeNo($value)
  * @method static Builder|Order wherePaymentAt($value)
- * @method static Builder|Order wherePaymentCashAmount($value)
  * @method static Builder|Order wherePaymentMethod($value)
  * @method static Builder|Order wherePaymentMethodTitle($value)
  * @method static Builder|Order wherePaymentStatus($value)
@@ -111,12 +111,10 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order whereSellerRate($value)
  * @method static Builder|Order whereShipping($value)
  * @method static Builder|Order whereShippingAt($value)
- * @method static Builder|Order whereShippingLines($value)
- * @method static Builder|Order whereShippingMethod($value)
+ * @method static Builder|Order whereShippingLine($value)
  * @method static Builder|Order whereShippingStatus($value)
  * @method static Builder|Order whereShippingTax($value)
  * @method static Builder|Order whereShippingTotal($value)
- * @method static Builder|Order whereShippingZoneId($value)
  * @method static Builder|Order whereShopId($value)
  * @method static Builder|Order whereShopName($value)
  * @method static Builder|Order whereShortCode($value)
@@ -128,7 +126,7 @@ use Vinkla\Hashids\Facades\Hashids;
  */
 class Order extends Model
 {
-    use Filterable, HasDates;
+    use Filterable, HasDates, HasMetas;
 
     const ORDER_STATUS_UNPAID = 'unpaid'; //待付款
     const ORDER_STATUS_PAID = 'paid'; //已付款
@@ -149,19 +147,14 @@ class Order extends Model
         'id', 'order_no', 'order_type', 'shop_id', 'shop_name', 'buyer_id', 'buyer_name', 'buyer_note',
         'seller_id', 'seller_name', 'discount_total', 'discount_tax', 'total', 'total_tax', 'prices_include_tax',
         'payment_method', 'payment_method_title', 'payment_status', 'payment_at', 'payment_cash_amount',
-        'shipping_method', 'shipping_zone_id', 'shipping_total', 'shipping_tax', 'shipping_status', 'shipping_at',
+        'shipping_method', 'shipping_line', 'shipping_total', 'shipping_tax', 'shipping_status', 'shipping_at',
         'buyer_rate', 'seller_rate', 'buyer_deleted', 'seller_deleted', 'out_trade_no', 'fee_lines', 'discount_lines', 'shipping',
         'billing', 'deliveryer_id', 'status', 'created_at', 'updated_at', 'completed_at', 'is_modified', 'short_code',
-        'meta_data', 'shipping_lines'
-    ];
-    protected $dates = [
-        'payment_at',
-        'shipping_at',
-        'completed_at'
     ];
     protected $appends = [
+        'meta_data',
         'status_des',
-        'links'
+        'links',
     ];
 
     protected $casts = [
@@ -169,11 +162,14 @@ class Order extends Model
         'discount_lines' => 'array',
         'shipping' => 'array',
         'billing' => 'array',
-        'shipping_lines' => 'json',
-        'meta_data' => 'json'
+        'shipping_line' => 'json',
+        'meta_data' => 'json',
+        'payment_at' => 'datetime',
+        'shipping_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
-    protected $with = ['items', 'buyer', 'seller', 'shop', 'transaction', 'deliveryer', 'shippingZone'];
+    protected $with = ['items', 'buyer', 'seller', 'shop', 'transaction', 'deliveryer', 'metas'];
 
     public static function boot()
     {
@@ -181,6 +177,7 @@ class Order extends Model
         static::deleting(function (Order $order) {
             $order->items()->delete();
             $order->notes()->delete();
+            $order->metas()->delete();
         });
 
         static::creating(function ($model) {
@@ -213,6 +210,11 @@ class Order extends Model
         return [
             'invoice' => route('order.invoice', Hashids::encodeHex($this->id)),
         ];
+    }
+
+    public function metas()
+    {
+        return $this->hasMany(OrderMeta::class, 'order_id', 'id');
     }
 
     /**
@@ -371,5 +373,62 @@ class Order extends Model
             }
         }
         return false;
+    }
+
+    public function printInvoice()
+    {
+        PrintNode::createPrintJob([
+            'printerId' => env('PRINTNODE_PRINTER_ID'),
+            'title' => 'Invoice',
+            'contentType' => 'pdf_uri',
+            'content' => $this->links['invoice'],
+            'source' => 'Noodlebox',
+            'options' => [
+                'bin' => '上下省纸设置',
+                'dpi' => '180x180',
+                'paper' => 'Roll Paper 80 x 3276 mm',
+                'copies' => 1,
+                'fit_to_page' => false,
+                'supports_custom_paper_size' => false,
+                'collate' => false
+            ]
+        ]);
+
+        $this->notes()->create([
+            'user_id' => auth()->id() ?: 0,
+            'content' => 'Invoice printed success'
+        ]);
+    }
+
+    public function sendSms()
+    {
+        $shipping = $this->shipping;
+        if (isset($shipping['phone']) && is_array($shipping['phone'])) {
+            if (is_array($shipping['phone'])) {
+                $phone_address = $shipping['phone']['national_number'] ?? '';
+                $phone_address .= ltrim($shipping['phone']['phone_number'] ?? '', '0');
+            } else {
+                $phone_address = $shipping['phone'] ?? '';
+                $phone_address = ltrim($phone_address, '+');
+                $phone_address = ltrim($phone_address, '0');
+            }
+
+            $message = settings('order_message_content');
+            $message = str_replace('{order_no}', $this->short_code, $message);
+            if ($this->buyer) {
+                $message = str_replace('{points}', $this->buyer->points, $message);
+            }
+
+            BulkSMS::sendSms([
+                'from' => 'NoodleBox',
+                'to' => '+' . $phone_address,
+                'body' => $message
+            ]);
+
+            $this->notes()->create([
+                'user_id' => auth()->id() ?: 0,
+                'content' => 'SMS send success'
+            ]);
+        }
     }
 }

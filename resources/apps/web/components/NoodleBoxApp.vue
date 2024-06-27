@@ -92,21 +92,10 @@ export default {
 
         // 监听自定义事件
         window.addEventListener('unauthenticated', (event) => {
-            console.log('你尚未登录');
+            //console.log('你尚未登录');
             //window.location.href = '/login?redirect=' + window.location.href;
-            //this.showLogin = true;
+            this.showLogin = true;
         });
-
-        window.addEventListener('cartChanged', (event) => {
-            //console.log(event);
-            HttpClient.get('/carts').then(response => {
-                document.querySelectorAll('.cart-count').forEach(item => {
-                    item.innerHTML = response.data.total;
-                });
-            });
-        });
-
-        window.dispatchEvent(new Event('cartChanged'));
     }
 }
 </script>

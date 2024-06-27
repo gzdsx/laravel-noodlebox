@@ -28,9 +28,9 @@ trait CartApis
     public function index(Request $request)
     {
         $query = $this->repository();
-        if ($request->has('purchase_via')) {
-            $query->where('purchase_via', $request->input('purchase_via', 0));
-        }
+        $request->whenHas('purchase_via', function ($input) use ($query) {
+            $query->where('purchase_via', $input);
+        });
         return json_success([
             'total' => $query->count(),
             'items' => $query->get()
@@ -68,20 +68,19 @@ trait CartApis
             }
         }
 
-        $key = md5(json_encode([
+        $cart_hash = md5(json_encode([
             $product_id,
-            $meta_data
+            $meta_data,
+            $purchase_via
         ]));
-        $cart = $this->repository()->firstOrNew(['product_id' => $product_id]);
-        $cartKey = md5(json_encode([
-            $cart->product_id,
-            $cart->meta_data
-        ]));
-        if ($key == $cartKey) {
+
+        $cart = $this->repository()->where(['cart_hash' => $cart_hash])->first();
+        if ($cart) {
             $cart->quantity += $quantity;
             $cart->save();
         } else {
             $cart = $this->repository()->make();
+            $cart->cart_hash = $cart_hash;
             $cart->product_id = $product->id;
             $cart->title = $product->title;
             $cart->image = $product->image;
@@ -93,7 +92,10 @@ trait CartApis
         }
 
         $cart->refresh();
-        return json_success($cart);
+        return json_success([
+            'cart' => $cart,
+            'total' => $this->repository()->count()
+        ]);
     }
 
     /**

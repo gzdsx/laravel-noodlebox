@@ -1,11 +1,9 @@
-@extends('layouts.default')
+@extends('web.my-account.layout')
 
-@section('title', __('My Orders'))
+@section('title','My Orders')
 
-@section('content')
-    <section class="page-section">
-        <div id="ordersApp"></div>
-    </section>
+@section('main-content')
+    <div id="ordersApp"></div>
 @endsection
 
 @section('footer-scripts')

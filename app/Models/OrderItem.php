@@ -56,7 +56,6 @@ class OrderItem extends Model
     protected $casts = [
         'meta_data' => 'json'
     ];
-
     public $timestamps = false;
 
     /**

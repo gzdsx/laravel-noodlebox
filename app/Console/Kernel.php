@@ -6,10 +6,12 @@ namespace App\Console;
 use App\Traits\WeChat\WechatDefaultConfig;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Artisan;
 
 class Kernel extends ConsoleKernel
 {
     use WechatDefaultConfig;
+
     /**
      * The Artisan commands provided by your application.
      *
@@ -22,19 +24,17 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->command('cashier-settlement')
+            ->dailyAt(settings('opening_hours_end'));
 
-        $schedule->call(function (){
-            //SendEmail::dispatch();
-        })->everyMinute();
-
-
+//        $schedule->call(function (){
+//            Artisan::call('cashier-settlement');
+//        })->everyMinute();
     }
 
     /**
@@ -44,7 +44,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

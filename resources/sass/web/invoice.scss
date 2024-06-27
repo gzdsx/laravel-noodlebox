@@ -4,7 +4,7 @@ html, body {
 }
 
 body {
-    font-size: 16px;
+    font-size: 18px;
     padding: 0;
 }
 
@@ -19,8 +19,8 @@ body {
 
 h3.shop-name {
     text-align: center;
-    margin-bottom: 1rem;
-    font-size: 2rem;
+    font-size: 1.2rem;
+    line-height: 1.2;
 }
 
 .shop-address {
@@ -34,9 +34,9 @@ h3.shop-name {
 }
 
 h1.title {
-    font-size: 2.4rem;
+    font-size: 1.2rem;
+    line-height: 1;
     text-align: center;
-    margin-bottom: 20px;
     text-transform: uppercase;
 }
 
@@ -56,6 +56,7 @@ h1.title {
     td {
         padding: 3px 1rem 3px 0;
         line-height: 1.1;
+        font-size: 15px;
     }
 }
 
@@ -65,7 +66,7 @@ h1.title {
     margin-top: 1.5rem;
 
     td, th {
-        padding: 0.8rem 0.6rem;
+        padding: 12px 5px;
     }
 
     thead {
@@ -87,19 +88,35 @@ h1.title {
         line-height: 1;
         margin-bottom: 10px;
         margin-top: 0;
-        font-size: 1rem;
+        font-size: 18px;
+        display: -webkit-box;
+
+        .qty{
+            display: block;
+            margin-right: 3px;
+        }
+
+        .tit{
+            -webkit-flex: 1;
+            flex: 1;
+            -webkit-box-flex: 1;
+        }
+    }
+
+    .price{
+        text-align: right;
     }
 
     .metas {
         display: block;
-        padding: 0;
+        padding: 0 0 0 10px;
         margin: 0;
         list-style: none;
 
         li {
             line-height: 1.2;
-            color: #666666;
-            font-size: 0.9rem;
+            color: #222;
+            font-size: 16px;
         }
     }
 }
@@ -107,10 +124,17 @@ h1.title {
 .table-total {
     width: 100%;
     border-spacing: 0;
+    border-top: 3px solid #000;
+    border-bottom: 3px solid #000;
 
     td, th {
         padding: 0.8rem 0.6rem;
         border-bottom: 1px #CCCCCC solid;
         text-align: left;
+        font-size: 18px;
     }
+}
+
+td.text-right{
+    text-align: right ;
 }

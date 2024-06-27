@@ -16,6 +16,8 @@ import OrderList from "./OrderList.vue";
 import OrderDetail from "./OrderDetail.vue";
 import PosMachineList from "./PosMachineList.vue";
 import Settings from "./Settings.vue";
+import CashierTransaction from "./CashierTransaction.vue";
+import DeliveryerTransaction from "./DeliveryerTransaction.vue";
 
 module.exports = [
     {path: '/product/list', component: ProductList, meta: {title: '商品管理'}},
@@ -40,4 +42,6 @@ module.exports = [
     {path: '/order/detail/:id?', component: OrderDetail, meta: {title: '订单详情', group: 'trade'}},
     {path: '/pos-machines', component: PosMachineList, meta: {title: 'POS管理', group: 'trade'}},
     {path: '/shop/settings', component: Settings, meta: {title: '店铺设置', group: 'trade'}},
+    {path: '/cashier/transactions', component: CashierTransaction, meta: {title: '收银台账', group: 'trade'}},
+    {path: '/deliveryer/transactions', component: DeliveryerTransaction, meta: {title: '司机台账', group: 'trade'}},
 ]

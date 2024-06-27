@@ -16,6 +16,16 @@
                                     <a href="{{$prod->url}}" title="{{$prod->title}}">
                                         <img src="{{asset('images/noodlebox/placeholder.png')}}" data-src="{{$prod->image}}" alt="{{$prod->title}}"/>
                                     </a>
+                                    @if($prod->icon=='new')
+                                        <span class="product-icon product-icon__new">new!</span>
+                                    @endif
+                                    @if($prod->icon=='hot')
+                                        <span class="product-icon product-icon__hot">hot!</span>
+                                    @endif
+
+                                    @if($spicy = $prod->getMeta('spicy'))
+                                        <span class="product-spicy product-spicy__{{$spicy}}"></span>
+                                    @endif
                                 </div>
                                 <div class="product-item__title">
                                     <a href="{{$prod->url}}">

@@ -1,58 +1,57 @@
 <template>
-    <div class="container">
-        <noodle-container :loading="loading">
-            <div class="row">
-                <div class="col-12 col-md-8">
-                    <div class="cart-items">
-                        <div class="cart-item" v-for="(item,index) in cart_items" :key="index">
-                            <div class="cart-item__remove">
-                                <i class="bi bi-x-circle" @click="removeItem(item)"></i>
-                            </div>
-                            <div class="cart-item__image">
-                                <img :src="item.image" alt="">
-                            </div>
-                            <div class="cart-item__main">
-                                <div class="cart-item__title">
-                                    <div class="title">{{ item.title }}</div>
-                                    <div class="metas" v-if="item.options">
-                                        {{ Object.values(item.options).join(', ') }}
-                                    </div>
-                                    <div class="metas"
-                                         v-if="item.additional_options &&item.additional_options.length">
-                                        {{ item.additional_options.join(', ') }}
-                                    </div>
-                                    <div class="text-safety-orange font-weight-bold" v-if="item.purchase_with_point">
-                                        Points: {{ item.pointTotal }}
-                                    </div>
+    <noodle-loading v-if="loading"/>
+    <div class="container" v-else>
+        <div class="row">
+            <div class="col-12 col-md-8">
+                <div class="cart-items">
+                    <div class="cart-item" v-for="(item,index) in cart_items" :key="index">
+                        <div class="cart-item__remove">
+                            <i class="bi bi-x-circle" @click="removeItem(item)"></i>
+                        </div>
+                        <div class="cart-item__image">
+                            <img :src="item.image" alt="">
+                        </div>
+                        <div class="cart-item__main">
+                            <div class="cart-item__title">
+                                <div class="title">{{ item.title }}</div>
+                                <div class="metas" v-if="item.options">
+                                    {{ Object.values(item.options).join(', ') }}
                                 </div>
-                                <div class="cart-item__price text-bull-cyan">€{{ item.price }}</div>
-                                <div class="cart-item__qty text-safety-orange"
-                                     v-if="item.purchase_via==='point'||item.purchase_via==='lottery'">
-                                    {{ item.quantity }}
+                                <div class="metas"
+                                     v-if="item.additional_options &&item.additional_options.length">
+                                    {{ item.additional_options.join(', ') }}
                                 </div>
-                                <div class="cart-item__qty" v-else>
-                                    <noodle-number-control v-model="item.quantity" @change="onQuantityChange(index)"/>
+                                <div class="text-safety-orange font-weight-bold" v-if="item.purchase_with_point">
+                                    Points: {{ item.pointTotal }}
                                 </div>
                             </div>
-                            <div class="cart-item__total text-bull-cyan">€{{ item.subtotal }}</div>
+                            <div class="cart-item__price text-bull-cyan">€{{ item.price }}</div>
+                            <div class="cart-item__qty text-safety-orange"
+                                 v-if="item.purchase_via==='point'||item.purchase_via==='lottery'">
+                                {{ item.quantity }}
+                            </div>
+                            <div class="cart-item__qty" v-else>
+                                <noodle-number-control v-model="item.quantity" @change="onQuantityChange(index)"/>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4">
-                    <div class="cart-totals">
-                        <div class="cart-total">
-                            <div class="cart-total__label cart-total__total">Cart Total</div>
-                            <div class="cart-total__value">€{{ total }}</div>
-                        </div>
-                    </div>
-                    <div class="cart-actions">
-                        <div class="cart-action">
-                            <button class="btn btn-danger btn-lg text-uppercase" @click="onCheckout">Check Out</button>
-                        </div>
+                        <div class="cart-item__total text-bull-cyan">€{{ item.subtotal }}</div>
                     </div>
                 </div>
             </div>
-        </noodle-container>
+            <div class="col-12 col-md-4">
+                <div class="cart-totals">
+                    <div class="cart-total">
+                        <div class="cart-total__label cart-total__total">Cart Total</div>
+                        <div class="cart-total__value">€{{ total }}</div>
+                    </div>
+                </div>
+                <div class="cart-actions">
+                    <div class="cart-action">
+                        <button class="btn btn-danger btn-lg text-uppercase" @click="onCheckout">Check Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -60,16 +59,18 @@
 import NoodleNumberControl from "../components/NoodleNumberControl.vue";
 import CartService from "../CartService";
 import HttpClient from "../HttpClient";
+import NoodleLogin from "../components/NoodleLogin.vue";
+import NoodleLoading from "../components/NoodleLoading.vue";
 
 const cart = new CartService();
 export default {
     name: "NoodleCart",
-    components: {NoodleNumberControl},
+    components: {NoodleLoading, NoodleLogin, NoodleNumberControl},
     data() {
         return {
             visible: false,
             cart_items: [],
-            loading: false
+            loading: true
         }
     },
     computed: {
@@ -105,7 +106,6 @@ export default {
             window.location.assign('/checkout');
         },
         fetchCartItems() {
-            this.loading = true;
             HttpClient.get('/carts').then((res) => {
                 res.data.items.forEach((item) => {
                     let meta_data = item.meta_data;
@@ -135,7 +135,12 @@ export default {
                     });
                 });
                 this.cart_items = res.data.items;
+                this.loading = false;
+            }).catch((reason) => {
+                this.$showToast(reason.message);
+                this.loading = false;
             }).finally(() => {
+                console.log('success');
                 this.loading = false;
             });
         }

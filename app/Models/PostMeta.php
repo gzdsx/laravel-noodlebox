@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\HasMetaValue;
+use App\Models\Traits\HasMetaValueAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $meta_id
  * @property int $post_id
  * @property string $meta_key
- * @property mixed $meta_value
+ * @property string|null $meta_value
  * @method static \Illuminate\Database\Eloquent\Builder|PostMeta newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PostMeta newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PostMeta query()
@@ -24,7 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PostMeta extends Model
 {
-    use HasMetaValue;
+    use HasMetaValueAttribute;
 
     protected $table = 'post_meta';
     protected $primaryKey = 'meta_id';

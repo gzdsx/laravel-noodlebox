@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $image 照片
  * @property float $lng 当前位置
  * @property float $lat 当前位置
- * @property string|null $pos
  * @property string $base_amount
  * @property string|null $color
  * @property string|null $status 状态
@@ -26,6 +25,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \Illuminate\Support\Collection $meta_data
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeliveryerMeta> $metas
  * @property-read int|null $metas_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property-read int|null $orders_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PosMachine> $posMachines
+ * @property-read int|null $pos_machines_count
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer query()
@@ -38,7 +41,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereLng($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer wherePhone($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer wherePos($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereUpdatedAt($value)
  * @mixin \Eloquent
@@ -58,15 +60,36 @@ class Deliveryer extends Model
         'status',
         'lng',
         'lat',
-        'pos',
         'base_amount',
         'color'
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|DeliveryerMeta
      */
-    public function metas(){
+    public function metas()
+    {
         return $this->hasMany(DeliveryerMeta::class, 'deliveryer_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|PosMachine
+     */
+    public function posMachines()
+    {
+        return $this->hasMany(PosMachine::class, 'deliveryer_id', 'id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'deliveryer_id', 'id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|DeliveryerTransaction
+     */
+    public function transactions()
+    {
+        return $this->hasMany(DeliveryerTransaction::class, 'deliveryer_id', 'id');
     }
 }

@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Providers\RouteServiceProvider;
+use App\Models\User;
 use App\Traits\Auth\UserRegister;
-use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -22,20 +26,12 @@ class RegisterController extends Controller
     use UserRegister;
 
     /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
-
-    /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Request $request)
+    public function __construct()
     {
-        parent::__construct($request);
         $this->middleware('guest');
     }
 

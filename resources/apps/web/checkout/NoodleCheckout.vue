@@ -1,5 +1,6 @@
 <template>
-    <noodle-container :loading="loading">
+    <noodle-loading v-if="loading"/>
+    <noodle-container v-else>
         <div class="container" v-if="cart_items.length===0">
             <h3 class="text-center pt-5 pb-5">The cart is empty!</h3>
         </div>
@@ -180,24 +181,27 @@
                                 <input type="radio" class="radio" :value="index" v-model="payment_method_index"/>
                                 <span class="radio-box"></span>
                                 <div class="pay-method__details flex-flow-1">
-                                    <div>{{ method.description }}</div>
+                                    <div>{{ method.title }}</div>
                                     <div><img :src="method.img" alt=""/></div>
                                 </div>
                             </label>
                         </div>
                     </div>
 
-                    <div class="form-group mt-5">
-                        <paypal-buttons
-                                :create-order="createPaypalOrder"
-                                :on-approve="createOrder"
-                                v-if="payment_method_index===0"/>
-                        <button
-                                class="btn btn-block btn-bull-cyan btn-lg text-white"
-                                @click="createOrder"
-                                v-else
-                        >Place Order
-                        </button>
+                    <div class="mt-5">
+                        <div class="invalid-feedback" v-if="resError" v-html="resError"></div>
+                        <div class="form-group">
+                            <paypal-buttons
+                                    :create-order="createPaypalOrder"
+                                    :on-approve="createOrder"
+                                    v-if="payment_method_index===0"/>
+                            <button
+                                    class="btn btn-block btn-bull-cyan btn-lg text-white"
+                                    @click="createOrder"
+                                    v-else
+                            >Place Order
+                            </button>
+                        </div>
                     </div>
 
                     <p class="text-center text-safety-orange">
@@ -215,12 +219,13 @@ import PaypalButtons from "./PaypalButtons.vue";
 import VueGoogleAutocomplete from "../../lib/VueGoogleAutocomplete.vue";
 import CartService from "../CartService";
 import CheckouItems from "./CheckouItems.vue";
+import NoodleLoading from "../components/NoodleLoading.vue";
 
 let controller = new AbortController();
 const cart = new CartService();
 export default {
     name: "NoodleCheckout",
-    components: {CheckouItems, PaypalButtons, NoodleContainer, VueGoogleAutocomplete},
+    components: {NoodleLoading, CheckouItems, PaypalButtons, NoodleContainer, VueGoogleAutocomplete},
     data() {
         return {
             cart_items: [],
@@ -248,24 +253,21 @@ export default {
             buyer_note: '',
             payment_methods: [
                 {
-                    id: 'paypal',
-                    name: 'PayPal',
-                    description: 'Pay Online (PayPal & Credit Car)',
+                    id: 'online',
+                    title: 'Pay Online (PayPal & Credit Car)',
                     fee: 0.5,
                     img: '/images/noodlebox/Full_Online.png'
                 },
                 {
                     id: 'card',
-                    name: 'Card',
-                    description: 'Pay by Card Reader',
+                    title: 'Pay by Card Reader',
                     fee: 0.5,
                     img: '/images/noodlebox/pay_by_card.png'
                 },
                 {
                     id: 'cash',
-                    name: 'Cash',
-                    description: 'Pay Cash',
-                    fee: 0.00,
+                    title: 'Pay Cash',
+                    fee: 0.0,
                     img: '/images/noodlebox/pay_cash.png'
                 },
             ],
@@ -275,7 +277,7 @@ export default {
                 address: null,
                 message: null
             },
-            loading: false,
+            loading: true,
             formatted_address: '',
             phone: {
                 national_number: '353',
@@ -300,7 +302,8 @@ export default {
             },
             settings: {
                 enable_points_checkout: 'no'
-            }
+            },
+            resError: null
         }
     },
     computed: {
@@ -389,11 +392,25 @@ export default {
                 return false;
             }
 
-            let shipping_zone_id = 0;
+            let shipping_line = {};
             if (shipping_method === 'delivery') {
                 let zone = this.shipping_zones[this.shipping_zone_index];
-                shipping_zone_id = zone.id;
                 this.shipping.city = zone.title;
+                shipping_line = {
+                    method_id: 'flat_rate',
+                    method_title: 'Delivery',
+                    total: zone.fee,
+                    zone_id: zone.id,
+                    zone_title: zone.title
+                };
+            } else {
+                shipping_line = {
+                    method_id: 'local_pickup',
+                    method_title: 'Collection',
+                    total: 0,
+                    zone_id: 0,
+                    zone_title: 'Local Pickup'
+                };
             }
 
             let fee_lines = [];
@@ -408,11 +425,20 @@ export default {
                     });
                 }
                 payment_method = method.id;
-                payment_method_title = method.name;
+                payment_method_title = method.title;
             }
 
             let discount_lines = [];
-            let order_items = cart_items.map((item) => {
+
+            let metas = [];
+            if (this.points > 0) {
+                metas.push({
+                    meta_key: 'payment_with_point_amount',
+                    meta_value: this.points
+                });
+            }
+
+            let items = cart_items.map((item) => {
                 return {
                     product_id: item.product_id,
                     quantity: item.quantity,
@@ -428,34 +454,24 @@ export default {
                 }
             });
 
-            let meta_data = [];
-            if (this.points > 0) {
-                meta_data.push({
-                    key: 'cost_points',
-                    value: this.points
-                });
-            }
-
             this.loading = false;
             shipping.phone = this.phone;
             return HttpClient.post('/orders', {
-                shipping_method,
-                shipping_zone_id,
                 shipping,
+                billing: shipping,
+                shipping_line,
                 buyer_note,
                 payment_method,
                 payment_method_title,
                 fee_lines,
                 discount_lines,
-                billing: shipping,
-                items: order_items,
-                meta_data,
-                points: this.points
+                metas,
+                items
             }).then((res) => {
                 cart.clearCart();
                 window.location.assign(res.data.links[1].href);
             }).catch(reason => {
-                console.log(reason.message);
+                this.resError = reason.message;
             }).finally(() => {
                 this.loading = false;
             });
@@ -557,8 +573,8 @@ export default {
             return Object.values(options).join(',');
         },
         getShippingAddress(addressData, placeResultData, id) {
-            console.log(addressData);
-            console.log(placeResultData);
+            // console.log(addressData);
+            // console.log(placeResultData);
             const {
                 subpremise,
                 street_number,
@@ -726,7 +742,7 @@ export default {
             }
 
             var that = this;
-            HttpClient.post('/sms/send', {
+            HttpClient.post('/captcha/sms', {
                 phone_number,
                 national_number
             }).then(response => {

@@ -17,6 +17,11 @@ trait HasMetas
         $this->metas()->updateOrCreate(['meta_key' => $meta_key], ['meta_value' => $meta_value]);
     }
 
+    public function removeMeta($meta_key)
+    {
+        $this->metas()->where('meta_key', $meta_key)->delete();
+    }
+
     /**
      * @param $meta_keys string|array
      * @return void

@@ -98,9 +98,21 @@
 
     .menu-user {
         display: flex;
-        column-gap: 10px;
+        column-gap: 15px;
 
-        .bi{
+        .dropdown:hover {
+            .dropdown-menu {
+                display: block;
+            }
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 10rem;
+        }
+
+        .bi {
             font-size: 22px;
         }
 

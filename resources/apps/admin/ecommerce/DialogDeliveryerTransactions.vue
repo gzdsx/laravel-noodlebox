@@ -43,17 +43,24 @@ import Pagination from "../mixins/Pagination";
 import ApiService from "../utils/ApiService";
 
 export default {
-    name: "DeliveryerTransactions",
+    name: "DialogDeliveryerTransaction",
     mixins: [Pagination],
     props: {
         value: {
             type: Boolean,
             default: false
         },
-        deliveryer: {
+        transaction: {
             type: Object,
             default() {
-                return {id: 0}
+                return {
+                    amount: 10,
+                    notes: '',
+                    total: 0,
+                    shipping_total: 0,
+                    cash_total: 0,
+                    cost_total: 0
+                }
             }
         }
     },

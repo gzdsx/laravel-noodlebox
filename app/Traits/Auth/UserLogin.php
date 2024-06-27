@@ -23,7 +23,7 @@ trait UserLogin
 
     public function username()
     {
-        return 'account';
+        return 'email';
     }
 
     /**
@@ -32,7 +32,7 @@ trait UserLogin
     protected function validateLogin(Request $request)
     {
         $request->validate([
-            $this->username() => 'required|string|account',
+            $this->username() => 'required|string|email',
             'password' => 'required|string|pwd',
         ]);
     }
@@ -43,27 +43,12 @@ trait UserLogin
      */
     protected function attemptLogin(Request $request)
     {
-        $account = $request->input('account');
+        $email = $request->input('email');
         $password = $request->input('password');
 
-        $emailLogin = $this->guard()->attempt([
-            'email' => $account,
+        return $this->guard()->attempt([
+            'email' => $email,
             'password' => $password
         ], $request->filled('remember'));
-
-        if ($emailLogin) {
-            return true;
-        }
-
-        $mobileLogin = $this->guard()->attempt([
-            'phone_number' => $account,
-            'password' => $password
-        ], $request->filled('remember'));
-
-        if ($mobileLogin) {
-            return true;
-        }
-
-        return false;
     }
 }

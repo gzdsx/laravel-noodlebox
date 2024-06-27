@@ -27,9 +27,19 @@
                 </el-table-column>
             </el-table>
             <div class="tablenav tablenav-bottom">
-                <el-button size="small" type="primary" :disabled="selectionIds.length === 0" @click="batchDelete">
-                    {{ $t('common.batch_delete') }}
-                </el-button>
+                <div class="table-actions">
+                    <el-button size="small" type="primary" :disabled="selectionIds.length === 0" @click="batchDelete">
+                        {{ $t('common.batch_delete') }}
+                    </el-button>
+                </div>
+                <el-pagination
+                    background
+                    layout="prev, pager, next,total"
+                    :total="total"
+                    :page-size="pageSize"
+                    :current-page="page"
+                    @current-change="onPageChange"
+                />
             </div>
         </section>
 

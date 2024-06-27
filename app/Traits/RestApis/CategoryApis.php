@@ -65,6 +65,15 @@ trait CategoryApis
         return json_success($model);
     }
 
+    public function update($id, Request $request)
+    {
+        $model = $this->repository()->findOrNew($id);
+        $model->fill($request->input('category', []));
+        $model->save();
+
+        return json_success($model);
+    }
+
     /**
      * @param $id
      * @return \Illuminate\Http\JsonResponse
@@ -95,25 +104,20 @@ trait CategoryApis
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
-    public function delete($id)
-    {
-        $this->deleteAll($id);
-        return json_success();
-    }
-
-    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
-    public function batchDestroy(Request $request)
+    public function destroy($id, Request $request)
     {
-        foreach ($request->input('ids', []) as $cate_id) {
-            $this->deleteAll($cate_id);
+        if ($id == 'batch') {
+            foreach ($request->input('ids', []) as $cate_id) {
+                $this->deleteAll($cate_id);
+            }
+        } else {
+            $this->deleteAll($id);
         }
+
         return json_success();
     }
 

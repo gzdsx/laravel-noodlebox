@@ -24,7 +24,7 @@ trait ProductVariationApis
     {
         $query = $this->repository();
         return json_success([
-            'count' => $query->count(),
+            'total' => $query->count(),
             'items' => $this->repository()->offset($request->input('offset', 0))
                 ->limit($request->input('limit', 15))->get()
         ]);

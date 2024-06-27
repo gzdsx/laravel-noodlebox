@@ -25,7 +25,7 @@ trait UserRegister
 
     protected function redirectTo()
     {
-        return '/home';
+        return route('verification.notice');
     }
 
     /**
@@ -37,6 +37,7 @@ trait UserRegister
     protected function validator(array $data)
     {
         return Validator::make($data, [
+            'nickname' => 'bail|required|string|max:255',
             'email' => 'bail|required|string|email|unique:user',
             'password' => 'bail|required|string|pwd',
         ]);
@@ -53,7 +54,6 @@ trait UserRegister
 
         $user = new User();
         $user->nickname = $data['nickname'] ?? '';
-        $user->phone = $data['phone'] ?? '';
         $user->email = $data['email'] ?? '';
         $user->password = bcrypt($data['password'] ?? '');
         $user->save();

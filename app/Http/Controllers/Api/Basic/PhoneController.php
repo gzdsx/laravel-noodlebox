@@ -20,6 +20,7 @@ class PhoneController extends BaseController
         }
 
         $verified = UserPhone::where([
+            'user_id' => auth()->id(),
             'national_number' => $national_number,
             'phone_number' => $phone_number,
         ])->exists();
@@ -50,7 +51,8 @@ class PhoneController extends BaseController
                 ];
 
                 $user_phone = UserPhone::firstOrCreate($attributes)->firstOrNew();
-                $user_phone->verified = 1;
+                $user_phone->verified_at = now();
+                $user_phone->user_id = auth()->id();
                 $user_phone->save();
 
                 return json_success();

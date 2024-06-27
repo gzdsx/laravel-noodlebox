@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $sku_title SKU名称
  * @property object|null $meta_data 元数据
  * @property string|null $purchase_via
+ * @property string|null $cart_hash
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 修改时间
  * @property-read \App\Models\Product|null $product
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Cart whereCartHash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereImage($value)
@@ -61,7 +63,8 @@ class Cart extends Model
         'sku_id',
         'sku_title',
         'meta_data',
-        'purchase_via'
+        'purchase_via',
+        'cart_hash'
     ];
 
     protected $casts = [

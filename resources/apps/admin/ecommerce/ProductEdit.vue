@@ -48,7 +48,7 @@
                                 <el-input type="text" v-model="product.keywords"/>
                             </el-form-item>
                             <el-form-item label="简短描述">
-                                <el-input type="textarea" rows="5" v-model="product.description"/>
+                                <wang-editor v-model="product.description" height="200" ref="description"/>
                             </el-form-item>
                             <el-form-item label="徽章">
                                 <div class="badges-wrapper">
@@ -121,7 +121,7 @@
                             <h2>变量和价格</h2>
                         </div>
                         <div class="post-card-body">
-                            <variation-panel :variation-list="product.variation_list"/>
+                            <variation-panel v-model="product.variation_list"/>
                         </div>
                     </div>
 
@@ -244,11 +244,6 @@ import BadgePanel from "../components/BadgePanel.vue";
 
 export default {
     name: "ProductEdit",
-    computed: {
-        variationList() {
-            return variationList
-        }
-    },
     components: {
         BadgePanel,
         AdditionOptionsPanel,
@@ -361,7 +356,7 @@ export default {
             this.product.attr_list = data.attrs;
         },
         onSubmit(type) {
-            //console.log(this.product.variation_list);
+            //console.log(this.product.variation_list);return ;
             let {product, images, content, skus, meta_data} = this;
             let {title, price, stock} = product;
 
@@ -425,7 +420,7 @@ export default {
             if (product.id) {
                 ProductService.updateProduct(product.id, product).then(() => {
                     this.$message.success('产品已更新');
-                    this.$router.history.go(0);
+                    //this.$router.history.go(0);
                 }).catch(reason => {
                     this.$message.error(reason.message);
                 }).finally(() => {

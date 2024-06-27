@@ -49,7 +49,8 @@ mix.js('resources/apps/web/cart.js', 'public/dist/web').vue();
 mix.js('resources/apps/web/product.js', 'public/dist/web').vue();
 mix.js('resources/apps/web/orders.js', 'public/dist/web').vue();
 mix.js('resources/apps/web/checkout.js', 'public/dist/web').vue();
-mix.js('resources/apps/web/lottery/checkout.js', 'public/dist/lottery').vue();
+mix.js('resources/apps/web/my-points.js', 'public/dist/web').vue();
+mix.js('resources/apps/web/my-address.js', 'public/dist/web').vue();
 mix.js('resources/apps/pos/index.js', 'public/dist/pos').vue();
 //sass
 mix.sass('resources/sass/bootstrap.scss', 'public/lib/bootstrap/bootstrap.min.css');

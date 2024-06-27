@@ -3,12 +3,20 @@
 namespace App\Http\Controllers\Admin\Ecommerce;
 
 use App\Http\Controllers\Api\BaseController;
+use App\Models\Order;
+use App\Support\PrintNode;
+use App\Traits\RestApis\OrderApis;
 use App\Traits\RestApis\SoldApis;
 use Illuminate\Http\Request;
 
 class OrderController extends BaseController
 {
-    use SoldApis;
+    use OrderApis;
+
+    protected function repository()
+    {
+        return Order::query();
+    }
 
     public function batchDestroy(Request $request)
     {
@@ -36,5 +44,11 @@ class OrderController extends BaseController
                 ->limit($request->input('limit', 10))
                 ->orderByDesc('created_at')->get()
         ]);
+    }
+
+    public function printOrder($id)
+    {
+        $order = $this->repository()->findOrFail($id);
+        $order->printInvoice();
     }
 }

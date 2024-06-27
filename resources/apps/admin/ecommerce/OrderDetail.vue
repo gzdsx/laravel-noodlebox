@@ -107,6 +107,8 @@
                         <el-button size="medium" type="primary" @update="onOrderUpdated" @click="showDialog=true">
                             订单处理
                         </el-button>
+
+                        <a :href="order.links.invoice" class="el-link el-link--primary" target="_blank">View Invoice</a>
                     </td>
                 </tr>
                 </tbody>

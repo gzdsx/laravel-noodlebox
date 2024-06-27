@@ -308,6 +308,7 @@
             top: 0;
             position: sticky;
             display: flex;
+            background-color: #444444;
 
             .product {
                 &-thumbnail {
@@ -374,7 +375,7 @@
             &__name {
                 font-weight: 600;
                 font-size: 1.2rem;
-                color: var(--bull-cyan);
+                color: var(--white);
                 margin-bottom: 0.75rem;
             }
 

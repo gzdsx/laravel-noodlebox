@@ -25,7 +25,10 @@
         <dialog-lottery-cart v-model="showCart"/>
         <div class="lottery-win-points" v-if="showPoints">+{{ prize.points }}</div>
         <div class="lottery-float" v-if="settings.enable==='yes'">
-            <img :src="settings.float_icon" alt="" @click="showLottery=true"/>
+            <div class="lottery-float__item">
+                <img :src="settings.float_icon" alt="" @click="showLottery=true"/>
+                <div class="badge point-count">0</div>
+            </div>
         </div>
     </div>
 </template>
@@ -59,6 +62,8 @@ export default {
                 this.settings = res.data;
             }).catch(reason => {
 
+            }).finally(() => {
+                window.dispatchEvent(new Event('pointChanged'));
             });
         },
         onDraw(prize) {
@@ -86,6 +91,17 @@ export default {
             this.showLottery = true;
         });
     },
+    mounted() {
+        window.addEventListener('pointChanged', (event) => {
+            if (window.noodlebox.user.id){
+                HttpClient.get('/my/points').then(response => {
+                    document.querySelectorAll('.point-count').forEach(item => {
+                        item.innerHTML = response.data.points;
+                    });
+                });
+            }
+        });
+    }
 }
 </script>
 

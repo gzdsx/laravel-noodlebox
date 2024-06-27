@@ -28,31 +28,36 @@
             </ul>
         </div>
         <div class="menu-right">
-            @if(Auth::check())
-                <div class="menu-user">
-                    <a href="{{route('my-account')}}" class="user-btn">
-                        <i class="bi bi-person-fill"></i>
-                        <span>{{Auth::user()->nickname}}</span>
-                    </a>
+            <div class="menu-user">
+                @auth
+                    <div class="dropdown">
+                        <a href="{{route('my-account')}}" role="button">
+                            <img src="{{auth()->user()->avatar}}" class="avatar" alt="">
+                            <span>{{auth()->user()->nickname}}</span>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{{route('my-account')}}">My Account</a>
+                            <a class="dropdown-item" href="{{route('logout')}}">Logout</a>
+                        </div>
+                    </div>
+                @endauth
+                @guest
+                    <div>
+                        <a href="{{route('login')}}" class="user-btn">
+                            <img src="{{asset('images/common/avatar_default.png')}}" class="avatar" alt="">
+                            <span>Login</span>
+                        </a>
+                    </div>
+                @endguest
+
+                <div>
                     <a href="{{url('cart')}}" class="logout-btn">
                         <i class="bi bi-cart">
                             <span class="badge cart-count">0</span>
                         </i>
                     </a>
                 </div>
-            @else
-                <div class="menu-user">
-                    <a href="{{url('login')}}" class="user-btn">
-                        <i class="bi bi-person-fill"></i>
-                        <span>Login</span>
-                    </a>
-                    <a href="{{url('cart')}}" class="logout-btn">
-                        <i class="bi bi-cart">
-                            <span class="badge cart-count">0</span>
-                        </i>
-                    </a>
-                </div>
-            @endif
+            </div>
         </div>
     </header>
 </div>

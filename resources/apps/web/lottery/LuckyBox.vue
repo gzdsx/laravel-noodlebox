@@ -49,13 +49,9 @@ export default {
                     this.$emit('draw', res.data);
                 }, 1000);
             }).catch(reason => {
-                if (reason.code === 401) {
-                    window.location.assign('/login?redirect=' + location.href);
-                } else {
-                    this.setTimeout(() => {
-                        this.$emit('error', reason);
-                    }, 1000);
-                }
+                this.setTimeout(() => {
+                    this.$emit('error', reason);
+                }, 1000);
             }).finally(() => {
                 setTimeout(() => {
                     this.loading = false;

@@ -30,10 +30,10 @@
         </td>
         <td style="width: 100px; text-align: center;">
             <div>
-                @if($order->shipping_method=='delivery')
-                    <img src="{{asset('images/noodlebox/local-shipping.png')}}" width="80" alt="">
+                @if($order->shipping_line['method_id']=='flat_rate')
+                    <img src="{{asset('images/noodlebox/local-shipping.png')}}" width="75" alt="">
                 @else
-                    <img src="{{asset('images/noodlebox/local-pickup.png')}}" width="80" alt="">
+                    <img src="{{asset('images/noodlebox/local-pickup.png')}}" width="75" alt="">
                 @endif
             </div>
             <h2 style="text-align: center; margin: 0; font-weight: bold;">{{$order->short_code}}</h2>
@@ -70,43 +70,43 @@
 </div>
 <table class="table-order-info">
     <colgroup>
-        <col width="110"/>
+        <col width="90"/>
         <col/>
     </colgroup>
     <tbody>
     <tr>
         <td>OrderN:</td>
-        <td>{{$order->order_no.'@'.$order->created_at->format('H:i:s')}}</td>
+        <td>{{$order->order_no}}</td>
     </tr>
     <tr>
         <td>OrderD:</td>
-        <td>{{$order->created_at->format('m/d/Y')}}</td>
+        <td>{{$order->created_at->format('m/d/Y H:m')}}</td>
     </tr>
     <tr>
-        <td>Created Via:</td>
+        <td>CreatedV:</td>
         <td>{{$order->created_via}}</td>
     </tr>
     <tr>
-        <td>PaymentM:</td>
+        <td>PaymentS:</td>
         <td>
-            @if($order->payment_method=='paypal')
-                Pay Online
-            @elseif($order->payment_method=='cash')
-                Pay Cash
-            @else
-                Pay by Card Reader
-            @endif
+            {{$order->payment_status ? 'Paid' : 'Unpaid'}}
         </td>
     </tr>
     @if($order->shipping_method=='delivery')
-    <tr>
-        <td>ShippingM:</td>
-        <td>{{ucfirst($order->shipping_method)}}-{{$order->shippingZone->title}}</td>
-    </tr>
+        <tr>
+            <td>ShippingM:</td>
+            <td>{{ucfirst($order->shipping_method)}}-{{$order->shippingZone->title}}</td>
+        </tr>
     @else
         <tr>
             <td>ShippingM:</td>
-            <td>{{ucfirst($order->shipping_method)}}</td>
+            <td>
+                @if($order->shipping_line['method_id'] == 'flat_rate')
+                    <span>{{$order->shipping_line['method_title'].' to '.$order->shipping_line['zone_title']}}</span>
+                @else
+                    <span>{{$order->shipping_line['method_title']}}</span>
+                @endif
+            </td>
         </tr>
     @endif
     </tbody>
@@ -114,7 +114,7 @@
 <table class="table-order-items">
     <colgroup>
         <col/>
-        <col width="120"/>
+        <col width="70"/>
     </colgroup>
     <thead>
     <tr>
@@ -127,58 +127,83 @@
         <tr>
             <td>
                 <h3 class="name">
-                    {{$item->quantity}}<sub style="line-height: 1; vertical-align: -2px;">&#42;</sub>{{$item->title}}
+                    <div class="qty">{{$item->quantity}}</div>
+                    <div style="font-weight: 400; margin-right: 3px;">x</div>
+                    <div class="tit">
+                        {{$item->title}}
+                    </div>
                 </h3>
                 @if(!empty($item->meta_data))
                     @isset($item->meta_data['options'])
                         <ul class="metas">
                             @foreach($item->meta_data['options'] as $k=>$v)
-                                <li>-{{$v}}</li>
+                                @if(!preg_match('/None/is',$v) && !preg_match('/Original/is',$v))
+                                    <li><strong>*</strong>{{$v}}</li>
+                                @endif
                             @endforeach
                         </ul>
                     @endisset
                 @endif
+                @if(isset($item->meta_data['purchase_via']) && $item->meta_data['purchase_via'] == 'point')
+                    <small>Purchase via point</small>
+                @endif
+                @if(isset($item->meta_data['purchase_via']) && $item->meta_data['purchase_via'] == 'lottery')
+                    <small>Purchase via lottery</small>
+                @endif
             </td>
-            <td>€{{$item->price}}</td>
+            <td class="price">{{$item->price}}</td>
         </tr>
     @endforeach
     </tbody>
 </table>
+@if($order->buyer_note)
+    <div style="margin-top: 10px; margin-bottom: 10px; background-color: #f5f5f5; padding: 10px; border-radius: 2px;">
+        <h4 style="margin: 0;">Customer Notes</h4>
+        <div>{{$order->buyer_note}}</div>
+    </div>
+@endif
 <table class="table-total">
     <colgroup>
         <col width="50%"/>
         <col/>
-        <col width="120"/>
     </colgroup>
     <tbody>
     <tr>
-        <th></th>
         <th>Subtotal</th>
-        <td><strong>€{{$subtotal}}</strong></td>
+        <td class="text-right"><strong>€{{$subtotal}}</strong></td>
     </tr>
     <tr>
-        <th></th>
         <th>Shipping</th>
-        <td><strong>€{{$order->shipping_total}}</strong></td>
+        <td class="text-right"><strong>€{{$order->shipping_total}}</strong></td>
     </tr>
     @foreach($order->fee_lines as $fee)
         <tr>
-            <th></th>
             <th>{{$fee['name']??''}}</th>
-            <td><strong>€{{$fee['total']??''}}</strong></td>
+            <td class="text-right"><strong>€{{$fee['total']??''}}</strong></td>
         </tr>
     @endforeach
     <tr>
-        <th></th>
-        <th>Total</th>
-        <td><strong>€{{$order->total}}</strong></td>
+        <th>PaymentM</th>
+        <td class="text-right" style="line-height: 1.1;">
+            @if($order->payment_method=='customize')
+                Card: {{format_amount($order->getMeta('payment_with_card_value'))}}<br>
+                Cash: {{format_amount($order->getMeta('payment_with_cash_value'))}}
+            @else
+                {{$order->payment_method_title}}
+            @endif
+        </td>
     </tr>
+    <tr>
+        <th>Total</th>
+        <td align="right" class="text-right"><strong>€{{$order->total}}</strong></td>
+    </tr>
+    @if($order->getMeta('cost_total') != 0)
+        <tr>
+            <th>Cost Fee</th>
+            <td align="right" class="text-right"><strong>€{{format_amount($order->getMeta('cost_total'))}}</strong></td>
+        </tr>
+    @endif
     </tbody>
 </table>
-@if($order->buyer_note)
-    <div style="margin-top: 30px; background-color: #f5f5f5; padding: 10px; border-radius: 2px;">
-        {{$order->buyer_note}}
-    </div>
-@endif
 </body>
 </html>
