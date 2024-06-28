@@ -21,13 +21,15 @@ class SettingController extends BaseController
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function update(Request $request)
     {
-        foreach ($request->input('settings', []) as $skey => $svalue) {
+        foreach ($request->all() as $skey => $svalue) {
             Setting::updateOrCreate(['skey' => $skey], ['svalue' => $svalue]);
         }
 
-        return json_success($request->input('settings', []));
+        cache()->forget('settings');
+        return json_success();
     }
 }

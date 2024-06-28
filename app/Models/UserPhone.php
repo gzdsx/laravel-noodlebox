@@ -41,11 +41,31 @@ class UserPhone extends Model
         'user_id',
         'phone_number',
         'national_number',
-        'verified',
+        'verified_at',
+    ];
+    protected $casts = [
+        'verified_at' => 'datetime',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public static function checkPhoneNumber($user_id, $phone_number, $national_number)
+    {
+        if ($user_id && $phone_number && $national_number) {
+            if (substr($phone_number, 0, 1) != '0') {
+                $phone_number = '0' . $phone_number;
+            }
+
+            return self::where([
+                'user_id' => $user_id,
+                'phone_number' => $phone_number,
+                'national_number' => $national_number,
+            ])->exists();
+        }
+
+        return false;
     }
 }

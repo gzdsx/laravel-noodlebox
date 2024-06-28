@@ -11,7 +11,7 @@ export default {
         onSubmit() {
             let {settings} = this;
             this.loading = true;
-            ApiService.post('/settings', {settings}).then(() => {
+            ApiService.post('/settings', settings).then(() => {
                 this.$message.success(this.$t('settings.saved'));
                 if (this.updated) {
                     this.updated();

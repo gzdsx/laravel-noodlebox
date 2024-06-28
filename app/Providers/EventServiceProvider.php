@@ -2,8 +2,7 @@
 
 namespace App\Providers;
 
-use App\Events\OrderCreated;
-use App\Listeners\Order\OrderCreatedListener3;
+
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Registered;
@@ -37,13 +36,10 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\Auth\UserVerifiedListener'
         ],
         'App\Events\OrderChanged' => [
-            'App\Listeners\Order\OrderChangedListener'
+            'App\Listeners\OrderChangedListener'
         ],
-        OrderCreated::class => [
-            'App\Listeners\Order\OrderCreatedListener2'
-        ],
-        'App\Events\OrderCreated2' => [
-            'App\Listeners\Order\OrderCreatedListener6'
+        'App\Events\OrderCreated' => [
+            'App\Listeners\OrderCreatedListener'
         ],
     ];
 
@@ -55,7 +51,5 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
-
-        //
     }
 }

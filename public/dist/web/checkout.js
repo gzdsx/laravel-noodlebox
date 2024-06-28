@@ -601,10 +601,10 @@ var _default2 = exports["default"] = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=script&lang=js":
-/*!************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=script&lang=js ***!
-  \************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=script&lang=js":
+/*!**************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=script&lang=js ***!
+  \**************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
@@ -616,390 +616,133 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
-var _NoodleContainer = _interopRequireDefault(__webpack_require__(/*! ../components/NoodleContainer.vue */ "./resources/apps/web/components/NoodleContainer.vue"));
-var _PaypalButtons = _interopRequireDefault(__webpack_require__(/*! ./PaypalButtons.vue */ "./resources/apps/web/checkout/PaypalButtons.vue"));
 var _VueGoogleAutocomplete = _interopRequireDefault(__webpack_require__(/*! ../../lib/VueGoogleAutocomplete.vue */ "./resources/apps/lib/VueGoogleAutocomplete.vue"));
-var _CartService = _interopRequireDefault(__webpack_require__(/*! ../CartService */ "./resources/apps/web/CartService.js"));
-var _CheckouItems = _interopRequireDefault(__webpack_require__(/*! ./CheckouItems.vue */ "./resources/apps/web/checkout/CheckouItems.vue"));
-var _NoodleLoading = _interopRequireDefault(__webpack_require__(/*! ../components/NoodleLoading.vue */ "./resources/apps/web/components/NoodleLoading.vue"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw new Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw new Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 var controller = new AbortController();
-var cart = new _CartService["default"]();
 var _default = exports["default"] = {
-  name: "NoodleCheckout",
+  name: "CheckoutShipping",
   components: {
-    NoodleLoading: _NoodleLoading["default"],
-    CheckouItems: _CheckouItems["default"],
-    PaypalButtons: _PaypalButtons["default"],
-    NoodleContainer: _NoodleContainer["default"],
     VueGoogleAutocomplete: _VueGoogleAutocomplete["default"]
   },
   data: function data() {
     return {
-      cart_items: [],
-      address_list: [],
-      payment_method_index: 0,
-      shipping_method: 'delivery',
-      shipping_zones: [],
-      shipping_zone_index: 0,
+      shipping_line: {
+        method_id: 'flat_rate',
+        method_title: 'Delivery',
+        zone_id: '',
+        zone_title: '',
+        total: 0
+      },
       shipping: {
         first_name: '',
         last_name: '',
+        address_line_1: '',
+        address_line_2: '',
+        city: '',
+        postal_code: '',
+        country: 'Ireland',
+        state: '',
         phone: {
           national_number: '353',
           phone_number: ''
-        },
-        email: '',
-        address_line_1: '',
-        address_line_2: '',
-        county: '',
-        city: '',
-        state: '',
-        country: '',
-        postal_code: ''
+        }
       },
-      buyer_note: '',
-      payment_methods: [{
-        id: 'online',
-        title: 'Pay Online (PayPal & Credit Car)',
-        fee: 0.5,
-        img: '/images/noodlebox/Full_Online.png'
-      }, {
-        id: 'card',
-        title: 'Pay by Card Reader',
-        fee: 0.5,
-        img: '/images/noodlebox/pay_by_card.png'
-      }, {
-        id: 'cash',
-        title: 'Pay Cash',
-        fee: 0.0,
-        img: '/images/noodlebox/pay_cash.png'
-      }],
-      errors: {
-        name: null,
-        phone: null,
-        address: null,
-        message: null
-      },
-      loading: true,
-      formatted_address: '',
-      phone: {
-        national_number: '353',
-        phone_number: '',
-        verified: false
-      },
-      original_phone: {
-        national_number: '353',
-        phone_number: '',
-        verified: false
-      },
+      phoneVerified: false,
       showCodeInput: false,
       verificationCode: '',
-      phoneVerified: false,
-      sendingCodeText: 'Get Code',
-      sendingCode: false,
-      points: 0,
-      pointsAccount: {
-        'points': 0,
-        'exchange_rate': 1,
-        'tips': ''
-      },
-      settings: {
-        enable_points_checkout: 'no'
-      },
-      resError: null
+      sendingCodeText: 'Send code',
+      disabledSendCode: false,
+      shipping_zones: [],
+      shipping_zone_index: 0,
+      errors: {},
+      formatted_address: ''
     };
   },
-  computed: {
-    subtotal: function subtotal() {
-      var total = 0;
-      this.cart_items.forEach(function (item) {
-        total += parseFloat(item.subtotal);
-      });
-      return total.toFixed(2);
-    },
-    shippingFee: function shippingFee() {
-      if (this.shipping_method === 'delivery' && this.shipping_zones.length) {
-        return this.shipping_zones[this.shipping_zone_index].fee;
-      }
-      return 0;
-    },
-    paymentFee: function paymentFee() {
-      var method = this.payment_methods[this.payment_method_index];
-      return method.fee;
-    },
-    total: function total() {
-      return (parseFloat(this.subtotal) + parseFloat(this.shippingFee) + parseFloat(this.paymentFee) - parseFloat(this.pointDiscount)).toFixed(2);
-    },
-    disabledSendCode: function disabledSendCode() {
-      return this.phone.phone_number.length < 5 || this.sendingCode;
-    },
-    pointDiscount: function pointDiscount() {
-      if (this.points > 0) {
-        return (Number(this.points) * Number(this.pointsAccount.exchange_rate)).toFixed(2);
-      }
-      return 0;
+  watch: {
+    shipping_line: function shipping_line(val) {
+      this.onChange();
     }
   },
-  watch: {},
   methods: {
-    fetchData: function fetchData() {
+    checkPhoneNumber: function checkPhoneNumber() {
       var _this = this;
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var response, shipping;
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
-            case 0:
-              _context.next = 2;
-              return _HttpClient["default"].get('/users/addresses');
-            case 2:
-              response = _context.sent;
-              shipping = response.data.shipping;
-              _this.fillShipping(shipping);
-              _context.next = 7;
-              return _HttpClient["default"].get('/shipping-zones');
-            case 7:
-              response = _context.sent;
-              _this.shipping_zones = response.data.items;
-              _this.shipping_zones.map(function (s, i) {
-                if (s.title === shipping.city) {
-                  _this.shipping_zone_index = i;
-                }
-              });
-            case 10:
-            case "end":
-              return _context.stop();
-          }
-        }, _callee);
-      }))();
-    },
-    validateOrder: function validateOrder() {
-      var check = true;
-      var cart_items = this.cart_items,
-        shipping_method = this.shipping_method,
-        shipping = this.shipping,
-        buyer_note = this.buyer_note;
-      if (!shipping.first_name) {
-        //this.errors.name = 'Please enter your name';
-        this.$showToast('Please enter your name');
-        return false;
+      var _this$shipping$phone = this.shipping.phone,
+        national_number = _this$shipping$phone.national_number,
+        phone_number = _this$shipping$phone.phone_number;
+      if (controller) {
+        controller.abort();
+        controller = new AbortController();
       }
-      if (!shipping.phone) {
-        //this.errors.phone = 'Please enter your phone number';
-        this.$showToast('Please enter your phone number');
-        return false;
-      }
-      if (shipping_method === 'delivery') {
-        if (!shipping.address_line_1) {
-          //this.errors.address = 'Please enter your address';
-          this.$showToast('Please enter your address');
-          return false;
-        }
-      }
-      if (!this.phoneVerified) {
-        this.$showToast('Please verify your phone number');
-        return false;
-      }
-      return check;
-    },
-    createOrder: function createOrder() {
-      var _this2 = this;
-      var cart_items = this.cart_items,
-        shipping_method = this.shipping_method,
-        shipping = this.shipping,
-        buyer_note = this.buyer_note;
-      if (!this.validateOrder()) {
-        return false;
-      }
-      var shipping_line = {};
-      if (shipping_method === 'delivery') {
-        var zone = this.shipping_zones[this.shipping_zone_index];
-        this.shipping.city = zone.title;
-        shipping_line = {
-          method_id: 'flat_rate',
-          method_title: 'Delivery',
-          total: zone.fee,
-          zone_id: zone.id,
-          zone_title: zone.title
-        };
-      } else {
-        shipping_line = {
-          method_id: 'local_pickup',
-          method_title: 'Collection',
-          total: 0,
-          zone_id: 0,
-          zone_title: 'Local Pickup'
-        };
-      }
-      var fee_lines = [];
-      var payment_method = '',
-        payment_method_title = '';
-      var method = this.payment_methods[this.payment_method_index];
-      if (method) {
-        if (method.fee) {
-          fee_lines.push({
-            name: 'Payment',
-            total: 0.5,
-            total_tax: 0
-          });
-        }
-        payment_method = method.id;
-        payment_method_title = method.title;
-      }
-      var discount_lines = [];
-      var metas = [];
-      if (this.points > 0) {
-        metas.push({
-          meta_key: 'payment_with_point_amount',
-          meta_value: this.points
-        });
-      }
-      var items = cart_items.map(function (item) {
-        return {
-          product_id: item.product_id,
-          quantity: item.quantity,
-          title: item.title,
-          price: item.price,
-          image: item.image,
-          meta_data: _objectSpread(_objectSpread({}, item.meta_data), {}, {
-            purchase_via: item.purchase_via
-          }),
-          subtotal: item.subtotal,
-          total: item.subtotal
-        };
-      });
-      this.loading = false;
-      shipping.phone = this.phone;
-      return _HttpClient["default"].post('/orders', {
-        shipping: shipping,
-        billing: shipping,
-        shipping_line: shipping_line,
-        buyer_note: buyer_note,
-        payment_method: payment_method,
-        payment_method_title: payment_method_title,
-        fee_lines: fee_lines,
-        discount_lines: discount_lines,
-        metas: metas,
-        items: items
-      }).then(function (res) {
-        cart.clearCart();
-        window.location.assign(res.data.links[1].href);
-      })["catch"](function (reason) {
-        _this2.resError = reason.message;
-      })["finally"](function () {
-        _this2.loading = false;
-      });
-    },
-    createPaypalOrder: function createPaypalOrder(data, actions) {
-      //console.log(actions);
-      if (!this.validateOrder()) {
-        return Promise.reject();
-      }
-      var total = this.total,
-        shipping = this.shipping,
-        cart_items = this.cart_items,
-        subtotal = this.subtotal,
-        shippingFee = this.shippingFee,
-        paymentFee = this.paymentFee;
-      var items = cart_items.map(function (item) {
-        return {
-          name: item.title,
-          unit_amount: {
-            currency_code: 'EUR',
-            value: item.price
-          },
-          quantity: item.quantity
-          //sku: item.id,
-          //image_url: item.image,
-        };
-      });
-
-      return _HttpClient["default"].post('/payment/paypal/create-order', {
-        orderData: {
-          intent: 'CAPTURE',
-          purchase_units: [{
-            amount: {
-              value: total.toString(),
-              currency_code: 'EUR',
-              breakdown: {
-                item_total: {
-                  currency_code: 'EUR',
-                  value: subtotal.toString()
-                },
-                shipping: {
-                  currency_code: 'EUR',
-                  value: shippingFee.toString()
-                },
-                handling: {
-                  currency_code: 'EUR',
-                  value: paymentFee.toString()
-                }
-              }
-            },
-            items: items
-          }],
-          payment_source: {
-            // card: {
-            //     number: '4111111111111111',
-            //     expiry: '01/2023',
-            //     cvv: '123',
-            //     name: 'John Doe',
-            //     billing_address: {
-            //         address_line_1: '123 Main St',
-            //         address_line_2: 'Apt 2',
-            //         admin_area_2: 'San Francisco',
-            //         admin_area_1: 'CA',
-            //         postal_code: '94105',
-            //         country_code: 'US'
-            //     }
-            // },
-            paypal: {
-              email_address: '',
-              name: {
-                given_name: shipping.first_name,
-                surname: shipping.last_name
-              },
-              address: {
-                address_line_1: shipping.address_line_1,
-                address_line_2: shipping.address_line_2,
-                admin_area_2: shipping.city,
-                admin_area_1: shipping.state,
-                postal_code: shipping.postalcode,
-                country_code: 'IR'
-              },
-              // phone: {
-              //     phone_type: 'MOBILE',
-              //     phone_number: {
-              //         national_number: ''
-              //     },
-              // },
-              experience_context: {
-                brand_name: 'Noodlebox',
-                landing_page_type: 'LOGIN',
-                user_action: 'PAY_NOW'
-                //return_url: 'https://example.com/return',
-                //cancel_url: 'https://example.com/cancel',
-              }
-            }
-          }
-        }
+      _HttpClient["default"].post('/my/phones/check', {
+        phone_number: phone_number,
+        national_number: national_number
+      }, {
+        signal: controller.signal
       }).then(function (response) {
-        return response.data.id;
+        _this.phoneVerified = response.data;
+      })["catch"](function (e) {
+        console.log(e);
+      });
+      this.onChange();
+    },
+    verifyPhoneNumber: function verifyPhoneNumber() {
+      var _this2 = this;
+      var _this$shipping$phone2 = this.shipping.phone,
+        phone_number = _this$shipping$phone2.phone_number,
+        national_number = _this$shipping$phone2.national_number;
+      _HttpClient["default"].post('/my/phones/verify', {
+        phone_number: phone_number,
+        national_number: national_number,
+        vercode: this.verificationCode
+      }).then(function (response) {
+        _this2.$showToast('Phone number verified!');
+        _this2.phoneVerified = true;
+        _this2.showCodeInput = false;
+      })["catch"](function (e) {
+        console.log(e);
+        _this2.$showToast(e.message);
       });
     },
-    metaValue: function metaValue(options) {
-      return Object.values(options).join(',');
+    getPhoneCode: function getPhoneCode() {
+      var _this3 = this;
+      var _this$shipping$phone3 = this.shipping.phone,
+        phone_number = _this$shipping$phone3.phone_number,
+        national_number = _this$shipping$phone3.national_number;
+      if (this.sendingCode) {
+        return false;
+      } else {
+        this.sendingCode = true;
+      }
+      var that = this;
+      _HttpClient["default"].post('/captcha/sms', {
+        phone_number: phone_number,
+        national_number: national_number
+      }).then(function (response) {
+        _this3.$showToast('SMS have sned!');
+        var timer = 60;
+        var interval = setInterval(function () {
+          timer--;
+          _this3.sendingCode = timer > 0;
+          if (timer === 0) {
+            clearInterval(interval);
+          }
+          that.sendingCodeText = timer > 0 ? 'Retrive after ' + timer + 's' : 'Get Code';
+        }, 1000);
+      })["catch"](function (e) {
+        console.log(e);
+        _this3.$showToast(e.message);
+      });
     },
     getShippingAddress: function getShippingAddress(addressData, placeResultData, id) {
-      var _this3 = this;
+      var _this4 = this;
       // console.log(addressData);
       // console.log(placeResultData);
       var subpremise = addressData.subpremise,
@@ -1014,20 +757,13 @@ var _default = exports["default"] = {
         administrative_area_level_2 = addressData.administrative_area_level_2;
       var formatted_address = placeResultData.formatted_address,
         address_components = placeResultData.address_components;
-      var check = false;
       this.shipping_zones.map(function (s, i) {
         if (formatted_address.indexOf(s.title) !== -1) {
-          check = true;
-          _this3.shipping_zone_index = i;
-          _this3.shipping.city = s.title;
-          _this3.$forceUpdate();
+          _this4.shipping_zone_index = i;
+          _this4.shipping.city = s.title;
+          _this4.$forceUpdate();
         }
       });
-      if (!check) {
-        this.$showToast("This address is not within the delivery range");
-        this.formatted_address = '';
-        return false;
-      }
       if (country) {
         this.shipping.country = country;
       }
@@ -1046,211 +782,322 @@ var _default = exports["default"] = {
       } else {
         this.shipping.postal_code = postal_code_prefix;
       }
-      var address = '',
+      var addressline = '',
         sp = '';
       if (subpremise) {
-        address += sp + subpremise;
+        addressline += sp + subpremise;
         sp = ' ';
       }
       if (street_number) {
-        address += sp + street_number;
+        addressline += sp + street_number;
         sp = ' ';
       }
       if (route) {
-        address += sp + route;
+        addressline += sp + route;
       }
       if (neighborhood) {
-        address += ',' + neighborhood;
+        addressline += ',' + neighborhood;
       }
-      this.shipping.address_line_1 = address;
+      this.shipping.address_line_1 = addressline;
       this.$forceUpdate();
     },
     addressChange: function addressChange(v) {
-      console.log('change');
+      //console.log('change');
       this.shipping.address_line_1 = v;
       // this.shipping.address_line_2 = '';
       // this.shipping.county = '';
       // this.shipping.city = '';
       // this.shipping.state = '';
       // this.shipping.postalcode = '';
+      this.onChange();
     },
-    fillShipping: function fillShipping(address) {
-      this.shipping = _objectSpread(_objectSpread({}, this.shipping), {}, {
-        first_name: address.first_name,
-        last_name: address.last_name,
-        email: address.email,
-        country: address.country,
-        state: address.state,
-        city: address.city,
-        county: address.county,
-        address_line_1: address.address_line_1,
-        address_line_2: address.address_line_2,
-        postal_code: address.postal_code
-      });
-      if (address.phone) {
-        var _address$phone = address.phone,
-          national_number = _address$phone.national_number,
-          phone_number = _address$phone.phone_number,
-          verified = _address$phone.verified;
-        if (national_number) {
-          this.phone.national_number = national_number;
-        }
-        if (phone_number) {
-          this.phone.phone_number = phone_number;
-        }
-        this.phone.verified = verified ? verified : false;
-        this.original_phone = {
-          national_number: national_number,
-          phone_number: phone_number,
-          verified: verified
-        };
-        this.phoneVerified = verified ? verified : false;
-      }
-      var addressline = address.address_line_1;
-      if (address.city) {
-        addressline += ',' + address.city;
-      }
-      if (address.state) {
-        addressline += ',' + address.state;
-      }
-      if (address.country) {
-        addressline += ',' + address.country;
-      }
-      this.formatted_address = addressline;
-
-      //console.log(address);
+    onZoneChange: function onZoneChange() {
+      var zone = this.shipping_zones[this.shipping_zone_index];
+      this.shipping_line.zone_id = zone.id;
+      this.shipping_line.zone_title = zone.title;
+      this.shipping_line.total = zone.fee;
+      this.onChange();
+      this.$emit('zone-change', zone);
     },
-    onPhoneNumberChange: function onPhoneNumberChange() {
-      var _this4 = this;
-      var _this$phone = this.phone,
-        national_number = _this$phone.national_number,
-        phone_number = _this$phone.phone_number,
-        verified = _this$phone.verified;
-      if (phone_number === this.original_phone.phone_number && national_number === this.original_phone.national_number) {
-        this.phoneVerified = this.original_phone.verified;
-        return;
-      }
-      if (controller) {
-        controller.abort();
-        controller = new AbortController();
-      }
-      _HttpClient["default"].post('phones/check', {
-        phone_number: phone_number,
-        national_number: national_number
-      }, {
-        signal: controller.signal
-      }).then(function (response) {
-        _this4.phoneVerified = response.data;
-      })["catch"](function (e) {
-        console.log(e);
-      });
-    },
-    getPhoneCode: function getPhoneCode() {
+    fetchData: function fetchData() {
       var _this5 = this;
-      var _this$phone2 = this.phone,
-        phone_number = _this$phone2.phone_number,
-        national_number = _this$phone2.national_number;
-      if (this.sendingCode) {
-        return false;
-      } else {
-        this.sendingCode = true;
-      }
-      var that = this;
-      _HttpClient["default"].post('/captcha/sms', {
-        phone_number: phone_number,
-        national_number: national_number
-      }).then(function (response) {
-        _this5.$showToast('SMS have sned!');
-        var timer = 60;
-        var interval = setInterval(function () {
-          timer--;
-          _this5.sendingCode = timer > 0;
-          if (timer === 0) {
-            clearInterval(interval);
-          }
-          that.sendingCodeText = timer > 0 ? 'Retrive after ' + timer + 's' : 'Get Code';
-        }, 1000);
-      })["catch"](function (e) {
-        console.log(e);
-        _this5.$showToast(e.message);
-      });
-    },
-    verifyPhoneNumber: function verifyPhoneNumber() {
-      var _this6 = this;
-      var _this$phone3 = this.phone,
-        phone_number = _this$phone3.phone_number,
-        national_number = _this$phone3.national_number;
-      _HttpClient["default"].post('/phones/verify', {
-        phone_number: phone_number,
-        national_number: national_number,
-        vercode: this.verificationCode
-      }).then(function (response) {
-        _this6.$showToast('Phone number verified!');
-        _this6.phoneVerified = true;
-        _this6.showCodeInput = false;
-      })["catch"](function (e) {
-        console.log(e);
-        _this6.$showToast(e.message);
-      });
-    },
-    fetchPointsAccount: function fetchPointsAccount() {
-      var _this7 = this;
-      _HttpClient["default"].get('/my/points').then(function (response) {
-        _this7.pointsAccount = response.data;
-      });
-    },
-    onInputPoints: function onInputPoints(e) {
-      this.points = this.points.replace(/[^0-9]/g, '');
-      if (this.points > this.pointsAccount.points) {
-        this.points = this.pointsAccount.points;
-      }
-    },
-    fetchCheckoutSettings: function fetchCheckoutSettings() {
-      var _this8 = this;
-      _HttpClient["default"].get('/checkout/settings').then(function (response) {
-        _this8.settings = _objectSpread(_objectSpread({}, _this8.settings), response.data);
-      });
-    },
-    fetchCartItems: function fetchCartItems() {
-      var _this9 = this;
-      this.loading = true;
-      _HttpClient["default"].get('/carts').then(function (res) {
-        res.data.items.forEach(function (item) {
-          var meta_data = item.meta_data;
-          if (meta_data) {
-            if (meta_data.options) {
-              item.options = meta_data.options;
-            }
-            if (meta_data.additional_options) {
-              item.additional_options = meta_data.additional_options;
-            }
-          }
-          Object.defineProperty(item, 'subtotal', {
-            get: function get() {
-              return (Number(this.price) * Number(this.quantity)).toFixed(2);
-            }
-          });
-          Object.defineProperty(item, 'pointTotal', {
-            get: function get() {
-              if (this.product) {
-                return (Number(this.product.point_price) * Number(this.quantity)).toFixed(2);
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var response, zone;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return _HttpClient["default"].get('/my/address');
+            case 2:
+              response = _context.sent;
+              _this5.shipping = _objectSpread(_objectSpread({}, _this5.shipping), response.data.shipping);
+              _context.next = 6;
+              return _HttpClient["default"].get('/shipping-zones');
+            case 6:
+              response = _context.sent;
+              _this5.shipping_zones = response.data.items;
+              _this5.shipping_zones.map(function (s, i) {
+                if (s.title === _this5.shipping.city) {
+                  _this5.shipping_zone_index = i;
+                }
+              });
+              if (_this5.shipping_line.method_id === 'flat_rate') {
+                zone = _this5.shipping_zones[_this5.shipping_zone_index];
+                _this5.shipping_line.zone_id = zone.id;
+                _this5.shipping_line.zone_title = zone.title;
+                _this5.shipping_line.total = zone.fee;
               }
-              return 0;
-            }
-          });
-        });
-        _this9.cart_items = res.data.items;
-      })["finally"](function () {
-        _this9.loading = false;
+              _this5.checkPhoneNumber();
+              _this5.$emit('zone-change');
+            case 12:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee);
+      }))();
+    },
+    onChange: function onChange() {
+      var shipping = this.shipping,
+        shipping_line = this.shipping_line;
+      this.$emit('change', {
+        shipping: shipping,
+        shipping_line: shipping_line
       });
     }
   },
   mounted: function mounted() {
-    this.fetchCartItems();
     this.fetchData();
-    this.fetchPointsAccount();
-    this.fetchCheckoutSettings();
   }
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=script&lang=js":
+/*!***************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=script&lang=js ***!
+  \***************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var _default = exports["default"] = {
+  name: "CheckoutUsePoints",
+  props: {
+    subtotal: {
+      type: Number | String,
+      "default": 0
+    }
+  },
+  data: function data() {
+    return {
+      points: 0,
+      pointsAccount: {
+        points: 0,
+        tips: ''
+      }
+    };
+  },
+  methods: {
+    handleSubmit: function handleSubmit() {
+      var _this = this;
+      var subtotal = this.subtotal,
+        points = this.points;
+      _HttpClient["default"].post('/checkout/use-points', {
+        subtotal: subtotal,
+        points: points
+      }).then(function (response) {
+        _this.points = response.data.points;
+        _this.$emit('change', {
+          points: response.data.points,
+          points_total: response.data.points_total
+        });
+      })["catch"](function (error) {
+        console.log(error.message);
+      });
+    },
+    fetchPointsAccount: function fetchPointsAccount() {
+      var _this2 = this;
+      _HttpClient["default"].get('/my/points').then(function (response) {
+        _this2.pointsAccount = _objectSpread(_objectSpread({}, _this2.pointsAccount), response.data);
+      });
+    }
+  },
+  mounted: function mounted() {
+    this.fetchPointsAccount();
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=script&lang=js":
+/*!************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=script&lang=js ***!
+  \************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _HttpClient = _interopRequireDefault(__webpack_require__(/*! ../HttpClient */ "./resources/apps/web/HttpClient.js"));
+var _NoodleContainer = _interopRequireDefault(__webpack_require__(/*! ../components/NoodleContainer.vue */ "./resources/apps/web/components/NoodleContainer.vue"));
+var _PaypalButtons = _interopRequireDefault(__webpack_require__(/*! ./PaypalButtons.vue */ "./resources/apps/web/checkout/PaypalButtons.vue"));
+var _CartService = _interopRequireDefault(__webpack_require__(/*! ../CartService */ "./resources/apps/web/CartService.js"));
+var _CheckouItems = _interopRequireDefault(__webpack_require__(/*! ./CheckouItems.vue */ "./resources/apps/web/checkout/CheckouItems.vue"));
+var _NoodleLoading = _interopRequireDefault(__webpack_require__(/*! ../components/NoodleLoading.vue */ "./resources/apps/web/components/NoodleLoading.vue"));
+var _CheckoutUsePoints = _interopRequireDefault(__webpack_require__(/*! ./CheckoutUsePoints.vue */ "./resources/apps/web/checkout/CheckoutUsePoints.vue"));
+var _CheckoutShipping = _interopRequireDefault(__webpack_require__(/*! ./CheckoutShipping.vue */ "./resources/apps/web/checkout/CheckoutShipping.vue"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var controller = new AbortController();
+var cart = new _CartService["default"]();
+var _default = exports["default"] = {
+  name: "NoodleCheckout",
+  components: {
+    CheckoutShipping: _CheckoutShipping["default"],
+    CheckoutUsePoints: _CheckoutUsePoints["default"],
+    NoodleLoading: _NoodleLoading["default"],
+    CheckouItems: _CheckouItems["default"],
+    PaypalButtons: _PaypalButtons["default"],
+    NoodleContainer: _NoodleContainer["default"]
+  },
+  data: function data() {
+    return {
+      loading: true,
+      payment_methods: [{
+        id: 'online',
+        title: 'Pay Online (PayPal & Credit Car)',
+        fee: 0.5,
+        img: '/images/noodlebox/Full_Online.png'
+      }, {
+        id: 'card',
+        title: 'Pay by Card Reader',
+        fee: 0.5,
+        img: '/images/noodlebox/pay_by_card.png'
+      }, {
+        id: 'cash',
+        title: 'Pay Cash',
+        fee: 0.0,
+        img: '/images/noodlebox/pay_cash.png'
+      }],
+      payment_method_index: 0,
+      settings: {
+        enable_points_checkout: 'no'
+      },
+      order: {
+        payment_method: 'online',
+        payment_method_title: 'Pay Online (PayPal & Credit Car)',
+        shipping_line: {
+          method_id: '',
+          method_title: '',
+          zone_id: '',
+          zone_title: ''
+        },
+        shipping: {
+          first_name: '',
+          last_name: '',
+          phone: {
+            national_number: '353',
+            phone_number: ''
+          },
+          email: '',
+          address_line_1: '',
+          address_line_2: '',
+          county: '',
+          city: '',
+          state: '',
+          country: '',
+          postal_code: ''
+        },
+        items: [],
+        meta_data: {},
+        buyer_note: '',
+        subtotal: 0,
+        total: 0,
+        created_via: 'checkout'
+      },
+      resError: null
+    };
+  },
+  watch: {
+    payment_method_index: function payment_method_index(val) {
+      var method = this.payment_methods[val];
+      this.order.payment_method = method.id;
+      this.order.payment_method_title = method.title;
+      this.loadOrderData();
+    }
+  },
+  methods: {
+    fetchCheckoutSettings: function fetchCheckoutSettings() {
+      var _this = this;
+      _HttpClient["default"].get('/checkout/settings').then(function (response) {
+        _this.settings = _objectSpread(_objectSpread({}, _this.settings), response.data);
+      });
+    },
+    createOrder: function createOrder() {
+      var _this2 = this;
+      this.loading = true;
+      return _HttpClient["default"].post('/orders', this.order).then(function (res) {
+        window.location.assign(res.data.links[1].href);
+      })["catch"](function (reason) {
+        _this2.resError = reason.message;
+        _this2.$showToast(reason.message);
+      })["finally"](function () {
+        _this2.loading = false;
+      });
+    },
+    createPaypalOrder: function createPaypalOrder(data, actions) {
+      return _HttpClient["default"].post('/payment/paypal/create-order', this.order).then(function (response) {
+        return response.data.id;
+      });
+    },
+    onPointsChange: function onPointsChange(data) {
+      this.order.meta_data['use_points_value'] = data.points;
+      this.loadOrderData();
+    },
+    onShippingChange: function onShippingChange(data) {
+      var shipping = data.shipping,
+        shipping_line = data.shipping_line;
+      this.order = _objectSpread(_objectSpread({}, this.order), {}, {
+        shipping: shipping,
+        shipping_line: shipping_line
+      });
+    },
+    loadOrderData: function loadOrderData() {
+      var _this3 = this;
+      this.loading = true;
+      _HttpClient["default"].post('/checkout/order', this.order).then(function (response) {
+        _this3.order = _objectSpread(_objectSpread({}, _this3.order), response.data);
+        _this3.settings = _objectSpread(_objectSpread({}, _this3.settings), response.data.settings);
+      })["catch"](function (error) {
+        console.log(error.message);
+      })["finally"](function () {
+        _this3.loading = false;
+      });
+    }
+  },
+  mounted: function mounted() {}
 };
 
 /***/ }),
@@ -1540,7 +1387,7 @@ var render = exports.render = function render() {
       staticClass: "additional"
     }, [_vm._v("\n                " + _vm._s(Object.values(item.meta_data.options).join(", ")) + "\n            ")]) : _vm._e()]), _vm._v(" "), _c("div", {
       staticClass: "order-item__subtotal"
-    }, [_vm._v("€" + _vm._s(item.subtotal))])]);
+    }, [_vm._v("€" + _vm._s(item.total))])]);
   })], 2);
 };
 var staticRenderFns = exports.staticRenderFns = [function () {
@@ -1558,10 +1405,10 @@ render._withStripped = true;
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=template&id=d10176c4&scoped=true":
-/*!***********************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=template&id=d10176c4&scoped=true ***!
-  \***********************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=template&id=37e0c43d&scoped=true":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=template&id=37e0c43d&scoped=true ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -1574,17 +1421,7 @@ exports.staticRenderFns = exports.render = void 0;
 var render = exports.render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _vm.loading ? _c("noodle-loading") : _c("noodle-container", [_vm.cart_items.length === 0 ? _c("div", {
-    staticClass: "container"
-  }, [_c("h3", {
-    staticClass: "text-center pt-5 pb-5"
-  }, [_vm._v("The cart is empty!")])]) : _c("div", {
-    staticClass: "container"
-  }, [_c("div", {
-    staticClass: "checkout-body"
-  }, [_c("div", {
-    staticClass: "checkout-col"
-  }, [_c("h3", {
+  return _c("div", [_c("h3", {
     staticClass: "font-weight-bold mb-4"
   }, [_vm._v("Billing & Shipping")]), _vm._v(" "), _c("h5", {
     staticClass: "font-weight-bold mb-3"
@@ -1598,20 +1435,20 @@ var render = exports.render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.shipping_method,
-      expression: "shipping_method"
+      value: _vm.shipping_line.method_id,
+      expression: "shipping_line.method_id"
     }],
     staticClass: "radio",
     attrs: {
       type: "radio",
-      value: "delivery"
+      value: "flat_rate"
     },
     domProps: {
-      checked: _vm._q(_vm.shipping_method, "delivery")
+      checked: _vm._q(_vm.shipping_line.method_id, "flat_rate")
     },
     on: {
       change: function change($event) {
-        _vm.shipping_method = "delivery";
+        return _vm.$set(_vm.shipping_line, "method_id", "flat_rate");
       }
     }
   }), _vm._v(" "), _c("span", {
@@ -1624,20 +1461,20 @@ var render = exports.render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.shipping_method,
-      expression: "shipping_method"
+      value: _vm.shipping_line.method_id,
+      expression: "shipping_line.method_id"
     }],
     staticClass: "radio",
     attrs: {
       type: "radio",
-      value: "collection"
+      value: "local_pickup"
     },
     domProps: {
-      checked: _vm._q(_vm.shipping_method, "collection")
+      checked: _vm._q(_vm.shipping_line.method_id, "local_pickup")
     },
     on: {
       change: function change($event) {
-        _vm.shipping_method = "collection";
+        return _vm.$set(_vm.shipping_line, "method_id", "local_pickup");
       }
     }
   }), _vm._v(" "), _c("span", {
@@ -1652,9 +1489,7 @@ var render = exports.render = function render() {
     staticClass: "col-md-6"
   }, [_c("div", {
     staticClass: "form-group"
-  }, [_c("div", {
-    staticClass: "form-group__label"
-  }, [_vm._v("Your name"), _c("i", [_vm._v("*")])]), _vm._v(" "), _c("div", {
+  }, [_vm._m(0), _vm._v(" "), _c("div", {
     staticClass: "form-group__input"
   }, [_c("input", {
     directives: [{
@@ -1675,6 +1510,7 @@ var render = exports.render = function render() {
       value: _vm.shipping.first_name
     },
     on: {
+      change: _vm.onChange,
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.shipping, "first_name", $event.target.value);
@@ -1690,9 +1526,7 @@ var render = exports.render = function render() {
     staticClass: "invalid-feedback"
   }, [_vm._v("Please enter your name")])])]), _vm._v(" "), _c("div", {
     staticClass: "col-md-6"
-  }, [_c("div", {
-    staticClass: "form-group__label"
-  }, [_vm._v("Phone number"), _c("i", [_vm._v("*")])]), _vm._v(" "), _c("div", {
+  }, [_vm._m(1), _vm._v(" "), _c("div", {
     staticClass: "form-group__input"
   }, [_c("div", {
     staticClass: "input-group"
@@ -1702,8 +1536,8 @@ var render = exports.render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.phone.national_number,
-      expression: "phone.national_number"
+      value: _vm.shipping.phone.national_number,
+      expression: "shipping.phone.national_number"
     }],
     staticClass: "form-control",
     staticStyle: {
@@ -1717,8 +1551,8 @@ var render = exports.render = function render() {
           var val = "_value" in o ? o._value : o.value;
           return val;
         });
-        _vm.$set(_vm.phone, "national_number", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
-      }, _vm.onPhoneNumberChange]
+        _vm.$set(_vm.shipping.phone, "national_number", $event.target.multiple ? $$selectedVal : $$selectedVal[0]);
+      }, _vm.checkPhoneNumber]
     }
   }, [_c("option", {
     attrs: {
@@ -1732,8 +1566,8 @@ var render = exports.render = function render() {
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: _vm.phone.phone_number,
-      expression: "phone.phone_number"
+      value: _vm.shipping.phone.phone_number,
+      expression: "shipping.phone.phone_number"
     }],
     staticClass: "form-control",
     "class": {
@@ -1744,13 +1578,13 @@ var render = exports.render = function render() {
       placeholder: "Phone number"
     },
     domProps: {
-      value: _vm.phone.phone_number
+      value: _vm.shipping.phone.phone_number
     },
     on: {
       input: [function ($event) {
         if ($event.target.composing) return;
-        _vm.$set(_vm.phone, "phone_number", $event.target.value);
-      }, _vm.onPhoneNumberChange]
+        _vm.$set(_vm.shipping.phone, "phone_number", $event.target.value);
+      }, _vm.checkPhoneNumber]
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "input-group-append"
@@ -1759,14 +1593,14 @@ var render = exports.render = function render() {
     attrs: {
       disabled: ""
     }
-  }, [_vm._v("Verified\n                                    ")]) : _c("button", {
+  }, [_vm._v("Verified\n                        ")]) : _c("button", {
     staticClass: "btn btn-danger",
     on: {
       click: function click($event) {
         _vm.showCodeInput = true;
       }
     }
-  }, [_vm._v("Verify\n                                    ")])])]), _vm._v(" "), _vm.showCodeInput ? _c("div", {
+  }, [_vm._v("Verify\n                        ")])])]), _vm._v(" "), _vm.showCodeInput ? _c("div", {
     staticClass: "d-flex flex-column mt-2"
   }, [_c("div", {
     staticClass: "input-group"
@@ -1801,7 +1635,7 @@ var render = exports.render = function render() {
     on: {
       click: _vm.getPhoneCode
     }
-  }, [_vm._v("\n                                            " + _vm._s(_vm.sendingCodeText) + "\n                                        ")])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("\n                                " + _vm._s(_vm.sendingCodeText) + "\n                            ")])])]), _vm._v(" "), _c("div", {
     staticClass: "mt-2"
   }, [_c("button", {
     staticClass: "btn btn-primary",
@@ -1812,7 +1646,7 @@ var render = exports.render = function render() {
     on: {
       click: _vm.verifyPhoneNumber
     }
-  }, [_vm._v("Submit\n                                    ")])])]) : _vm._e()]), _vm._v(" "), _c("div", {
+  }, [_vm._v("Submit\n                        ")])])]) : _vm._e()]), _vm._v(" "), _c("div", {
     directives: [{
       name: "show",
       rawName: "v-show",
@@ -1820,13 +1654,11 @@ var render = exports.render = function render() {
       expression: "errors.phone"
     }],
     staticClass: "invalid-feedback"
-  }, [_vm._v(_vm._s(_vm.errors.phone))])])]), _vm._v(" "), _vm.shipping_method === "delivery" ? _c("div", {
+  }, [_vm._v(_vm._s(_vm.errors.phone))])])]), _vm._v(" "), _vm.shipping_line.method_id === "flat_rate" ? _c("div", {
     staticClass: "mt-4"
   }, [_c("div", {
     staticClass: "form-group"
-  }, [_c("div", {
-    staticClass: "form-group__label"
-  }, [_vm._v("Address"), _c("i", [_vm._v("*")])]), _vm._v(" "), _c("div", {
+  }, [_vm._m(2), _vm._v(" "), _c("div", {
     staticClass: "form-group__input"
   }, [_c("vue-google-autocomplete", {
     attrs: {
@@ -1857,7 +1689,7 @@ var render = exports.render = function render() {
     }],
     staticClass: "form-control custom-select",
     on: {
-      change: function change($event) {
+      change: [function ($event) {
         var $$selectedVal = Array.prototype.filter.call($event.target.options, function (o) {
           return o.selected;
         }).map(function (o) {
@@ -1865,7 +1697,7 @@ var render = exports.render = function render() {
           return val;
         });
         _vm.shipping_zone_index = $event.target.multiple ? $$selectedVal : $$selectedVal[0];
-      }
+      }, _vm.onZoneChange]
     }
   }, _vm._l(_vm.shipping_zones, function (zone, index) {
     return _c("option", {
@@ -1873,7 +1705,7 @@ var render = exports.render = function render() {
       domProps: {
         value: index
       }
-    }, [_vm._v(_vm._s(zone.title + " €" + zone.fee) + "\n                                    ")]);
+    }, [_vm._v(_vm._s(zone.title + " €" + zone.fee) + "\n                        ")]);
   }), 0)])]), _vm._v(" "), _c("div", {
     staticClass: "col"
   }, [_c("div", {
@@ -1895,50 +1727,54 @@ var render = exports.render = function render() {
       value: _vm.shipping.postal_code
     },
     on: {
+      change: _vm.onChange,
       input: function input($event) {
         if ($event.target.composing) return;
         _vm.$set(_vm.shipping, "postal_code", $event.target.value);
       }
     }
-  })])])])]) : _vm._e(), _vm._v(" "), _c("div", {
-    staticClass: "form-group mt-4"
-  }, [_c("h5", {
-    staticClass: "font-weight-bold"
-  }, [_vm._v("Order notes")]), _vm._v(" "), _c("div", {
-    staticClass: "form-group__input"
-  }, [_c("textarea", {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: _vm.buyer_note,
-      expression: "buyer_note"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      type: "text",
-      rows: "3",
-      placeholder: ""
-    },
-    domProps: {
-      value: _vm.buyer_note
-    },
-    on: {
-      input: function input($event) {
-        if ($event.target.composing) return;
-        _vm.buyer_note = $event.target.value;
-      }
-    }
-  })])])]), _vm._v(" "), _c("div", {
-    staticClass: "checkout-col checkout-order"
-  }, [_c("h3", {
-    staticClass: "font-weight-bold"
-  }, [_vm._v("You order")]), _vm._v(" "), _c("checkou-items", {
-    attrs: {
-      items: _vm.cart_items
-    }
-  }), _vm._v(" "), _vm.settings.enable_points_checkout === "yes" ? _c("div", {
-    staticClass: "form-group mt-4"
-  }, [_c("div", {
+  })])])])]) : _vm._e()]);
+};
+var staticRenderFns = exports.staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "form-group__label"
+  }, [_vm._v("Your name"), _c("i", [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "form-group__label"
+  }, [_vm._v("Phone number"), _c("i", [_vm._v("*")])]);
+}, function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "form-group__label"
+  }, [_vm._v("Address"), _c("i", [_vm._v("*")])]);
+}];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=template&id=c295a26a&scoped=true":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=template&id=c295a26a&scoped=true ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", [_c("div", {
     staticClass: "form-group__label"
   }, [_vm._v("Use Points")]), _vm._v(" "), _c("div", {
     staticClass: "form-group__input"
@@ -1962,23 +1798,100 @@ var render = exports.render = function render() {
       value: _vm.points
     },
     on: {
-      input: [function ($event) {
+      input: function input($event) {
         if ($event.target.composing) return;
         _vm.points = $event.target.value;
-      }, _vm.onInputPoints]
+      }
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "input-group-append"
   }, [_c("button", {
     staticClass: "btn btn-danger",
     on: {
-      click: function click($event) {
-        _vm.points = _vm.pointsAccount.points;
+      click: _vm.handleSubmit
+    }
+  }, [_vm._v("Use points")])])])]), _vm._v(" "), _c("div", {
+    staticClass: "text-turquoise mt-2"
+  }, [_vm._v(_vm._s(_vm.pointsAccount.tips))])]);
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=template&id=d10176c4&scoped=true":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=template&id=d10176c4&scoped=true ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "container"
+  }, [_c("div", {
+    staticClass: "checkout-body"
+  }, [_c("div", {
+    staticClass: "checkout-col"
+  }, [_c("checkout-shipping", {
+    on: {
+      change: _vm.onShippingChange,
+      "zone-change": _vm.loadOrderData
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "form-group mt-4"
+  }, [_c("h5", {
+    staticClass: "font-weight-bold"
+  }, [_vm._v("Order notes")]), _vm._v(" "), _c("div", {
+    staticClass: "form-group__input"
+  }, [_c("textarea", {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: _vm.order.buyer_note,
+      expression: "order.buyer_note"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      type: "text",
+      rows: "3",
+      placeholder: ""
+    },
+    domProps: {
+      value: _vm.order.buyer_note
+    },
+    on: {
+      input: function input($event) {
+        if ($event.target.composing) return;
+        _vm.$set(_vm.order, "buyer_note", $event.target.value);
       }
     }
-  }, [_vm._v("Use all points\n                                ")])])])]), _vm._v(" "), _c("div", {
-    staticClass: "text-turquoise mt-2"
-  }, [_vm._v(_vm._s(_vm.pointsAccount.tips))])]) : _vm._e(), _vm._v(" "), _c("div", {
+  })])])], 1), _vm._v(" "), _c("div", {
+    staticClass: "checkout-col checkout-order"
+  }, [_c("h3", {
+    staticClass: "font-weight-bold"
+  }, [_vm._v("You order")]), _vm._v(" "), _c("checkou-items", {
+    attrs: {
+      items: _vm.order.items
+    }
+  }), _vm._v(" "), _vm.settings.enable_points_checkout === "yes" ? _c("div", {
+    staticClass: "form-group mt-4"
+  }, [_c("checkout-use-points", {
+    attrs: {
+      subtotal: _vm.order.subtotal
+    },
+    on: {
+      change: _vm.onPointsChange
+    }
+  })], 1) : _vm._e(), _vm._v(" "), _c("div", {
     staticClass: "order-totals"
   }, [_c("div", {
     staticClass: "order-total"
@@ -1986,31 +1899,35 @@ var render = exports.render = function render() {
     staticClass: "order-total__label"
   }, [_vm._v("Subtotal")]), _vm._v(" "), _c("div", {
     staticClass: "order-total__total"
-  }, [_vm._v("€" + _vm._s(_vm.subtotal))])]), _vm._v(" "), _vm.shippingFee ? _c("div", {
+  }, [_vm._v("€" + _vm._s(_vm.order.subtotal))])]), _vm._v(" "), _vm.order.shipping_line.method_id === "flat_rate" ? _c("div", {
     staticClass: "order-total"
   }, [_c("div", {
     staticClass: "order-total__label"
   }, [_vm._v("Shipping")]), _vm._v(" "), _c("div", {
     staticClass: "order-total__total"
-  }, [_vm._v("+€" + _vm._s(_vm.shippingFee))])]) : _vm._e(), _vm._v(" "), _vm.paymentFee ? _c("div", {
-    staticClass: "order-total"
-  }, [_c("div", {
-    staticClass: "order-total__label"
-  }, [_vm._v("Payment")]), _vm._v(" "), _c("div", {
-    staticClass: "order-total__total"
-  }, [_vm._v("+€" + _vm._s(_vm.paymentFee))])]) : _vm._e(), _vm._v(" "), _vm.points > 0 ? _c("div", {
-    staticClass: "order-total"
-  }, [_c("div", {
-    staticClass: "order-total__label"
-  }, [_vm._v("Points")]), _vm._v(" "), _c("div", {
-    staticClass: "order-total__total"
-  }, [_vm._v("-€" + _vm._s(_vm.pointDiscount))])]) : _vm._e(), _vm._v(" "), _c("div", {
+  }, [_vm._v("+€" + _vm._s(_vm.order.shipping_total))])]) : _vm._e(), _vm._v(" "), _vm._l(_vm.order.fee_lines, function (fee, index) {
+    return _c("div", {
+      staticClass: "order-total"
+    }, [_c("div", {
+      staticClass: "order-total__label"
+    }, [_vm._v(_vm._s(fee.name))]), _vm._v(" "), _c("div", {
+      staticClass: "order-total__total"
+    }, [_vm._v("+€" + _vm._s(fee.total))])]);
+  }), _vm._v(" "), _vm._l(_vm.order.discount_lines, function (discount, index) {
+    return _c("div", {
+      staticClass: "order-total"
+    }, [_c("div", {
+      staticClass: "order-total__label"
+    }, [_vm._v(_vm._s(discount.name))]), _vm._v(" "), _c("div", {
+      staticClass: "order-total__total"
+    }, [_vm._v("-€" + _vm._s(discount.total))])]);
+  }), _vm._v(" "), _c("div", {
     staticClass: "order-total"
   }, [_c("div", {
     staticClass: "order-total__label"
   }, [_vm._v("Total")]), _vm._v(" "), _c("div", {
     staticClass: "order-total__total"
-  }, [_vm._v("€" + _vm._s(_vm.total))])])]), _vm._v(" "), _c("div", {
+  }, [_vm._v("€" + _vm._s(_vm.order.total))])])], 2), _vm._v(" "), _c("div", {
     staticClass: "pay-methods mt-5"
   }, _vm._l(_vm.payment_methods, function (method, index) {
     return _c("div", {
@@ -2067,11 +1984,15 @@ var render = exports.render = function render() {
     on: {
       click: _vm.createOrder
     }
-  }, [_vm._v("Place Order\n                        ")])], 1)]), _vm._v(" "), _c("p", {
-    staticClass: "text-center text-safety-orange"
-  }, [_vm._v("\n                    I’ve read and accept the "), _c("a", [_vm._v("terms & conditions")]), _vm._v(" and "), _c("a", [_vm._v("privacy conditions")])])], 1)])])]);
+  }, [_vm._v("Place Order\n                    ")])], 1)]), _vm._v(" "), _vm._m(0)], 1)]), _vm._v(" "), _vm.loading ? _c("noodle-loading") : _vm._e()], 1);
 };
-var staticRenderFns = exports.staticRenderFns = [];
+var staticRenderFns = exports.staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("p", {
+    staticClass: "text-center text-safety-orange"
+  }, [_vm._v("\n                I’ve read and accept the "), _c("a", [_vm._v("terms & conditions")]), _vm._v(" and "), _c("a", [_vm._v("privacy conditions")])]);
+}];
 render._withStripped = true;
 
 /***/ }),
@@ -5624,6 +5545,86 @@ component.options.__file = "resources/apps/web/checkout/CheckouItems.vue"
 
 /***/ }),
 
+/***/ "./resources/apps/web/checkout/CheckoutShipping.vue":
+/*!**********************************************************!*\
+  !*** ./resources/apps/web/checkout/CheckoutShipping.vue ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _CheckoutShipping_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _CheckoutShipping_vue_vue_type_template_id_37e0c43d_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CheckoutShipping.vue?vue&type=template&id=37e0c43d&scoped=true */ "./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=template&id=37e0c43d&scoped=true");
+/* harmony import */ var _CheckoutShipping_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CheckoutShipping.vue?vue&type=script&lang=js */ "./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _CheckoutShipping_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _CheckoutShipping_vue_vue_type_template_id_37e0c43d_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _CheckoutShipping_vue_vue_type_template_id_37e0c43d_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "37e0c43d",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/checkout/CheckoutShipping.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/apps/web/checkout/CheckoutUsePoints.vue":
+/*!***********************************************************!*\
+  !*** ./resources/apps/web/checkout/CheckoutUsePoints.vue ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _CheckoutUsePoints_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _CheckoutUsePoints_vue_vue_type_template_id_c295a26a_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CheckoutUsePoints.vue?vue&type=template&id=c295a26a&scoped=true */ "./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=template&id=c295a26a&scoped=true");
+/* harmony import */ var _CheckoutUsePoints_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CheckoutUsePoints.vue?vue&type=script&lang=js */ "./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _CheckoutUsePoints_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _CheckoutUsePoints_vue_vue_type_template_id_c295a26a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _CheckoutUsePoints_vue_vue_type_template_id_c295a26a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "c295a26a",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/checkout/CheckoutUsePoints.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/apps/web/checkout/NoodleCheckout.vue":
 /*!********************************************************!*\
   !*** ./resources/apps/web/checkout/NoodleCheckout.vue ***!
@@ -5818,6 +5819,40 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=script&lang=js":
+/*!**********************************************************************************!*\
+  !*** ./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=script&lang=js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutShipping_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutShipping_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckoutShipping.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutShipping_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=script&lang=js":
+/*!***********************************************************************************!*\
+  !*** ./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=script&lang=js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutUsePoints_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutUsePoints_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckoutUsePoints.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutUsePoints_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=script&lang=js":
 /*!********************************************************************************!*\
   !*** ./resources/apps/web/checkout/NoodleCheckout.vue?vue&type=script&lang=js ***!
@@ -5918,6 +5953,42 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckouItems_vue_vue_type_template_id_0dabf81b_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckouItems_vue_vue_type_template_id_0dabf81b_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckouItems.vue?vue&type=template&id=0dabf81b&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckouItems.vue?vue&type=template&id=0dabf81b&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=template&id=37e0c43d&scoped=true":
+/*!****************************************************************************************************!*\
+  !*** ./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=template&id=37e0c43d&scoped=true ***!
+  \****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutShipping_vue_vue_type_template_id_37e0c43d_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutShipping_vue_vue_type_template_id_37e0c43d_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutShipping_vue_vue_type_template_id_37e0c43d_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutShipping_vue_vue_type_template_id_37e0c43d_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckoutShipping.vue?vue&type=template&id=37e0c43d&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutShipping.vue?vue&type=template&id=37e0c43d&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=template&id=c295a26a&scoped=true":
+/*!*****************************************************************************************************!*\
+  !*** ./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=template&id=c295a26a&scoped=true ***!
+  \*****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutUsePoints_vue_vue_type_template_id_c295a26a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutUsePoints_vue_vue_type_template_id_c295a26a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutUsePoints_vue_vue_type_template_id_c295a26a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CheckoutUsePoints_vue_vue_type_template_id_c295a26a_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CheckoutUsePoints.vue?vue&type=template&id=c295a26a&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/checkout/CheckoutUsePoints.vue?vue&type=template&id=c295a26a&scoped=true");
 
 
 /***/ }),

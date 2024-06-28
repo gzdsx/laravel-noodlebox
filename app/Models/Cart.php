@@ -72,6 +72,7 @@ class Cart extends Model
     ];
 
     protected $with = ['shop', 'product', 'sku'];
+    protected $appends = ['total'];
 
     public function getMetaDataAttribute($value)
     {
@@ -123,6 +124,11 @@ class Cart extends Model
         return $price;
     }
 
+    public function getTotalAttribute()
+    {
+        return $this->price * $this->quantity;
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo|Shop
      */
@@ -145,5 +151,19 @@ class Cart extends Model
     public function sku()
     {
         return $this->belongsTo(ProductSku::class, 'sku_id', 'id');
+    }
+
+    /**
+     * @param $key
+     * @param $default
+     * @return mixed
+     */
+    public function getMeta($key, $default = null)
+    {
+        if (is_array($this->meta_data)) {
+            return collect($this->meta_data)->get($key, $default);
+        }
+
+        return collect()->get($key, $default);
     }
 }

@@ -1,22 +1,31 @@
 <?php
 
-namespace App\Http\Controllers\Api\Basic;
+namespace App\Http\Controllers\Api\My;
 
 use App\Http\Controllers\Api\BaseController;
-use App\Http\Controllers\Controller;
-use App\Models\UserPhone;
 use App\Models\Captcha;
+use App\Models\UserPhone;
 use Illuminate\Http\Request;
 
 class PhoneController extends BaseController
 {
     public function check(Request $request)
     {
-        $phone_number = $request->input('phone_number');
+        $request->validate([
+            'national_number' => 'required|numeric',
+            'phone_number' => 'required|string',
+        ]);
+
         $national_number = $request->input('national_number');
+        $phone_number = $request->input('phone_number');
+        $phone_number = preg_replace("/\s/", '', $phone_number);
 
         if (!$phone_number) {
             return json_success(false);
+        }
+
+        if (substr($phone_number, 0, 1) != '0') {
+            $phone_number = '0' . $phone_number;
         }
 
         $verified = UserPhone::where([
@@ -41,18 +50,21 @@ class PhoneController extends BaseController
         $vercode = $request->input('vercode');
 
         $phone_number = preg_replace("/\s/", '', $phone_number);
-        $address = $national_number . ltrim($phone_number, '0');
+        if (substr($phone_number, 0, 1) != '0') {
+            $phone_number = '0' . $phone_number;
+        }
+        $phone_address = $national_number . ltrim($phone_number, '0');
 
-        if ($verify = Captcha::wherePhone($address)->orderByDesc('id')->first()) {
+        if ($verify = Captcha::wherePhone($phone_address)->orderByDesc('id')->first()) {
             if ($verify->code == $vercode) {
                 $attributes = [
+                    'user_id' => auth()->id(),
                     'phone_number' => $phone_number,
                     'national_number' => $national_number
                 ];
 
-                $user_phone = UserPhone::firstOrCreate($attributes)->firstOrNew();
+                $user_phone = UserPhone::firstOrNew($attributes);
                 $user_phone->verified_at = now();
-                $user_phone->user_id = auth()->id();
                 $user_phone->save();
 
                 return json_success();

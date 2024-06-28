@@ -39,7 +39,7 @@
                     <div class="order-totals">
                         <div class="order-total">
                             <div class="order-total__label">Subtotal</div>
-                            <div class="order-total__value">€{{bcsub($order->total,$order->shipping_total,2)}}</div>
+                            <div class="order-total__value">€{{$order->subtotal}}</div>
                         </div>
                         <div class="order-total">
                             <div class="order-total__label">Shipping</div>
@@ -49,6 +49,12 @@
                             <div class="order-total">
                                 <div class="order-total__label">{{$fee['name']??''}}</div>
                                 <div class="order-total__value">€{{$fee['total']??''}}</div>
+                            </div>
+                        @endforeach
+                        @foreach($order->discount_lines as $discount)
+                            <div class="order-total">
+                                <div class="order-total__label">{{$discount['name']??''}}</div>
+                                <div class="order-total__value">-€{{$discount['total']??''}}</div>
                             </div>
                         @endforeach
                         <div class="order-total">

@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -15,18 +14,14 @@ class OrderChanged
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $order;
-    public $eventType;
-
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Order $order, $eventType)
+    public function __construct()
     {
-        $this->order = $order;
-        $this->eventType = $eventType;
+        //
     }
 
     /**

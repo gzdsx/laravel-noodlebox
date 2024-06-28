@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Listeners\Order;
+namespace App\Listeners;
 
 use App\Events\OrderCreated;
-use App\Support\BulkSMS;
-use App\Support\PrintNode;
+use App\Models\Setting;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class OrderCreatedListener2
+class OrderCreatedListener
 {
     /**
      * Create the event listener.
@@ -23,14 +22,13 @@ class OrderCreatedListener2
     /**
      * Handle the event.
      *
-     * @param \App\Events\OrderCreated $event
+     * @param  \App\Events\OrderCreated  $event
      * @return void
      */
     public function handle(OrderCreated $event)
     {
         //发送短信
         if (settings('send_order_message') == 'yes') {
-            //dd($event->order);
             try {
                 $event->order->sendSms();
             } catch (\Exception $e) {

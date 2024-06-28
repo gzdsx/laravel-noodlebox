@@ -2938,7 +2938,7 @@ var _default = exports["default"] = {
     },
     fetchPosMachines: function fetchPosMachines(cb) {
       var _this5 = this;
-      _ApiService["default"].get('/pos-machines?status=idle').then(function (response) {
+      _ApiService["default"].get('/pos-machines?status=idle&is_cashier=0').then(function (response) {
         _this5.posMachineList = _this5.deliveryer.pos_machines.concat(response.data.items);
         if (cb) cb();
       });
@@ -14599,10 +14599,19 @@ var render = exports.render = function render() {
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
-      prop: "status",
       width: "100",
       label: "Status"
-    }
+    },
+    scopedSlots: _vm._u([{
+      key: "default",
+      fn: function fn(scope) {
+        return [_c("el-tag", {
+          attrs: {
+            type: scope.row.deliveryer ? "success" : "danger"
+          }
+        }, [_vm._v(_vm._s(scope.row.deliveryer ? "Inuse" : "Idle"))])];
+      }
+    }])
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
       width: "80",
@@ -23940,9 +23949,7 @@ var _default = exports["default"] = {
       var _this = this;
       var settings = this.settings;
       this.loading = true;
-      _ApiService["default"].post('/settings', {
-        settings: settings
-      }).then(function () {
+      _ApiService["default"].post('/settings', settings).then(function () {
         _this.$message.success(_this.$t('settings.saved'));
         if (_this.updated) {
           _this.updated();

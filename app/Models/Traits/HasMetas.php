@@ -44,10 +44,11 @@ trait HasMetas
 
     /**
      * @param $meta_key
-     * @return array|mixed
+     * @param $default
+     * @return mixed
      */
-    public function getMeta($meta_key)
+    public function getMeta($meta_key, $default = null)
     {
-        return $this->getMetas()->get($meta_key);
+        return $this->getMetas()->get($meta_key, $default);
     }
 }

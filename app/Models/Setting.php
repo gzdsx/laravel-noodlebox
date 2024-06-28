@@ -63,8 +63,9 @@ class Setting extends Model
      */
     public static function settingsFromCache()
     {
-        return cache()->rememberForever('settings', function () {
-            return Setting::get()->pluck('svalue', 'skey');
-        });
+//        return cache()->rememberForever('settings', function () {
+//            return Setting::get()->pluck('svalue', 'skey');
+//        });
+        return Setting::get()->pluck('svalue', 'skey');
     }
 }

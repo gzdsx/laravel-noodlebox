@@ -155,6 +155,7 @@ class Order extends Model
         'meta_data',
         'status_des',
         'links',
+        'subtotal'
     ];
 
     protected $casts = [
@@ -210,6 +211,13 @@ class Order extends Model
         return [
             'invoice' => route('order.invoice', Hashids::encodeHex($this->id)),
         ];
+    }
+
+    public function getSubtotalAttribute()
+    {
+        return $this->items->sum(function (OrderItem $item) {
+            return $item->total;
+        });
     }
 
     public function metas()

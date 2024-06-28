@@ -6,6 +6,7 @@ use App\Models\Setting;
  * @param $name
  * @param $default
  * @return \Illuminate\Support\Collection|mixed
+ * @throws Exception
  */
 function settings($name = null, $default = null)
 {

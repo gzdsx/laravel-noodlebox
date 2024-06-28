@@ -11,7 +11,7 @@
                     {{ Object.values(item.meta_data.options).join(', ') }}
                 </div>
             </div>
-            <div class="order-item__subtotal">€{{ item.subtotal }}</div>
+            <div class="order-item__subtotal">€{{ item.total }}</div>
         </div>
     </div>
 </template>

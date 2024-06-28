@@ -8,6 +8,8 @@ use App\Models\Cart;
 use App\Models\Deliveryer;
 use App\Models\Order;
 use App\Models\OrderNote;
+use App\Models\ShippingZone;
+use App\Models\UserPhone;
 use App\Models\UserPointTransaction;
 use App\Support\TradeUtil;
 use \Illuminate\Http\Request;
@@ -62,6 +64,13 @@ trait OrderApis
      */
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'payment_method' => 'required',
+            'shipping_line' => 'required',
+            'shipping' => 'required',
+            'items' => 'required',
+        ]);
+
         return DB::transaction(function () use ($request) {
             $order = $this->repository()->make();
             $order->order_no = TradeUtil::createOrderNo();
@@ -77,6 +86,12 @@ trait OrderApis
             $buyer = Auth::user();
             $order->buyer_id = $buyer->id;
             $order->buyer_name = $buyer->nickname;
+
+            $phone_number = $order->shipping['phone']['phone_number'] ?? '';
+            $national_number = $order->shipping['phone']['national_number'] ?? '';
+            if (!UserPhone::checkPhoneNumber($buyer->id, $phone_number, $national_number)) {
+                abort(422, 'Phone number not verified');
+            }
 
             $total = 0;
             $fee_lines = $request->input('fee_lines', []);
@@ -101,9 +116,9 @@ trait OrderApis
             $order->discount_total = $discount_total;
             $order->save();
 
-            $metas = $request->input('metas', []);
-            foreach ($metas as $meta) {
-                $order->metas()->create($meta);
+            $meta_data = $request->input('meta_data', []);
+            foreach ($meta_data as $key => $value) {
+                $order->updateMeta($key, $value);
             }
 
             $items = $request->input('items', []);
@@ -133,6 +148,21 @@ trait OrderApis
             }
 
             $order->save();
+
+            //积分抵扣现金
+            $use_points_value = $request->input('use_points_value', 0);
+            if ($use_points_value > 0) {
+                $buyer->points -= $use_points_value;
+                $buyer->save();
+
+                $transaction = new UserPointTransaction();
+                $transaction->user_id = $buyer->id;
+                $transaction->points = $use_points_value;
+                $transaction->type = 2;
+                $transaction->detail = 'Deduction of points for cash';
+                $transaction->save();
+            }
+
             //消费积分
             if ($consume_points_total > 0) {
                 $buyer->points -= $consume_points_total;
@@ -246,7 +276,7 @@ trait OrderApis
             }
         }
 
-        if ($order->deliveryer_id){
+        if ($order->deliveryer_id) {
             $order->status = Order::ORDER_STATUS_COMPLETED;
         }
 

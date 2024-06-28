@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Test;
 
+use App\Events\OrderChanged;
 use App\Events\OrderCreated;
 use App\Http\Controllers\Controller;
 use App\Jobs\SyncUsers;
@@ -16,6 +17,7 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -27,13 +29,12 @@ class IndexController extends Controller
 {
     public function index(Request $request)
     {
-        $time_start = settings('opening_hours_start');
+        //$time_start = settings('opening_hours_start');
 
         //return Carbon::createFromTimeString($time_start)->subDay()->toDateTimeString();
 
         //User::whereKey(1000000)->update(['password'=>bcrypt('12341234')]);
-        $order = Order::orderByDesc('id')->first();
-        $this->dispatchSync(new OrderCreated($order));
+        dd(settings());
     }
 
     function generateCombinations($options)

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners\Order;
+namespace App\Listeners;
 
 use App\Events\OrderChanged;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -599,7 +599,14 @@ img, video {
   width: 100%;
 }
 .home .header-wrapper {
-  display: none;
+  position: relative;
+  min-height: auto;
+}
+.home .header-wrapper .header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
 }
 
 .page-section {
