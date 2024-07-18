@@ -4,6 +4,7 @@ module.exports = [
         component: require('./Settings.vue').default,
         meta: {
             title: 'Lottery Settings',
+            capabilities: ['administrator', 'manager']
         }
     },
     {
@@ -11,6 +12,7 @@ module.exports = [
         component: require('./Prizes.vue').default,
         meta: {
             title: 'Prizes',
+            capabilities: ['administrator', 'manager']
         }
     },
     {
@@ -18,6 +20,7 @@ module.exports = [
         component: require('./Records.vue').default,
         meta: {
             title: 'Records',
+            capabilities: ['administrator', 'manager']
         }
     },
 ]

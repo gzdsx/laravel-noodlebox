@@ -2,7 +2,11 @@
     <div class="container">
         <div class="checkout-body">
             <div class="checkout-col">
-                <checkout-shipping @change="onShippingChange" @zone-change="loadOrderData"/>
+                <checkout-shipping
+                    :order.sync="order"
+                    :shipping-zones.sync="options.shipping_zones"
+                    @total-change="loadOrderData"
+                />
                 <div class="form-group mt-4">
                     <h5 class="font-weight-bold">Order notes</h5>
                     <div class="form-group__input">
@@ -14,8 +18,9 @@
             <div class="checkout-col checkout-order">
                 <h3 class="font-weight-bold">You order</h3>
                 <checkou-items :items="order.items"/>
-                <div class="form-group mt-4" v-if="settings.enable_points_checkout==='yes'">
-                    <checkout-use-points :subtotal="order.subtotal" @change="onPointsChange"/>
+                <div class="form-group mt-4" v-if="options.enable_points_checkout==='yes'">
+                    <checkout-use-points :default-points.sync="order.meta_data.use_points_value||0"
+                                         @submit="onPointsChange"/>
                 </div>
                 <div class="order-totals">
                     <div class="order-total">
@@ -41,9 +46,10 @@
                 </div>
 
                 <div class="pay-methods mt-5">
-                    <div class="pay-method" v-for="(method,index) in payment_methods" :key="index">
+                    <div class="pay-method" v-for="(method,index) in options.payment_methods" :key="index">
                         <label class="label-radio">
-                            <input type="radio" class="radio" :value="index" v-model="payment_method_index"/>
+                            <input type="radio" class="radio" :value="method.id"
+                                   @change="loadOrderData" v-model="order.payment_method"/>
                             <span class="radio-box"></span>
                             <div class="pay-method__details flex-flow-1">
                                 <div>{{ method.title }}</div>
@@ -54,16 +60,18 @@
                 </div>
 
                 <div class="mt-5">
-                    <div class="invalid-feedback" v-if="resError" v-html="resError"></div>
+                    <div class="invalid-feedback show" v-if="resError" v-html="resError"></div>
                     <div class="form-group">
                         <paypal-buttons
-                                :create-order="createPaypalOrder"
-                                :on-approve="createOrder"
-                                v-if="payment_method_index===0"/>
+                            :create-order="createPaypalOrder"
+                            :on-approve="createOrder"
+                            :on-click="onPaypalClick"
+                            :on-error="onPaypalError"
+                            v-if="order.payment_method==='online'"/>
                         <button
-                                class="btn btn-block btn-bull-cyan btn-lg text-white"
-                                @click="createOrder"
-                                v-else
+                            class="btn btn-block btn-bull-cyan btn-lg text-white"
+                            @click="createOrder"
+                            v-else
                         >Place Order
                         </button>
                     </div>
@@ -81,14 +89,11 @@
 import HttpClient from "../HttpClient";
 import NoodleContainer from "../components/NoodleContainer.vue";
 import PaypalButtons from "./PaypalButtons.vue";
-import CartService from "../CartService";
 import CheckouItems from "./CheckouItems.vue";
 import NoodleLoading from "../components/NoodleLoading.vue";
 import CheckoutUsePoints from "./CheckoutUsePoints.vue";
 import CheckoutShipping from "./CheckoutShipping.vue";
 
-let controller = new AbortController();
-const cart = new CartService();
 export default {
     name: "NoodleCheckout",
     components: {
@@ -102,55 +107,17 @@ export default {
     data() {
         return {
             loading: true,
-            payment_methods: [
-                {
-                    id: 'online',
-                    title: 'Pay Online (PayPal & Credit Car)',
-                    fee: 0.5,
-                    img: '/images/noodlebox/Full_Online.png'
-                },
-                {
-                    id: 'card',
-                    title: 'Pay by Card Reader',
-                    fee: 0.5,
-                    img: '/images/noodlebox/pay_by_card.png'
-                },
-                {
-                    id: 'cash',
-                    title: 'Pay Cash',
-                    fee: 0.0,
-                    img: '/images/noodlebox/pay_cash.png'
-                },
-            ],
-            payment_method_index: 0,
-            settings: {
-                enable_points_checkout: 'no'
+            options: {
+                enable_points_checkout: 'no',
+                shipping_zones: [],
+                payment_methods: []
             },
             order: {
                 payment_method: 'online',
                 payment_method_title: 'Pay Online (PayPal & Credit Car)',
-                shipping_line: {
-                    method_id: '',
-                    method_title: '',
-                    zone_id: '',
-                    zone_title: '',
-                },
-                shipping: {
-                    first_name: '',
-                    last_name: '',
-                    phone: {
-                        national_number: '353',
-                        phone_number: ''
-                    },
-                    email: '',
-                    address_line_1: '',
-                    address_line_2: '',
-                    county: '',
-                    city: '',
-                    state: '',
-                    country: '',
-                    postal_code: '',
-                },
+                shipping_method: 'flat_rate',
+                shipping: {},
+                shipping_line: {},
                 items: [],
                 meta_data: {},
                 buyer_note: '',
@@ -161,19 +128,11 @@ export default {
             resError: null
         }
     },
-    watch: {
-        payment_method_index(val) {
-            let method = this.payment_methods[val];
-            this.order.payment_method = method.id;
-            this.order.payment_method_title = method.title;
-            this.loadOrderData();
-        }
-    },
     methods: {
-        fetchCheckoutSettings() {
-            HttpClient.get('/checkout/settings').then((response) => {
-                this.settings = {
-                    ...this.settings,
+        fetchOptions() {
+            HttpClient.get('/checkout/options').then((response) => {
+                this.options = {
+                    ...this.options,
                     ...response.data
                 };
             });
@@ -190,21 +149,53 @@ export default {
             });
         },
         createPaypalOrder(data, actions) {
-            return HttpClient.post('/payment/paypal/create-order', this.order).then(response => {
+            return HttpClient.post('/payment/paypal/order', this.order).then(response => {
                 return response.data.id;
             });
         },
-        onPointsChange(data) {
-            this.order.meta_data['use_points_value'] = data.points;
+        onPaypalClick(data, actions) {
+            let {shipping} = this.order;
+            if (!shipping.first_name) {
+                this.$showToast('Please fill your name');
+                return actions.reject();
+            }
+
+            if (!shipping.phone.phone_number) {
+                this.$showToast('Please fill your phone number');
+                return actions.reject();
+            }
+
+            if (!shipping.address_line_1) {
+                this.$showToast('Please fill your address');
+                return actions.reject();
+            }
+
+            //console.log(shipping);
+            if (!shipping.phone.verified) {
+                this.$showToast('Phone number not verified');
+                return actions.reject();
+            }
+
+            return actions.resolve();
+        },
+        onPaypalError(error) {
+            //console.log(error);
+            this.$showToast(error.message);
+        },
+        onPointsChange(points) {
+            this.order.meta_data = {
+                ...this.order.meta_data,
+                use_points_value: points
+            };
             this.loadOrderData();
         },
-        onShippingChange(data) {
-            let {shipping, shipping_line} = data;
-            this.order = {
-                ...this.order,
-                shipping,
-                shipping_line
-            }
+        onShippingChange(shipping) {
+            this.order.shipping = shipping;
+        },
+        onShippingLineChange(shipping_line) {
+            console.log(shipping_line);
+            this.order.shipping_line = shipping_line;
+            this.loadOrderData();
         },
         loadOrderData() {
             this.loading = true;
@@ -212,10 +203,6 @@ export default {
                 this.order = {
                     ...this.order,
                     ...response.data
-                };
-                this.settings = {
-                    ...this.settings,
-                    ...response.data.settings
                 };
             }).catch((error) => {
                 console.log(error.message);
@@ -225,7 +212,8 @@ export default {
         }
     },
     mounted() {
-
+        this.fetchOptions();
+        this.loadOrderData({});
     }
 }
 </script>

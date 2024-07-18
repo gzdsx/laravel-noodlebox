@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Ecommerce;
 
-use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\PosMachine;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class CashierController extends Controller

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\Lottery;
 
-use App\Http\Controllers\Api\BaseController;
-use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\LotteryPrize;
 use App\Models\LotteryRecord;
 use App\Models\LotterySetting;
 use App\Models\UserPointTransaction;
+use App\Http\Controllers\Api\BaseController;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class LotteryController extends BaseController
@@ -45,7 +45,7 @@ class LotteryController extends BaseController
             $cart->image = $prize->image;
             $cart->quantity += 1;
             $cart->meta_data = [
-                'is_gift' => 'yes'
+                'purchase_via' => 'lottery'
             ];
             $cart->save();
         } elseif ($prize->type == 'point') {

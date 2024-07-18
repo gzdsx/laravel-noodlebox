@@ -32,6 +32,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('cashier-settlement')
             ->dailyAt(settings('opening_hours_end'));
 
+        $schedule->command('deliveryer-settlement')
+            ->dailyAt(settings('opening_hours_end'));
+
 //        $schedule->call(function (){
 //            Artisan::call('cashier-settlement');
 //        })->everyMinute();

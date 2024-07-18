@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Lottery;
 
+use App\Models\LotterySetting;
 use App\Http\Controllers\Admin\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\LotterySetting;
 use Illuminate\Http\Request;
 
 class SettingController extends BaseController

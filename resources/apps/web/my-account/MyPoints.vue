@@ -1,20 +1,6 @@
 <template>
     <div>
         <h4 class="text-safety-orange mb-4">My Noodle Box Points: {{ points.toLocaleString() }}</h4>
-        <h5 class="text-safety-orange">Ways to gain more points:</h5>
-        <div class="my-account-block">
-            <p>
-                On social media, share the exclusive referral links we provide for you (updated every 7 days), and earn
-                5
-                points for every recommended purchase! It’s very easy to get started. Just paste the referral link below
-                into your social media post. Be sure to briefly explain why you like our food or service. When your
-                friends
-                click the link and make a purchase, you will receive 30 points, which you can redeem for discounts on
-                future
-                purchases and enter our prize wheel/treasure chest. Thank you for helping us spread the word!
-            </p>
-            <p>You can check your points status in the (view points log).</p>
-        </div>
         <h5 class="text-safety-orange">Referral Link</h5>
         <div class="my-account-block">
             <p class="text-safety-orange">{{referral_link_description}}</p>

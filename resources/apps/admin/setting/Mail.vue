@@ -5,7 +5,7 @@
         </div>
 
         <section class="page-section setting-form-wrapper" v-loading="loading">
-            <el-form label-width="160px">
+            <el-form label-width="160px" size="medium">
                 <el-form-item :label="$t('settings.mail_from_name')">
                     <el-input class="w300" v-model="settings.mail_from_name"/>
                 </el-form-item>

@@ -119,7 +119,7 @@ export default {
             this.showDialog = true;
         },
         onShowEdit(link) {
-            this.link = link;
+            this.link = {...link};
             this.showDialog = true;
         },
         onSubmit() {
@@ -135,13 +135,13 @@ export default {
             }
 
             if (link.id) {
-                ApiService.put('/links/' + link.id, {link}).then(() => {
+                ApiService.put('/links/' + link.id, link).then(() => {
                     this.$message.success(this.$t('link.updated'));
                     this.showDialog = false;
                     this.fetchList();
                 });
             } else {
-                ApiService.post('/links', {link}).then(() => {
+                ApiService.post('/links', link).then(() => {
                     this.$message.success(this.$t('link.saved'));
                     this.showDialog = false;
                     this.fetchList();

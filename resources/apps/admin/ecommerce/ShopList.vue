@@ -1,19 +1,19 @@
 <template>
     <main-layout>
         <div class="d-flex" slot="header">
-            <h2>门店管理</h2>
+            <h2>{{$t('shop.manage')}}</h2>
         </div>
 
         <div class="page-section">
             <div class="table-edit-header">
                 <el-tabs @tab-click="onClickTab" value="all">
-                    <el-tab-pane label="全部" name="all"></el-tab-pane>
-                    <el-tab-pane label="营业中" name="opening"></el-tab-pane>
-                    <el-tab-pane label="已关闭" name="closed"></el-tab-pane>
+                    <el-tab-pane :label="$t('common.all')" name="all"/>
+                    <el-tab-pane :label="$t('shop.statuses.opening')" name="opening"/>
+                    <el-tab-pane :label="$t('shop.statuses.closed')" name="closed"/>
                 </el-tabs>
                 <div class="buttons-wrapper">
                     <router-link to="/shop/new">
-                        <el-button type="primary" size="small">添加门店</el-button>
+                        <el-button type="primary" size="small">{{$t('shop.addnew')}}</el-button>
                     </router-link>
                 </div>
             </div>
@@ -22,30 +22,30 @@
                 <el-table-column label="Logo" width="70">
                     <template slot-scope="scope">
                         <a :href="scope.row.url" target="_blank">
-                            <img :src="scope.row.logo" class="img-50 img-round">
+                            <img :src="scope.row.logo" class="img-50 img-round" alt="">
                         </a>
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="店铺名称"/>
-                <el-table-column prop="user.nickname" width="120px" label="店主"/>
-                <el-table-column prop="status_des" width="120px" label="店铺状态"/>
-                <el-table-column prop="created_at" width="170" label="创建时间"/>
-                <el-table-column width="50" label="操作" align="right">
+                <el-table-column prop="name" :label="$t('shop.name')"/>
+                <el-table-column prop="user.nickname" width="120px" :label="$t('shop.owner')"/>
+                <el-table-column prop="status_des" width="120px" :label="$t('shop.status')"/>
+                <el-table-column prop="created_at" width="170" :label="$t('shop.created_at')"/>
+                <el-table-column width="50" :label="$t('common.operation')" align="right">
                     <template slot-scope="scope">
-                        <router-link :to="'/shop/edit/'+scope.row.id">编辑</router-link>
+                        <router-link :to="'/shop/edit/'+scope.row.id">{{ $t('common.edit') }}</router-link>
                     </template>
                 </el-table-column>
             </el-table>
             <div class="tablenav tablenav-bottom">
                 <div class="table-actions">
                     <el-button size="small" type="primary" :disabled="selectionIds.length === 0" @click="onBatchDelete">
-                        批量删除
+                        {{$t('common.batch_delete')}}
                     </el-button>
                     <el-button size="small" :disabled="selectionIds.length === 0"
-                               @click="onBatchUpdate({status:'closed'})">批量关闭
+                               @click="onBatchUpdate({status:'closed'})">{{$t('shop.bulk_close')}}
                     </el-button>
                     <el-button size="small" :disabled="selectionIds.length === 0"
-                               @click="onBatchUpdate({status:'opening'})">批量开启
+                               @click="onBatchUpdate({status:'opening'})">{{$t('shop.bulk_open')}}
                     </el-button>
                 </div>
                 <el-pagination

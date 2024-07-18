@@ -33,7 +33,7 @@ trait CartApis
         });
         return json_success([
             'total' => $query->count(),
-            'items' => $query->get()
+            'items' => $query->orderByDesc('updated_at')->get()
         ]);
     }
 
@@ -92,10 +92,7 @@ trait CartApis
         }
 
         $cart->refresh();
-        return json_success([
-            'cart' => $cart,
-            'total' => $this->repository()->count()
-        ]);
+        return json_success($cart);
     }
 
     /**

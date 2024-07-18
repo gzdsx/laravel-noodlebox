@@ -25,7 +25,7 @@ trait UserRegister
 
     protected function redirectTo()
     {
-        return route('verification.notice');
+        //return route('verification.notice');
     }
 
     /**

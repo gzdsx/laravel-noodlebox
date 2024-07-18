@@ -13,7 +13,7 @@
         </div>
 
         <div class="page-section">
-            <el-table :data="block.items" style="width: 100%" @selection-change="onSelectionChange">
+            <el-table :data="block.items" v-loading="loading" sortable="true" @selection-change="onSelectionChange">
                 <el-table-column width="45" type="selection"/>
                 <el-table-column width="70" :label="$t('common.image')">
                     <template slot-scope="scope">
@@ -74,6 +74,7 @@ export default {
     name: "BlockItem",
     data() {
         return {
+            loading: true,
             item: {},
             block: {},
             selectionIds: [],
@@ -89,6 +90,8 @@ export default {
                 this.block = response.data;
             }).catch(reason => {
                 this.$message.error(reason.message);
+            }).finally(() => {
+                this.loading = false;
             });
         },
         resetData() {
@@ -114,7 +117,7 @@ export default {
 
             this.submiting = true;
             if (item.id) {
-                ApiService.put('/blocks/items/' + item.id, {item}).then(() => {
+                ApiService.put('/blocks/items/' + item.id, item).then(() => {
                     this.resetData();
                     this.fetchData();
                     this.showDialog = false;
@@ -123,7 +126,7 @@ export default {
                     this.submiting = false;
                 });
             } else {
-                ApiService.post('/blocks/items', {item}).then(() => {
+                ApiService.post('/blocks/items', item).then(() => {
                     this.resetData();
                     this.fetchData();
                     this.showDialog = false;

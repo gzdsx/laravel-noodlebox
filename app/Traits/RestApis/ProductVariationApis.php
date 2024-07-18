@@ -74,20 +74,26 @@ trait ProductVariationApis
 
     /**
      * @param Request $request
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function update(Request $request, $id)
     {
-        $model = $this->repository()->findOrFail($id);
-        $model->delete();
-
-        return json_success();
+        return $this->store($request, $id);
     }
 
-    public function batchDestroy(Request $request)
+    /**
+     * @param $id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id, Request $request)
     {
-        $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
-
+        if ($id == 'batch'){
+            $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
+        }else{
+            $this->repository()->findOrFail($id)->delete();
+        }
         return json_success();
     }
 }

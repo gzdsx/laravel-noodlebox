@@ -1,22 +1,22 @@
 <template>
     <main-layout>
         <div class="d-flex" slot="header">
-            <h2>订单详情</h2>
+            <h2>{{$t('order.detail')}}</h2>
         </div>
 
         <section class="page-section" v-loading="loading">
             <div class="edit-title">
-                <strong>商品信息</strong>
+                <strong>{{$t('order.product_info')}}</strong>
             </div>
             <table class="order-table">
                 <thead>
                 <tr>
-                    <th>宝贝</th>
+                    <th>{{$t('order.product')}}</th>
                     <th></th>
-                    <th class="align-center">单价</th>
-                    <th class="align-center">数量</th>
-                    <th class="align-center">优惠</th>
-                    <th class="align-center">实付款</th>
+                    <th class="align-center">{{$t('product.price')}}</th>
+                    <th class="align-center">{{$t('order.quantity')}}</th>
+                    <th class="align-center">{{$t('order.discount')}}</th>
+                    <th class="align-center">{{$t('order.total')}}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -41,13 +41,13 @@
                     </td>
                     <td>
                         <div class="align-center" v-if="idx===0">
-                            <p>-￥{{ order.discount_total }}</p>
+                            <p>-€{{ order.discount_total }}</p>
                         </div>
                     </td>
                     <td>
                         <div class="align-center" v-if="idx===0">
-                            <p><strong>￥{{ order.total }}</strong></p>
-                            <p class="col-freight">(配送费: €{{ order.shipping_total }})</p>
+                            <p><strong>€{{ order.total }}</strong></p>
+                            <p class="col-freight">({{$t('order.shipping_fee')}}: €{{ order.shipping_total }})</p>
                         </div>
                     </td>
                 </tr>
@@ -60,27 +60,27 @@
                 </colgroup>
                 <tbody>
                 <tr>
-                    <td class="cell-label">订单编号</td>
+                    <td class="cell-label">{{$t('order.no')}}</td>
                     <td>{{ order.order_no }}</td>
                 </tr>
                 <tr>
-                    <td class="cell-label">创建时间</td>
+                    <td class="cell-label">{{$t('order.created_at')}}</td>
                     <td>{{ order.created_at }}</td>
                 </tr>
                 <tr>
-                    <td class="cell-label">订单状态</td>
+                    <td class="cell-label">{{$t('order.status')}}</td>
                     <td>{{ order.status_des }}</td>
                 </tr>
                 <tr>
-                    <td class="cell-label">订单金额</td>
+                    <td class="cell-label">{{$t('order.total')}}</td>
                     <td>{{ order.total }}</td>
                 </tr>
                 <tr>
-                    <td class="cell-label">付款方式</td>
+                    <td class="cell-label">{{$t('order.payment_method')}}</td>
                     <td>{{ order.payment_method_title }}</td>
                 </tr>
                 <tr>
-                    <td class="cell-label" valign="top">配送地址</td>
+                    <td class="cell-label" valign="top">{{$t('order.shipping_address')}}</td>
                     <td>
                         <div v-if="shipping.first_name">{{ shipping.first_name }}</div>
                         <div v-if="shipping.last_name">{{ shipping.last_name }}</div>
@@ -98,14 +98,14 @@
                     </td>
                 </tr>
                 <tr v-if="order.deliveryer">
-                    <td class="cell-label">配送员</td>
+                    <td class="cell-label">{{$t('order.deliveryer')}}</td>
                     <td>{{ order.deliveryer.name }}</td>
                 </tr>
                 <tr>
                     <td class="cell-label"></td>
                     <td>
                         <el-button size="medium" type="primary" @update="onOrderUpdated" @click="showDialog=true">
-                            订单处理
+                            {{$t('order.dispose')}}
                         </el-button>
 
                         <a :href="order.links.invoice" class="el-link el-link--primary" target="_blank">View Invoice</a>
@@ -164,7 +164,7 @@ export default {
                 }
             }).then(() => {
                 this.fetchData();
-                this.$message.success('订单已更新');
+                this.$message.success('Order Updated!');
             }).finally(() => {
                 this.loading = false;
             });

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\Lottery;
 
+use App\Models\LotteryPrize;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\LotteryPrize;
 use Illuminate\Http\Request;
 
 class PrizeController extends BaseController

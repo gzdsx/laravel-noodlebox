@@ -46,27 +46,28 @@ trait ShippingZoneApis
     public function store(Request $request, $id = null)
     {
         $model = $this->repository()->findOrNew($id);
-        $model->fill($request->input('zone', []))->save();
+        $model->fill($request->all())->save();
         return json_success($model);
+    }
+
+    public function update(Request $request, $id)
+    {
+        return $this->store($request, $id);
     }
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy($id)
-    {
-        $this->repository()->whereKey($id)->delete();
-        return json_success();
-    }
-
-    /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function batchDestroy(Request $request)
+    public function destroy($id, Request $request)
     {
-        $this->repository()->whereKey($request->input('ids', []))->delete();
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->delete();
+        } else {
+            $this->repository()->findOrFail($id)->delete();
+        }
+
         return json_success();
     }
 }

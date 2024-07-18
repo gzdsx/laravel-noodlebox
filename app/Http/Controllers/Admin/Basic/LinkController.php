@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin\Basic;
 
 
-use App\Http\Controllers\Admin\BaseController;
 use App\Models\Link;
+use App\Http\Controllers\Admin\BaseController;
 use Illuminate\Http\Request;
 
 class LinkController extends BaseController
@@ -45,23 +45,40 @@ class LinkController extends BaseController
 
     /**
      * @param Request $request
-     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $id = null)
+    public function store(Request $request)
     {
-        $model = $this->repository()->findOrNew($id);
-        $model->fill($request->input('link', []))->save();
+        $model = $this->repository()->make();
+        $model->fill($request->all())->save();
         return json_success($model);
     }
 
     /**
      * @param Request $request
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function batchDestroy(Request $request)
+    public function update(Request $request, $id)
     {
-        $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
+        $model = $this->repository()->findOrNew($id);
+        $model->fill($request->all())->save();
+        return json_success($model);
+    }
+
+    /**
+     * @param $id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id, Request $request)
+    {
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->delete();
+        } else {
+            $this->repository()->whereKey($id)->delete();
+        }
+
         return json_success();
     }
 }

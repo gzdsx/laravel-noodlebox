@@ -30,6 +30,13 @@ class CustomEnsureEmailIsVerified
             }
         }
 
+        if ($request->user() && $request->user()->freeze) {
+            //return abort(403, 'Your account has been restricted from logging in. Please contact the administrator.');
+            return $request->expectsJson()
+                ? abort(403, 'Your account has been restricted from logging in. Please contact the administrator.')
+                : Redirect::guest(URL::route('verification.forbidden'));
+        }
+
         return $next($request);
     }
 }

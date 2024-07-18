@@ -2,42 +2,36 @@
     <main-layout>
         <h2 slot="header">{{ $t('user.manage') }}</h2>
         <section class="page-section">
-            <div class="form-inline">
-                <div class="form-item">
-                    <div class="form-item-label">ID</div>
-                    <div class="form-item-input">
-                        <el-input size="medium" class="w200" clearable v-model="params.id"/>
-                    </div>
-                </div>
-                <div class="form-item">
-                    <div class="form-item-label">{{ $t('user.nickname') }}</div>
-                    <div class="form-item-input">
-                        <el-input size="medium" class="w200" clearable v-model="params.nickname"/>
-                    </div>
-                </div>
-                <div class="form-item">
-                    <div class="form-item-label">{{ $t('user.phone') }}</div>
-                    <div class="form-item-input">
-                        <el-input size="medium" class="w200" clearable v-model="params.phone_number"/>
-                    </div>
-                </div>
-                <div class="form-item">
-                    <div class="form-item-label">{{ $t('user.email') }}</div>
-                    <div class="form-item-input">
-                        <el-input size="medium" class="w200" clearable v-model="params.email"/>
-                    </div>
-                </div>
-                <div class="form-item">
-                    <el-button size="medium" type="primary" @click="onSearch">{{ $t('common.search') }}</el-button>
-                </div>
-            </div>
+            <el-form :inline="true" size="medium">
+                <el-form-item label="ID">
+                    <el-input class="w150" clearable v-model="params.user_id"/>
+                </el-form-item>
+                <el-form-item :label="$t('user.nickname')">
+                    <el-input size="medium" class="w150" clearable v-model="params.nickname"/>
+                </el-form-item>
+                <el-form-item :label="$t('user.phone')">
+                    <el-input size="medium" class="w150" clearable v-model="params.phone"/>
+                </el-form-item>
+                <el-form-item :label="$t('user.email')">
+                    <el-input size="medium" class="w150" clearable v-model="params.email"/>
+                </el-form-item>
+                <el-form-item label="Role">
+                    <el-select size="medium" class="w150" clearable v-model="params.role">
+                        <el-option label="Administrator" value="administrator"/>
+                        <el-option label="Manager" value="manager"/>
+                        <el-option label="User" value="user"/>
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSearch">{{ $t('common.search') }}</el-button>
+                </el-form-item>
+            </el-form>
         </section>
 
         <div class="page-section">
             <div class="tablenav tablenav-top">
                 <el-tabs @tab-click="onClickTab" value="all">
                     <el-tab-pane :label="$t('common.all')" name="all"/>
-                    <el-tab-pane :label="$t('user.pending')" name="pending"/>
                     <el-tab-pane :label="$t('user.forbidden')" name="forbidden"/>
                 </el-tabs>
             </div>
@@ -75,9 +69,6 @@
                     <el-button size="small" type="primary" :disabled="selectionIds.length===0" @click="onDelete">
                         {{ $t('common.batch_delete') }}
                     </el-button>
-                    <el-button size="small" :disabled="selectionIds.length===0" @click="onBatchUpdate({state:1})">
-                        {{ $t('user.approved') }}
-                    </el-button>
                     <el-button size="small" :disabled="selectionIds.length===0" @click="onBatchUpdate({freeze:1})">
                         {{ $t('user.forbidden') }}
                     </el-button>
@@ -86,12 +77,12 @@
                     </el-button>
                 </div>
                 <el-pagination
-                        background
-                        layout="prev, pager, next, total"
-                        :total="total"
-                        :page-size="pageSize"
-                        :current-page="page"
-                        @current-change="onPageChange"
+                    background
+                    layout="prev, pager, next, total"
+                    :total="total"
+                    :page-size="pageSize"
+                    :current-page="page"
+                    @current-change="onPageChange"
                 />
             </div>
         </div>
@@ -128,7 +119,7 @@ export default {
     data() {
         return {
             params: {
-                id: '',
+                user_id: '',
                 nickname: '',
                 status: '',
                 email: '',

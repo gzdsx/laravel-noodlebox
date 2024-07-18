@@ -12,9 +12,6 @@
  */
 
 // 用户认证
-use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-
 Route::group(['namespace' => 'Auth'], function () {
     Route::get('login', 'LoginController@index')->name('login');
     Route::get('login/appcode', 'LoginController@appcode');
@@ -39,4 +36,8 @@ Route::group(['namespace' => 'Auth'], function () {
     Route::get('/email/verify', 'VerificationController@show')->name('verification.notice');
     Route::get('/email/verify/{id}/{hash}', 'VerificationController@verify')->name('verification.verify');
     Route::post('/email/verification-notification', 'VerificationController@resend')->name('verification.resend');
+
+    Route::get('/forbidden', function () {
+        return view('auth.forbidden');
+    })->name('verification.forbidden');
 });

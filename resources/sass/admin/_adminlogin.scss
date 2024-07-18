@@ -1,9 +1,10 @@
 .admin-login {
+    position: absolute;
     display: flex;
-    margin: 0 auto;
     justify-content: center;
     align-items: center;
     height: 100%;
+    width: 100%;
     background: #2E3A4C;
     color: #ffffff;
 
@@ -30,7 +31,7 @@
             color: #fff;
             font-weight: 600;
 
-            &:-webkit-autofill{
+            &:-webkit-autofill {
                 -webkit-background-image: none !important;
                 -webkit-text-fill-color: #ffffff !important;
                 -webkit-box-shadow: 0 0 0 1000px transparent inset !important;

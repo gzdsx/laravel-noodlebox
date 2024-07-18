@@ -28,7 +28,7 @@
                 </el-dropdown>
             </div>
             <div class="v-dropdown">
-                <el-dropdown @command="selectLang">
+                <el-dropdown @command="setLocale">
                     <a class="el-dropdown-link">
                         <i class="bi bi-translate"></i>
                         <span>{{ curLang }}</span>
@@ -53,8 +53,8 @@ export default {
     data() {
         return {
             languages: {
-                'zh_CN': '简体中文',
-                'en': 'English'
+                'en': 'English',
+                'zh-CN': '简体中文'
             },
             curLang: ''
         }
@@ -67,14 +67,11 @@ export default {
     methods: {
         logout() {
             AuthService.removeToken();
-            this.$router.replace('/login');
+            //this.$router.replace('/login');
+            window.location.assign('/vue-admin/login');
         },
-        selectLang(lang) {
-            ApiService.get('/locale/messages/' + lang).then(response => {
-                const {locale, messages} = response.data;
-                this.$i18n.setLocaleMessage('locale', messages);
-                this.curLang = this.languages[lang];
-            });
+        setLocale(locale) {
+            this.$i18n.locale = locale;
         },
         onCommand(cmd) {
             if (cmd.event === 'logout') {
@@ -91,17 +88,7 @@ export default {
         }
     },
     mounted() {
-        this.curLang = this.languages[this.$lang];
-        if (AuthService.getToken()) {
-            ApiService.get('/user/info').then(response => {
-                this.$store.commit('signin', response.data);
-            });
-        }
-
-        ApiService.get('/locale').then(response => {
-            this.$lang = response.data;
-            this.curLang = this.languages[this.$lang];
-        });
+        this.curLang = this.languages[this.$i18n.locale];
     }
 }
 </script>

@@ -1,38 +1,38 @@
 <template>
     <main-layout>
         <div class="d-flex" slot="header">
-            <h2 class="flex-grow-1">奖品管理</h2>
+            <h2 class="flex-grow-1">{{ $t('lottery.prizes.page_title') }}</h2>
             <div class="header-right">
-                <el-button type="primary" size="small" @click="onShowAdd">添加奖品</el-button>
+                <el-button type="primary" size="small" @click="onShowAdd">{{ $t('lottery.prizes.add') }}</el-button>
             </div>
         </div>
 
         <section class="page-section">
             <el-table :data="dataList" v-loading="loading" @selection-change="onSelectionChange">
                 <el-table-column width="40" type="selection"/>
-                <el-table-column label="图片" width="100">
+                <el-table-column :label="$t('lottery.prizes.image')" width="100">
                     <template slot-scope="scope">
                         <featured-image :src="scope.row.image" width="60px" height="60px"/>
                     </template>
                 </el-table-column>
-                <el-table-column label="名称">
+                <el-table-column :label="$t('lottery.prizes.name')">
                     <template slot-scope="scope">
                         <strong>{{ scope.row.name }}</strong>
                     </template>
                 </el-table-column>
-                <el-table-column label="类型" width="100">
+                <el-table-column :label="$t('lottery.prizes.type')" width="100">
                     <template slot-scope="scope">
-                        <span v-if="scope.row.type==='product'">产品</span>
-                        <span v-else>积分</span>
+                        <span v-if="scope.row.type==='product'">{{ $t('lottery.prizes.type_options.product') }}</span>
+                        <span v-else>{{ $t('lottery.prizes.type_options.point') }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="probability" label="中奖概率" width="100"/>
-                <el-table-column prop="stock" label="数量" width="100"/>
-                <el-table-column prop="sort_num" label="排序" width="100"/>
-                <el-table-column label="状态" width="100">
+                <el-table-column prop="probability" :label="$t('lottery.prizes.probability')" width="100"/>
+                <el-table-column prop="stock" :label="$t('lottery.prizes.stock')" width="100"/>
+                <el-table-column prop="sort_num" :label="$t('lottery.prizes.sort_num')" width="100"/>
+                <el-table-column :label="$t('lottery.prizes.status')" width="100">
                     <template slot-scope="scope">
-                        <span v-if="scope.row.status">已激活</span>
-                        <span class="text-danger" v-else>未激活</span>
+                        <span v-if="scope.row.status">{{ $t('lottery.prizes.status_options.active') }}</span>
+                        <span class="text-danger" v-else>{{ $t('lottery.prizes.status_options.inactive') }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('common.edit')" width="100" align="right">
@@ -54,50 +54,50 @@
                     </el-button>
                 </div>
                 <el-pagination
-                        background
-                        layout="prev, pager, next,total"
-                        :total="total"
-                        :page-size="pageSize"
-                        :current-page="page"
-                        @current-change="onPageChange"
+                    background
+                    layout="prev, pager, next,total"
+                    :total="total"
+                    :page-size="pageSize"
+                    :current-page="page"
+                    @current-change="onPageChange"
                 />
             </div>
         </section>
 
         <el-dialog
-                title="编辑奖品"
-                :visible.sync="showDialog"
-                :close-on-click-modal="false"
-                :close-on-press-escape="false"
-                closeable
+            title="编辑奖品"
+            :visible.sync="showDialog"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            closeable
         >
             <el-form size="medium" label-width="80px">
-                <el-form-item label="图片">
+                <el-form-item :label="$t('lottery.prizes.image')">
                     <featured-image :src="prize.image" width="100px" height="100px" fit="contain" @click="onShowMedia"/>
                 </el-form-item>
-                <el-form-item label="名称">
+                <el-form-item :label="$t('lottery.prizes.name')">
                     <el-input class="w500" v-model="prize.name"/>
                 </el-form-item>
-                <el-form-item label="类型">
+                <el-form-item :label="$t('lottery.prizes.type')">
                     <el-select class="w200" v-model="prize.type">
-                        <el-option label="产品" value="product"/>
-                        <el-option label="积分" value="point"/>
+                        <el-option :label="$t('lottery.prizes.type_options.product')" value="product"/>
+                        <el-option :label="$t('lottery.prizes.type_options.point')" value="point"/>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="积分" v-if="prize.type==='point'">
+                <el-form-item :label="$t('lottery.prizes.points')" v-if="prize.type==='point'">
                     <el-input class="w200" v-model="prize.points"/>
                 </el-form-item>
-                <el-form-item label="数量">
+                <el-form-item :label="$t('lottery.prizes.stock')">
                     <el-input class="w200" v-model="prize.stock"/>
                 </el-form-item>
-                <el-form-item label="中奖概率">
+                <el-form-item :label="$t('lottery.prizes.probability')">
                     <el-input class="w200" v-model="prize.probability"/>
                 </el-form-item>
-                <el-form-item label="显示顺序">
+                <el-form-item :label="$t('lottery.prizes.sort_num')">
                     <el-input class="w200" v-model="prize.sort_num"/>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="onSubmit">确定</el-button>
+                    <el-button type="primary" @click="onSubmit">{{ $t('lottery.prizes.save') }}</el-button>
                 </el-form-item>
             </el-form>
         </el-dialog>
@@ -134,7 +134,7 @@ export default {
         },
         batchDelete() {
             let ids = this.selectionIds.map((d) => d.id);
-            this.$confirm('此操作将永久删除所选信息, 是否继续?', '提示', {
+            this.$confirm(this.$t('common.delete_tips'), this.$t('common.delete_confirm'), {
                 type: 'warning'
             }).then(() => {
                 this.loading = true;
@@ -150,7 +150,7 @@ export default {
             this.loading = true;
             ApiService.put('/lottery/prizes/batch', {ids, data: {status}}).then(() => {
                 this.fetchList();
-                this.$message.success('奖品积更新');
+                this.$message.success('Prizze updated');
             }).finally(() => {
                 this.loading = false;
             });

@@ -13,8 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id 用户ID
  * @property string|null $national_number 国家代码
  * @property string|null $phone_number 电话号码
- * @property int $verified
- * @property string|null $verified_at 验证时间
+ * @property \Illuminate\Support\Carbon|null $verified_at 验证时间
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 绑定时间
  * @property-read \Illuminate\Support\Collection $meta_data
@@ -28,7 +27,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|UserPhone wherePhoneNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereVerified($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereVerifiedAt($value)
  * @mixin \Eloquent
  */

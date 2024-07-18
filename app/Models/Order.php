@@ -29,11 +29,13 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property string $discount_tax 优惠税额
  * @property string $total
  * @property string $total_tax
+ * @property string|null $cost_total
  * @property int $prices_include_tax
  * @property string $payment_method
  * @property string|null $payment_method_title
  * @property int $payment_status 支付状态，1=已支付，0=未支付
  * @property \Illuminate\Support\Carbon|null $payment_at 付款时间
+ * @property string|null $shipping_method
  * @property array $shipping_line 配送区域
  * @property string $shipping_total 配送费
  * @property string $shipping_tax
@@ -51,8 +53,8 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property int $deliveryer_id 配送员
  * @property string|null $created_via
  * @property string $status 订单状态
- * @property int $is_modified
  * @property string|null $short_code
+ * @property int $is_modified
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property \Illuminate\Support\Carbon|null $completed_at 完成时间
@@ -62,6 +64,7 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property-read \Illuminate\Support\Collection $meta_data
  * @property-read array|\Illuminate\Contracts\Translation\Translator|string|null $pay_status_des
  * @property-read mixed|null $status_des
+ * @property-read mixed $subtotal
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderItem> $items
  * @property-read int|null $items_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderMeta> $metas
@@ -86,6 +89,7 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order whereBuyerNote($value)
  * @method static Builder|Order whereBuyerRate($value)
  * @method static Builder|Order whereCompletedAt($value)
+ * @method static Builder|Order whereCostTotal($value)
  * @method static Builder|Order whereCreatedAt($value)
  * @method static Builder|Order whereCreatedVia($value)
  * @method static Builder|Order whereDeliveryerId($value)
@@ -112,6 +116,7 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order whereShipping($value)
  * @method static Builder|Order whereShippingAt($value)
  * @method static Builder|Order whereShippingLine($value)
+ * @method static Builder|Order whereShippingMethod($value)
  * @method static Builder|Order whereShippingStatus($value)
  * @method static Builder|Order whereShippingTax($value)
  * @method static Builder|Order whereShippingTotal($value)
@@ -140,16 +145,18 @@ class Order extends Model
     const ORDER_STATUS_DELIVERING = 'delivering'; //配送中
     const ORDER_STATUS_FAILED = 'failed';
     const ORDER_STATUS_REFUNDED = 'refunded';
+    const SHIPPING_METHOD_FLATRATE = 'flat_rate';
+    const SHIPPING_METHOD_LOCALPICKUP = 'local_pickup';
 
     protected $table = 'order';
     protected $primaryKey = 'id';
     protected $fillable = [
         'id', 'order_no', 'order_type', 'shop_id', 'shop_name', 'buyer_id', 'buyer_name', 'buyer_note',
-        'seller_id', 'seller_name', 'discount_total', 'discount_tax', 'total', 'total_tax', 'prices_include_tax',
-        'payment_method', 'payment_method_title', 'payment_status', 'payment_at', 'payment_cash_amount',
+        'seller_id', 'seller_name', 'discount_total', 'discount_tax', 'total', 'total_tax', 'cost_total',
+        'prices_include_tax', 'payment_method', 'payment_method_title', 'payment_status', 'payment_at',
         'shipping_method', 'shipping_line', 'shipping_total', 'shipping_tax', 'shipping_status', 'shipping_at',
-        'buyer_rate', 'seller_rate', 'buyer_deleted', 'seller_deleted', 'out_trade_no', 'fee_lines', 'discount_lines', 'shipping',
-        'billing', 'deliveryer_id', 'status', 'created_at', 'updated_at', 'completed_at', 'is_modified', 'short_code',
+        'buyer_rate', 'seller_rate', 'buyer_deleted', 'seller_deleted', 'out_trade_no', 'fee_lines', 'discount_lines',
+        'shipping', 'billing', 'deliveryer_id', 'status', 'is_modified', 'short_code',
     ];
     protected $appends = [
         'meta_data',
@@ -157,7 +164,6 @@ class Order extends Model
         'links',
         'subtotal'
     ];
-
     protected $casts = [
         'fee_lines' => 'array',
         'discount_lines' => 'array',
@@ -169,6 +175,7 @@ class Order extends Model
         'shipping_at' => 'datetime',
         'completed_at' => 'datetime',
     ];
+    protected $hidden = ['metas'];
 
     protected $with = ['items', 'buyer', 'seller', 'shop', 'transaction', 'deliveryer', 'metas'];
 
@@ -195,7 +202,7 @@ class Order extends Model
      */
     public function getStatusDesAttribute()
     {
-        return is_null($this->status) ?: trans('order.order_statuses.' . $this->status);
+        return is_null($this->status) ?: trans('order.status_options.' . $this->status);
     }
 
     /**

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Basic;
 
 
-use App\Http\Controllers\Api\BaseController;
 use App\Traits\RestApis\DistrictApis;
+use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 
 class DistrcitController extends BaseController

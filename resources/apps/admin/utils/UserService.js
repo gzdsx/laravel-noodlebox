@@ -7,11 +7,11 @@ const UserService = {
     getUser(id) {
         return ApiService.get('/users/' + id);
     },
-    storeUser(user) {
-        return ApiService.post('/users', {user});
+    storeUser(data) {
+        return ApiService.post('/users', data);
     },
-    updateUser(id, user) {
-        return ApiService.put('/users/' + id, {user});
+    updateUser(id, data) {
+        return ApiService.put('/users/' + id, data);
     },
     deleteUser(ids) {
         return ApiService.delete('/users/batch', {data: {ids}});

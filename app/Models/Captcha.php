@@ -30,4 +30,19 @@ class Captcha extends Model
     protected $table = 'captcha';
     protected $primaryKey = 'id';
     protected $fillable = ['code', 'phone', 'email', 'used'];
+
+    /**
+     * @param $phone
+     * @param $code
+     * @return bool
+     */
+    public static function checkPhone($phone, $code)
+    {
+        $phone = preg_replace('/\s/', '', $phone);
+        if ($captcha = static::where('code', $code)->orderByDesc('id')->first()) {
+            return $captcha->phone == $phone;
+        }
+
+        return false;
+    }
 }

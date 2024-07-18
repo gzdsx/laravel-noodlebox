@@ -9,18 +9,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="{{asset('images/sterling/favicon.png')}}" rel="icon">
     <link href="{{asset('lib/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
-    <link href="{{asset('lib/element/element-ui.css?v=2.15.4')}}" rel="stylesheet">
     <link href="{{asset('dist/admin/index.css?v='.appversion())}}" rel="stylesheet">
     <script src="{{asset('lib/echarts.min.js?v='.appversion())}}" type="text/javascript"></script>
-    <script src="{{asset('lib/vue/vue-chunk.js?v='.appversion())}}" type="text/javascript"></script>
-    <script src="{{asset('lib/vue/vue-router.min.js?v='.appversion())}}" type="text/javascript"></script>
-    <script src="{{asset('lib/element/element-ui.js?v='.appversion())}}" type="text/javascript"></script>
-    <script>
+    <script type="text/javascript">
         window.siteUrl = "{{env('APP_URL')}}";
     </script>
 </head>
 <body>
 <div id="app"></div>
+<script src="{{asset('dist/admin/vendors.js?v='.appversion())}}" type="text/javascript"></script>
 <script src="{{asset('dist/admin/app.js?v='.appversion())}}" type="text/javascript"></script>
 </body>
 </html>

@@ -17,29 +17,6 @@
 </div>
 
 <h3 class="shop-name">Noodle Box Drogheda</h3>
-<table style="width: 100%;">
-    <tr>
-        <td>
-            <div class="shop-address">
-                <p>39 West Street</p>
-                <p>Drogheda</p>
-                <p>Co. Louth</p>
-                <p>TEL: 041-9845775</p>
-                <p>www.noodlebox.ie</p>
-            </div>
-        </td>
-        <td style="width: 100px; text-align: center;">
-            <div>
-                @if($order->shipping_line['method_id']=='flat_rate')
-                    <img src="{{asset('images/noodlebox/local-shipping.png')}}" width="75" alt="">
-                @else
-                    <img src="{{asset('images/noodlebox/local-pickup.png')}}" width="75" alt="">
-                @endif
-            </div>
-            <h2 style="text-align: center; margin: 0; font-weight: bold;">{{$order->short_code}}</h2>
-        </td>
-    </tr>
-</table>
 
 <h1 class="title">invoice</h1>
 <div class="shipping-address">
@@ -164,8 +141,8 @@
 @endif
 <table class="table-total">
     <colgroup>
-        <col width="50%"/>
-        <col/>
+        <col width="50%"></col>
+        <col></col>
     </colgroup>
     <tbody>
     <tr>
@@ -174,23 +151,31 @@
     </tr>
     <tr>
         <th>Shipping</th>
-        <td class="text-right"><strong>€{{$order->shipping_total}}</strong></td>
+        <td class="text-right"><strong>+€{{$order->shipping_total}}</strong></td>
     </tr>
     @foreach($order->fee_lines as $fee)
         <tr>
             <th>{{$fee['name']??''}}</th>
-            <td class="text-right"><strong>€{{$fee['total']??''}}</strong></td>
+            <td class="text-right"><strong>+€{{$fee['total']??''}}</strong></td>
+        </tr>
+    @endforeach
+    @foreach($order->discount_lines as $discount)
+        <tr>
+            <th>{{$discount['name']??''}}</th>
+            <td class="text-right"><strong>-€{{$discount['total']??''}}</strong></td>
         </tr>
     @endforeach
     <tr>
         <th>PaymentM</th>
         <td class="text-right" style="line-height: 1.1;">
-            @if($order->payment_method=='customize')
-                Card: {{format_amount($order->getMeta('payment_with_card_value'))}}<br>
-                Cash: {{format_amount($order->getMeta('payment_with_cash_value'))}}
-            @else
-                {{$order->payment_method_title}}
-            @endif
+            <strong>
+                @if($order->payment_method=='customize')
+                    Card: {{format_amount($order->getMeta('payment_with_card_value'))}}<br>
+                    Cash: {{format_amount($order->getMeta('payment_with_cash_value'))}}
+                @else
+                    {{ucfirst($order->payment_method)}}
+                @endif
+            </strong>
         </td>
     </tr>
     <tr>
@@ -204,6 +189,29 @@
         </tr>
     @endif
     </tbody>
+</table>
+<table style="width: 100%; margin-top: 20px;">
+    <tr>
+        <td>
+            <div class="shop-address">
+                <p>39 West Street</p>
+                <p>Drogheda</p>
+                <p>Co. Louth</p>
+                <p>TEL: 041-9845775</p>
+                <p>www.noodlebox.ie</p>
+            </div>
+        </td>
+        <td style="width: 100px; text-align: center;">
+            <div>
+                @if($order->shipping_line['method_id']=='flat_rate')
+                    <img src="{{asset('images/noodlebox/local-shipping.png')}}" width="75" alt="">
+                @else
+                    <img src="{{asset('images/noodlebox/local-pickup.png')}}" width="75" alt="">
+                @endif
+            </div>
+            <h2 style="text-align: center; margin: 0; font-weight: bold;">{{$order->short_code}}</h2>
+        </td>
+    </tr>
 </table>
 </body>
 </html>

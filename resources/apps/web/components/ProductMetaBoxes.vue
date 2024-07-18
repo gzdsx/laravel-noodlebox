@@ -13,7 +13,8 @@
             </div>
         </div>
 
-        <div class="product-description text-safety-orange" v-html="product.description" v-if="product.description"></div>
+        <div class="product-description text-safety-orange" v-html="product.description"
+             v-if="product.description"></div>
         <div class="product-badges" v-if="product.meta_data.badges">
             <img v-for="(b,i) in product.meta_data.badges" :key="i" :src="b" alt="">
         </div>
@@ -154,14 +155,16 @@ export default {
         },
         addToCart() {
             let {options, additional_options, usePointPurchase} = this;
+            let purchase_via = usePointPurchase ? 'point' : 'order';
             HttpClient.post('/carts', {
                 product_id: this.product.id,
                 quantity: this.quantity,
                 meta_data: {
                     options,
-                    additional_options
+                    additional_options,
+                    purchase_via,
                 },
-                purchase_via: usePointPurchase ? 'point' : 'order'
+                purchase_via
             }).then((res) => {
                 window.dispatchEvent(new Event('cartChanged'));
                 this.$showToast('Added to cart successfully!');
@@ -172,24 +175,6 @@ export default {
 
             });
         },
-        saveToCart() {
-            let {product, finalPrice, quantity, options, additional_options, usePointPurchase} = this;
-
-            const cart = new CartService();
-            cart.addToCart({
-                product_id: product.id,
-                title: product.title,
-                image: product.image,
-                price: finalPrice,
-                quantity,
-                options,
-                additional_options,
-                usePointPurchase,
-                point_price: product.point_price,
-            });
-            this.$showToast('Added to cart successfully!');
-            this.$emit('added', cart.getCartItems());
-        }
     },
     mounted() {
 

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 
-use App\Http\Controllers\Controller;
 use App\Traits\Auth\UserLogin;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class LoginController extends Controller
@@ -33,20 +33,30 @@ class LoginController extends Controller
         $account = $request->input('account');
         $password = $request->input('password');
 
-        return $this->guard()->attempt([
+        $check = $this->guard()->attempt([
             'phone_number' => $account,
+            'password' => $password
+        ], $request->filled('remember'));
+
+        if ($check) {
+            return true;
+        }
+
+        return $this->guard()->attempt([
+            'email' => $account,
             'password' => $password
         ], $request->filled('remember'));
     }
 
     protected function sendLoginResponse(Request $request)
     {
-        if ($this->guard()->user()->isAdmin()) {
+        $capability = $this->guard()->user()->getMeta('capability');
+        if ($capability == 'administrator' || $capability == 'manager') {
             $access_token = $this->guard()->user()->createToken('admin')->accessToken;
-
-            return json_success(compact('access_token'));
+            $capability = $this->guard()->user()->getMeta('capability');
+            return json_success(compact('access_token', 'capability'));
         }
 
-        abort(403);
+        abort(403, trans('auth.failed'));
     }
 }

@@ -2602,11 +2602,11 @@ img, video {
   6% {
     transform: scale3d(1, 1, 1) rotate3d(0, 0, 1, -8deg);
   }
-  18%, 30%, 42% {
-    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 8deg);
-  }
   12%, 24%, 36%, 48% {
     transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -8deg);
+  }
+  18%, 30%, 42% {
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 8deg);
   }
   54% {
     transform: scale3d(1, 1, 1);

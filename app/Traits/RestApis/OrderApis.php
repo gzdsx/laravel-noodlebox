@@ -77,6 +77,7 @@ trait OrderApis
             $order->out_trade_no = TradeUtil::createOutTradeNo();
             $order->payment_method = $request->input('payment_method');
             $order->payment_method_title = $request->input('payment_method_title');
+            $order->shipping_method = $request->input('shipping_method', Order::SHIPPING_METHOD_LOCALPICKUP);
             $order->shipping_line = $request->input('shipping_line', []);
             $order->buyer_note = $request->input('buyer_note');
             $order->shipping = $request->input('shipping', []);
@@ -87,10 +88,10 @@ trait OrderApis
             $order->buyer_id = $buyer->id;
             $order->buyer_name = $buyer->nickname;
 
-            $phone_number = $order->shipping['phone']['phone_number'] ?? '';
-            $national_number = $order->shipping['phone']['national_number'] ?? '';
+            $phone_number = $order->shipping['phone_number'] ?? '';
+            $national_number = $order->shipping['national_number'] ?? '';
             if (!UserPhone::checkPhoneNumber($buyer->id, $phone_number, $national_number)) {
-                abort(422, 'Phone number not verified');
+                //abort(422, 'Phone number not verified');
             }
 
             $total = 0;
@@ -100,7 +101,7 @@ trait OrderApis
             }
             $order->fee_lines = $fee_lines;
 
-            if ($order->shipping_line['method_id'] == 'flat_rate') {
+            if ($order->shipping_method == Order::SHIPPING_METHOD_FLATRATE) {
                 $order->shipping_total = $order->shipping_line['total'] ?? 0;
                 $total += $order->shipping_total;
             }
@@ -116,41 +117,33 @@ trait OrderApis
             $order->discount_total = $discount_total;
             $order->save();
 
+            //return json_success($request->all());
             $meta_data = $request->input('meta_data', []);
             foreach ($meta_data as $key => $value) {
                 $order->updateMeta($key, $value);
             }
 
-            $items = $request->input('items', []);
-            foreach ($items as $item) {
-                $order->items()->create($item);
-            }
-
             $earn_points_total = 0;
             $consume_points_total = 0;
-            foreach ($order->items()->with(['product'])->get() as $item) {
+            $cart_items = $buyer->carts()->with(['product'])->get();
+            foreach ($cart_items as $item) {
                 $total += $this->calculateItemTotal($item);
                 $earn_points_total += $this->calculateItemEarnPoints($item);
                 $consume_points_total = $this->calculateItemComsumePoints($item);
+
+                $order->items()->create($item->only($item->getFillable()));
             }
 
             $order->total = $total;
-            if ($order->shipping_line['method_id'] == 'flat_rate') {
-                $order->status = Order::ORDER_STATUS_PROCESSIING;
-                if ($order->payment_method == 'online') {
-                    $order->payment_status = 1;
-                    $order->payment_at = now();
-                }
-            } else {
-                $order->status = Order::ORDER_STATUS_COMPLETED;
+            $order->status = Order::ORDER_STATUS_PROCESSIING;
+            if ($order->payment_method == 'online') {
                 $order->payment_status = 1;
                 $order->payment_at = now();
             }
-
             $order->save();
 
             //积分抵扣现金
-            $use_points_value = $request->input('use_points_value', 0);
+            $use_points_value = $order->getMeta('use_points_value', 0);
             if ($use_points_value > 0) {
                 $buyer->points -= $use_points_value;
                 $buyer->save();
@@ -222,10 +215,10 @@ trait OrderApis
     {
         $order = $this->repository()->findOrFail($id);
 
-        if ($request->has('metas')) {
-            $metas = $request->input('metas', []);
-            foreach ($metas as $meta) {
-                $order->updateMeta($meta['meta_key'], $meta['meta_value']);
+        if ($request->has('meta_data')) {
+            $meta_data = $request->input('meta_data', []);
+            foreach ($meta_data as $key => $value) {
+                $order->updateMeta($key, $value);
             }
         }
 
@@ -280,7 +273,7 @@ trait OrderApis
             $order->status = Order::ORDER_STATUS_COMPLETED;
         }
 
-        if ($request->has('payment_method')) {
+        if ($request->filled('payment_method')) {
             $payment_method = $request->input('payment_method');
             if ($payment_method != $order->payment_method) {
                 $content = 'Order payment method changed from ' . __('payment.methods.' . $order->payment_method) . ' to ' . __('payment.methods.' . $payment_method) . '.';
@@ -289,9 +282,11 @@ trait OrderApis
                 $order->payment_method_title = $request->input('payment_method_title');
                 $is_modified = true;
             }
+
+            $order->payment_method_title = $request->input('payment_method_title');
         }
 
-        if ($request->has('total')) {
+        if ($request->filled('total')) {
             $total = $request->input('total');
             if ($total != $order->total) {
                 $order_notes[] = 'Order total changed from ' . $order->total . ' to ' . $total . '.';
@@ -331,6 +326,25 @@ trait OrderApis
         return json_success($order);
     }
 
+    public function destroy($id, Request $request)
+    {
+        if ($id == 'batch') {
+            $ids = $request->input('ids', []);
+            $this->repository()->whereKey($ids)->get()->each->delete();
+        } else {
+            $this->repository()->findOrFail($id)->delete();
+        }
+
+        return json_success();
+    }
+
+    public function options()
+    {
+        return json_success([
+            'status_options' => trans('order.status_options')
+        ]);
+    }
+
     protected function calculateItemTotal($item)
     {
         return $item->price * $item->quantity;
@@ -349,8 +363,9 @@ trait OrderApis
     protected function calculateItemComsumePoints($item)
     {
         $points = 0;
-        if ($item->product && is_array($item['meta_data'])) {
-            if (isset($item['meta_data']['purchase_via']) && $item['meta_data']['purchase_via'] == 'point') {
+        $metas = collect($item->meta_data ?? []);
+        if ($item->product && !$metas->isEmpty()) {
+            if ($metas->get('purchase_via') == 'point') {
                 $points = $item->product->point_price * $item->quantity;
             }
         }

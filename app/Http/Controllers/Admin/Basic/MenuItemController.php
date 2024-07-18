@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Basic;
 
-use App\Http\Controllers\Admin\BaseController;
 use App\Traits\RestApis\MenuItemApis;
+use App\Http\Controllers\Admin\BaseController;
 
 class MenuItemController extends BaseController
 {

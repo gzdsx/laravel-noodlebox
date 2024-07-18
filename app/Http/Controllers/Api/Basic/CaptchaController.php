@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\Basic;
 
-use App\Http\Controllers\Api\BaseController;
-use App\Http\Controllers\Controller;
 use App\Models\Captcha;
 use App\Support\BulkSMS;
+use App\Http\Controllers\Api\BaseController;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class CaptchaController extends BaseController

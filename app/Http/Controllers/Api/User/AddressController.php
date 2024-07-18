@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use App\Http\Controllers\Api\BaseController;
 use App\Models\UserPhone;
 use App\Traits\RestApis\UserAddressApis;
+use App\Http\Controllers\Api\BaseController;
 
 class AddressController extends BaseController
 {

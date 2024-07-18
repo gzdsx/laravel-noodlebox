@@ -93,14 +93,14 @@ export default {
             }
 
             if (kefu.id) {
-                ApiService.put('/kefus/' + kefu.id, {kefu}).then(() => {
+                ApiService.put('/kefus/' + kefu.id, kefu).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
                     this.$message.success(this.$t('kefu.updated'));
                 });
             } else {
-                ApiService.post('/kefus', {kefu}).then(() => {
+                ApiService.post('/kefus', kefu).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
@@ -113,7 +113,7 @@ export default {
             this.showDialog = true;
         },
         onShowEdit(d) {
-            this.kefu = d;
+            this.kefu = {...d};
             this.showDialog = true;
         },
     },

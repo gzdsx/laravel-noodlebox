@@ -52,7 +52,7 @@ trait ShopApis
     public function store(Request $request, $id = 0)
     {
         $shop = $this->repository()->findOrNew($id);
-        $shop->fill($request->input('shop', []));
+        $shop->fill($request->all());
         $shop->save();
 
         if ($request->has('shop.images')) {
@@ -68,26 +68,24 @@ trait ShopApis
         return json_success($shop);
     }
 
-    /**
-     * @param $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy($id)
+    public function update(Request $request, $id)
     {
-        if ($shop = $this->repository()->find($id)) {
-            $shop->delete();
-        }
-
-        return json_success();
+        return $this->store($request, $id);
     }
 
     /**
+     * @param $id
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function batchDelete(Request $request)
+    public function destroy($id, Request $request)
     {
-        $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
+        } else {
+            $this->repository()->findOrFail($id)->delete();
+        }
+
         return json_success();
     }
 }

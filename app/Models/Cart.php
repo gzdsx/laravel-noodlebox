@@ -20,10 +20,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $sku_id SKU ID
  * @property string|null $sku_title SKU名称
  * @property object|null $meta_data 元数据
- * @property string|null $purchase_via
  * @property string|null $cart_hash
+ * @property string|null $purchase_via
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 修改时间
+ * @property-read mixed $total
  * @property-read \App\Models\Product|null $product
  * @property-read \App\Models\Shop|null $shop
  * @property-read \App\Models\ProductSku|null $sku

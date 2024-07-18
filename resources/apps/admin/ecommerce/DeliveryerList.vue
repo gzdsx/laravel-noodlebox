@@ -1,9 +1,9 @@
 <template>
     <main-layout>
         <div class="d-flex" slot="header">
-            <h2 class="flex-grow-1">配送员管理</h2>
+            <h2 class="flex-grow-1">{{$t('deliveryer.title')}}</h2>
             <div>
-                <el-button type="primary" size="small" @click="onShowAdd">新增配送员</el-button>
+                <el-button type="primary" size="small" @click="onShowAdd">{{$t('deliveryer.addnew')}}</el-button>
             </div>
         </div>
         <section class="page-section">
@@ -14,12 +14,12 @@
                         <featured-image :src="scope.row.image" width="60px" height="60px" :alt="$t('user.avatar')"/>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('kefu.name')">
+                <el-table-column :label="$t('deliveryer.name')">
                     <template slot-scope="scope">
                         <strong :style="{'color':scope.row.color}">{{ scope.row.name }}</strong>
                     </template>
                 </el-table-column>
-                <el-table-column prop="phone" width="200" :label="$t('kefu.phone')"/>
+                <el-table-column prop="phone" width="200" :label="$t('user.phone')"/>
                 <el-table-column prop="pos" width="200" label="POS">
                     <template slot-scope="scope">
                         <div class="column-tags">
@@ -29,16 +29,15 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="base_amount" width="100" label="底金"/>
-                <el-table-column prop="status" width="100" :label="$t('状态')"/>
+                <el-table-column prop="base_amount" width="100" :label="$t('deliveryer.base_amount')"/>
+                <el-table-column prop="status" width="100" :label="$t('status')"/>
                 <el-table-column width="auto" :label="$t('common.option')" align="right" fixed="right">
                     <template slot-scope="scope">
                         <el-button size="mini" type="text" @click="onShowEdit(scope.row)">{{
                             $t('common.edit')
                             }}
                         </el-button>
-                        <el-button size="mini" type="text" @click="handleShowSattlement(scope.row)">结算</el-button>
-                        <el-button size="mini" type="text" @click="handleShowDetail(scope.row)">账户明细</el-button>
+                        <el-button size="mini" type="text" @click="handleShowDetail(scope.row)">{{ $t('deliveryer.account_detail')}}</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -61,30 +60,30 @@
         <el-dialog :title="$t('New Deliveryer')" closeable :visible.sync="showDialog" :close-on-click-modal="false"
                    :close-on-press-escape="false">
             <el-form size="medium" label-width="80px" style="width: 500px;">
-                <el-form-item label="头像">
+                <el-form-item :label="$t('user.avatar')">
                     <div class="img-80" @click="showPicker=true">
                         <featured-image :src="deliveryer.image"/>
                     </div>
                 </el-form-item>
-                <el-form-item :label="$t('kefu.name')">
+                <el-form-item :label="$t('deliveryer.name')">
                     <el-input size="medium" v-model="deliveryer.name"/>
                 </el-form-item>
                 <el-form-item :label="$t('kefu.phone')">
                     <el-input size="medium" v-model="deliveryer.phone"/>
                 </el-form-item>
-                <el-form-item label="状态">
+                <el-form-item :label="$t('common.status')">
                     <el-radio-group v-model="deliveryer.status">
                         <el-radio label="online">Online</el-radio>
                         <el-radio label="offline">Offline</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item label="POS机">
+                <el-form-item :label="$t('deliveryer.pos_machines')">
                     <el-checkbox-group v-model="deliveryer.pos_machines">
                         <el-checkbox v-for="item in posMachineList" :key="item.id" :label="item">{{ item.name }}
                         </el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
-                <el-form-item label="底金">
+                <el-form-item :label="$t('deliveryer.base_amount')">
                     <el-input class="w200" v-model="deliveryer.base_amount"/>
                 </el-form-item>
                 <el-form-item label="Color">
@@ -251,7 +250,7 @@ export default {
         },
         handleShowDetail(d) {
             this.deliveryer = d;
-            this.showTransactions = true;
+            this.showOrders = true;
         },
         handleShowOrders() {
             this.showOrders = true;

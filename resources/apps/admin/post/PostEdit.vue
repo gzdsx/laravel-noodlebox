@@ -22,7 +22,7 @@
                             <el-col :span="12">
                                 <el-form-item :label="$t('common.url')">
                                     <el-input type="text" size="medium" v-model="post.slug">
-                                        <span slot="prepend">{{siteUrl}}/</span>
+                                        <span slot="prepend">{{ siteUrl }}/{{ type }}/</span>
                                     </el-input>
                                 </el-form-item>
                             </el-col>
@@ -87,7 +87,7 @@
                         <div class="post-card-body">
                             <div class="form-label">{{ $t('post.format') }}</div>
                             <el-select size="medium" class="w-100" v-model="post.format">
-                                <el-option v-for="(v,k) in formats" :value="k" :label="v" :key="k"/>
+                                <el-option v-for="(v,k) in options.formats" :value="k" :label="v" :key="k"/>
                             </el-select>
                             <div class="form-label">{{ $t('post.price') }}</div>
                             <div>
@@ -119,7 +119,7 @@
 </template>
 
 <script>
-import CategoryCheckboxList from "../components/CategoryCheckboxList";
+import CategoryCheckboxList from "../category/CategoryCheckboxList";
 import CategoryService from "../utils/CategoryService";
 import PostService from "../utils/PostService";
 
@@ -134,11 +134,14 @@ export default {
             images: [],
             metas: [],
             categories: [],
-            formats: [],
             selectedCategories: [],
             showMediaDialog: false,
             disabled: false,
             siteUrl: window.siteUrl || window.location.origin,
+            options: {
+                formats: [],
+                statuses: []
+            }
         }
     },
     methods: {
@@ -152,9 +155,12 @@ export default {
                 if (images) this.images = images;
             });
         },
-        fetchFormats() {
-            PostService.get('formats').then(response => {
-                this.formats = response.data;
+        fetchOptions() {
+            PostService.get('options').then(response => {
+                this.options = {
+                    ...this.options,
+                    ...response.data
+                };
             });
         },
         fetchCategories() {
@@ -207,7 +213,7 @@ export default {
     },
     mounted() {
         this.fetchData();
-        this.fetchFormats();
+        this.fetchOptions();
         this.fetchCategories();
     },
 }

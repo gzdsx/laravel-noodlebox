@@ -42,34 +42,35 @@ trait AdApis
 
     /**
      * @param Request $request
-     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $id = null)
+    public function store(Request $request)
     {
-        $newAd = $request->input('ad', []);
-        $model = $this->repository()->findOrNew($id);
-        $model->fill($newAd)->save();
+        $model = $this->repository()->make();
+        $model->fill($request->all())->save();
         return json_success($model);
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function batchDestroy(Request $request)
+    public function update(Request $request, $id)
     {
-        $this->repository()->whereKey($request->input('ids', []))->delete();
-        return json_success();
+        if ($id == 'batch'){
+            $this->repository()->whereKey($request->input('ids', []))->update($request->input('data', []));
+            return json_success();
+        }
+
+        $model = $this->repository()->findOrNew($id);
+        $model->fill($request->all())->save();
+        return json_success($model);
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function batchUpdate(Request $request)
+    public function destroy($id, Request $request)
     {
-        $this->repository()->whereKey($request->input('ids', []))->update($request->input('data', []));
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->delete();
+            return json_success();
+        } else {
+            $this->repository()->whereKey($id)->delete();
+        }
         return json_success();
     }
 }

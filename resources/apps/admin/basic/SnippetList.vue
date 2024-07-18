@@ -94,13 +94,13 @@ export default {
             }
 
             if (snippet.id) {
-                ApiService.put('/snippets/' + snippet.id, {snippet}).then(() => {
+                ApiService.put('/snippets/' + snippet.id, snippet).then(() => {
                     this.showDialog = false;
                     this.resetData();
                     this.fetchList();
                 });
             } else {
-                ApiService.post('/snippets', {snippet}).then(() => {
+                ApiService.post('/snippets', snippet).then(() => {
                     this.showDialog = false;
                     this.resetData();
                     this.fetchList();

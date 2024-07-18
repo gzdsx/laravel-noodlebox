@@ -27,7 +27,7 @@
                             </div>
                             <div class="cart-item__price text-bull-cyan">€{{ item.price }}</div>
                             <div class="cart-item__qty text-safety-orange"
-                                 v-if="item.purchase_via==='point'||item.purchase_via==='lottery'">
+                                 v-if="item.meta_data.purchase_via==='point'||item.meta_data.purchase_via==='lottery'">
                                 {{ item.quantity }}
                             </div>
                             <div class="cart-item__qty" v-else>

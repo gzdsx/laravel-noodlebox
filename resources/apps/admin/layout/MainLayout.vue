@@ -13,16 +13,6 @@
 <script>
 export default {
     name: "MainLayout",
-    props: {
-        loading: {
-            type: Boolean,
-            default: true
-        }
-    },
-    watch: {
-        loading(val) {
-        }
-    }
 }
 </script>
 

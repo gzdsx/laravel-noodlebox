@@ -54,9 +54,9 @@ trait PostApis
      */
     public function store(Request $request, $id = null)
     {
-        $newPost = collect($request->input('post', []));
+        $newPost = collect($request->all());
         $model = $this->repository()->findOrNew($id);
-        $model->fill($newPost->toArray())->save();
+        $model->fill($newPost->only($model->getFillable())->toArray())->save();
         $model->save();
 
         if ($newPost->has('categories')) {
@@ -100,34 +100,43 @@ trait PostApis
 
     /**
      * @param Request $request
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
      */
-    public function destroy($id)
+    public function update(Request $request, $id)
     {
-        $this->repository()->whereKey($id)->get()->each->delete();
+        if ($id == 'batch') {
+            $data = $request->input('data', []);
+            $this->repository()->whereKey($request->input('ids', []))->update($data);
+            return json_success();
+        }
+
+        return $this->store($request, $id);
+    }
+
+    /**
+     * @param $id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id, Request $request)
+    {
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
+        } else {
+            $this->repository()->whereKey($id)->get()->each->delete();
+        }
         return json_success();
     }
 
     /**
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function batchDestroy(Request $request)
+    public function options()
     {
-        $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
-        return json_success();
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function batchUpdate(Request $request)
-    {
-        $data = $request->input('data', []);
-        $this->repository()->whereKey($request->input('ids', []))->update($data);
-
-        return json_success();
+        return json_success([
+            'formats' => trans('post.formats'),
+            'statuses' => trans('post.statuses'),
+        ]);
     }
 }

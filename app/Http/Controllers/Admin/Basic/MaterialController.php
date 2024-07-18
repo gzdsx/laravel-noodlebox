@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin\Basic;
 
 
-use App\Http\Controllers\Admin\BaseController;
 use App\Models\Material;
 use App\Traits\RestApis\MaterialApis;
+use App\Http\Controllers\Admin\BaseController;
 
 class MaterialController extends BaseController
 {

@@ -95,14 +95,14 @@ export default {
             this.disabled = true;
 
             if (page.id) {
-                ApiService.put('/pages/' + page.id, {page}).then(() => {
+                ApiService.put('/pages/' + page.id, page).then(() => {
                     this.$message.success(this.$t('page.updated'));
                     this.fetchData();
                 }).finally(() => {
                     this.disabled = false;
                 });
             } else {
-                ApiService.post('/pages', {page}).then(res => {
+                ApiService.post('/pages', page).then(res => {
                     this.$message.success(this.$t('page.saved'));
                     this.$router.replace('/page/edit/' + res.data.id);
                 }).finally(() => {
@@ -113,7 +113,7 @@ export default {
         resetData() {
             this.page = {
                 title: '',
-                name: '',
+                slug: '',
                 image: '',
                 content: ''
             };

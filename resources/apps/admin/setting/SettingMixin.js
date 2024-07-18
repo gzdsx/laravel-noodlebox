@@ -4,7 +4,7 @@ export default {
     data() {
         return {
             settings: {},
-            loading: false
+            loading: true
         }
     },
     methods: {
@@ -32,6 +32,10 @@ export default {
                 ...this.settings,
                 ...res.data
             };
+        }).catch(reason => {
+
+        }).finally(() => {
+            this.loading = false;
         });
     }
 }

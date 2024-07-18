@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Basic;
 
+use App\Models\Badge;
 use App\Http\Controllers\Admin\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\Badge;
 use Illuminate\Http\Request;
 
 class BadgeController extends BaseController

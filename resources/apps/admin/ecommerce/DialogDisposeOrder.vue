@@ -1,19 +1,19 @@
 <template>
     <div>
         <el-dialog
-                title="订单处理"
-                width="75%"
-                :visible="value"
-                :close-on-click-modal="false"
-                :close-on-press-escape="false"
-                append-to-body
-                closeable
-                @close="close"
+            :title="$t('order.dispose')"
+            width="75%"
+            :visible="value"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            append-to-body
+            closeable
+            @close="close"
         >
             <el-row :gutter="20" type="flex">
                 <el-col :span="12">
-                    <el-form label-width="100px" size="medium" v-loading="loading">
-                        <el-form-item label="配送地址">
+                    <el-form label-width="160px" size="medium" v-loading="loading">
+                        <el-form-item :label="$t('order.shipping_address')">
                             <div style="line-height: 1.4; padding-top:8px;">
                                 <div>{{ shipping.first_name }}</div>
                                 <div>{{ shipping.address_line_1 }}</div>
@@ -26,76 +26,93 @@
                                 </div>
                             </div>
                         </el-form-item>
-                        <el-form-item label="配送方式">
-                            <el-select size="medium" class="w300" v-model="shipping_line.method_id">
+                        <el-form-item :label="$t('order.shipping_method')">
+                            <el-select
+                                size="medium"
+                                class="w300"
+                                v-model="shipping_line.method_id"
+                                @change="onShippingMethodChange"
+                            >
                                 <el-option
-                                        v-for="(v,k) in shippingMethodList"
-                                        :label="v"
-                                        :value="k"
-                                        :key="k"
+                                    v-for="(v,k) in shippingMethodList"
+                                    :label="v"
+                                    :value="k"
+                                    :key="k"
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="配送区域" v-if="shipping_line.method_id==='flat_rate'">
-                            <el-select size="medium" class="w300" v-model="shipping_line.zone_id">
+                        <el-form-item :label="$t('order.shipping_zone')" v-if="shipping_line.method_id==='flat_rate'">
+                            <el-select
+                                size="medium"
+                                class="w300"
+                                v-model="shippingZoneIndex"
+                                @change="onShippingMethodChange"
+                            >
                                 <el-option
-                                        v-for="(v,k) in shippingZones"
-                                        :label="v.title+'(€'+v.fee+')'"
-                                        :value="v.id"
-                                        :key="k"
+                                    v-for="(v,k) in shippingZones"
+                                    :label="v.title+'(€'+v.fee+')'"
+                                    :value="k"
+                                    :key="k"
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="配送员" v-if="shipping_line.method_id==='flat_rate'">
+                        <el-form-item :label="$t('order.deliveryer')" v-if="shipping_line.method_id==='flat_rate'">
                             <el-select size="medium" class="w300" v-model="order.deliveryer_id">
                                 <el-option
-                                        v-for="(v,k) in deliveryerList"
-                                        :label="v.name"
-                                        :value="v.id"
-                                        :key="k"
+                                    v-for="(v,k) in deliveryerList"
+                                    :label="v.name"
+                                    :value="v.id"
+                                    :key="k"
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="订单状态">
+                        <el-form-item :label="$t('order.order_status')">
                             <el-select size="medium" class="w300" v-model="order.status">
                                 <el-option
-                                        v-for="(v,k) in statusList"
-                                        :label="v"
-                                        :value="k"
-                                        :key="k"
+                                    v-for="(v,k) in statusList"
+                                    :label="v"
+                                    :value="k"
+                                    :key="k"
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="订单总价">
+                        <el-form-item :label="$t('order.order_total')">
                             <el-input
-                                    class="w300"
-                                    type="number"
-                                    :value="newOrderTotal"
+                                class="w300"
+                                type="number"
+                                :value="orderTotal"
                             />
                         </el-form-item>
                         <el-form-item label="Cost Fee">
                             <div class="d-flex">
                                 <el-input
-                                        class="w300"
-                                        type="number"
-                                        v-model="meta_data.cost_total"
+                                    class="w300"
+                                    type="number"
+                                    v-model="order.cost_total"
                                 />
                             </div>
                         </el-form-item>
-                        <el-form-item label="付款方式">
-                            <el-select size="medium" class="w300" v-model="order.payment_method">
+                        <el-form-item :label="$t('order.payment_method')">
+                            <el-select
+                                size="medium"
+                                class="w300"
+                                v-model="payment_method"
+                                @change="onShippingMethodChange"
+                                :disabled="order.payment_method==='online'"
+                            >
                                 <el-option
-                                        v-for="(v,k) in paymentMethodList"
-                                        :label="v.title"
-                                        :value="v.id"
-                                        :key="k"
+                                    v-for="(v,k) in paymentMethodList"
+                                    :label="v.title"
+                                    :value="v.id"
+                                    :key="k"
+                                    :disabled="v.id==='online'"
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item v-if="order.payment_method==='customize'">
+                        <el-form-item v-if="payment_method==='customize'">
                             <el-input
-                                    class="w200"
-                                    v-model="meta_data.payment_with_cash_value"
+                                class="w200"
+                                v-model="meta_data.payment_with_cash_value"
                             >
                                 <span slot="prepend">By Cash</span>
                             </el-input>
@@ -104,25 +121,25 @@
                             </el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="onSubmit">提交</el-button>
+                            <el-button type="primary" @click="onSubmit">{{ $t('common.submit') }}</el-button>
                         </el-form-item>
                     </el-form>
                 </el-col>
                 <el-col :span="12">
                     <div>Customer Notes</div>
                     <el-input
-                            type="textarea"
-                            class="w500"
-                            :rows="3"
-                            v-model="order.buyer_note"
+                        type="textarea"
+                        class="w500"
+                        :rows="3"
+                        v-model="order.buyer_note"
                     />
 
                     <div style="margin:10px 0;">Order Logs</div>
                     <el-timeline>
                         <el-timeline-item
-                                v-for="(note, index) in order_notes"
-                                :key="index"
-                                :timestamp="note.created_at"
+                            v-for="(note, index) in order_notes"
+                            :key="index"
+                            :timestamp="note.created_at"
                         >
                             <div class="el-timeline-item__content" v-html="note.content"></div>
                         </el-timeline-item>
@@ -130,21 +147,14 @@
                 </el-col>
             </el-row>
         </el-dialog>
-        <dialog-edit-order-item
-                :order-item="orderItem"
-                v-model="showOrderItem"
-                @update="showOrderItem=false"
-        />
     </div>
 </template>
 
 <script>
 import ApiService from "../utils/ApiService";
-import DialogEditOrderItem from "./DialogEditOrderItem.vue";
 
 export default {
     name: "DialogDisposeOrder",
-    components: {DialogEditOrderItem},
     props: {
         value: {
             type: Boolean,
@@ -162,6 +172,7 @@ export default {
     },
     data() {
         return {
+            loading: false,
             statusList: [],
             deliveryerList: [
                 {
@@ -173,7 +184,6 @@ export default {
                 status: 'pending',
                 deliveryer_id: ''
             },
-            loading: false,
             paymentMethodList: [
                 {
                     id: 'online',
@@ -201,12 +211,7 @@ export default {
                 'local_pickup': 'Collection',
             },
             shippingZones: [],
-            showOrderItem: false,
-            orderItem: {},
-            //newOrderTotal: '0.00',
-            order_notes: [],
-            calculatorType: '+',
-            showCalculator: false,
+            shippingZoneIndex: 0,
             shipping: {},
             shipping_line: {
                 method_id: 'local_pickup',
@@ -219,45 +224,50 @@ export default {
             meta_data: {
                 cost_total: 0,
                 payment_with_cash_value: 0
-            }
+            },
+            order_notes: [],
+            orderTotal: 0,
+            payment_method: 'online',
         }
     },
     computed: {
         payByCardValue() {
-            return (this.newOrderTotal - this.meta_data.payment_with_cash_value).toFixed(2);
-        },
-        newOrderTotal() {
-            let total = Number(this.order.total) + Number(this.meta_data.cost_total) - Number(this.order.shipping_total);
-            this.shippingZones.filter(item => item.id === this.shipping_line.zone_id).map(item => {
-                total += Number(item.fee);
-            });
-            return total.toFixed(2);
+            return (this.orderTotal - this.meta_data.payment_with_cash_value).toFixed(2);
         },
     },
     watch: {
         value(val) {
             if (val) {
                 this.fetchOrderNotes();
-                let {shipping, shipping_line, metas} = this.order;
+                let {shipping, shipping_line, meta_data, total} = this.order;
                 this.shipping = shipping || {};
                 this.shipping_line = {
                     ...this.shipping_line,
                     ...shipping_line
                 }
+                this.meta_data = {
+                    ...this.meta_data,
+                    ...meta_data,
+                }
 
-                metas.map(item => {
-                    this.meta_data[item.meta_key] = item.meta_value;
-                });
+                if (shipping_line.zone_id > 0) {
+                    this.shippingZoneIndex = this.shippingZones.findIndex(item => item.id === shipping_line.zone_id);
+                }
+
+                this.payment_method = this.order.payment_method || 'online';
+
+                this.orderTotal = total;
+                this.costTotal = this.meta_data.cost_total;
             }
-        }
+        },
     },
     methods: {
         close() {
             this.$emit('input', false);
         },
         fetchStatusList() {
-            this.$get('/orders/statuses').then(response => {
-                this.statusList = response.data;
+            this.$get('/orders/options').then(response => {
+                this.statusList = response.data.status_options;
             });
         },
         fetchDeliveryerList() {
@@ -281,50 +291,28 @@ export default {
                 status,
                 buyer_note,
                 deliveryer_id,
-                fee_lines,
-                discount_lines,
-                payment_method,
+                cost_total
             } = this.order;
-            let {shipping_line, newOrderTotal} = this;
-            if (shipping_line.method_id === 'flat_rate') {
-                shipping_line.method_title = 'Delivery';
-                let zone = this.shippingZones.filter(item => item.id === shipping_line.zone_id)[0];
-                if (zone) {
-                    shipping_line.total = zone.fee;
-                    shipping_line.zone_title = zone.title;
-                    shipping_line.zone_id = zone.id;
-                }
-            } else {
-                shipping_line.method_title = 'Collection';
-                shipping_line.total = 0;
-                shipping_line.zone_title = '';
-                shipping_line.zone_id = 0;
-            }
-
+            let {shipping_line, orderTotal, payByCardValue, payment_method} = this;
             let payment_method_title = this.paymentMethodList.filter(item => item.id === payment_method)[0].title;
-            let metas = [];
-            this.meta_data.payment_with_card_value = this.payByCardValue;
-            for (let k in this.meta_data) {
-                metas.push({
-                    meta_key: k,
-                    meta_value: this.meta_data[k]
-                });
-            }
+            let meta_data = {
+                ...this.meta_data,
+                payment_with_card_value: payByCardValue,
+            };
 
             this.loading = true;
             ApiService.put(`/orders/${id}`, {
+                cost_total,
                 shipping_line,
                 payment_method,
                 payment_method_title,
-                status,
                 deliveryer_id,
                 buyer_note,
-                fee_lines,
-                discount_lines,
-                total: newOrderTotal,
-                metas
+                meta_data,
+                status,
+                total: orderTotal,
             }).then(() => {
-                this.$message.success('订单已更新');
+                this.$message.success('Order Updated!');
                 this.$emit('update');
             }).finally(() => {
                 this.loading = false;
@@ -334,17 +322,36 @@ export default {
         subTotal(item) {
             return item.price * item.quantity;
         },
-        handlerShowItem(item) {
-            this.orderItem = item;
-            this.showOrderItem = true;
-        },
-        onCalculate() {
-            if (this.calculatorType === '+') {
-                this.newOrderTotal = (Number(this.order.total) + Number(this.varAmount)).toFixed(2);
+        onShippingMethodChange() {
+            let {total, shipping_total} = this.order;
+            let cost_total = this.meta_data.cost_total || 0;
+            if (this.shipping_line.method_id === 'flat_rate') {
+                let zone = this.shippingZones[this.shippingZoneIndex];
+                if (zone) {
+                    this.shipping_line = {
+                        method_id: 'flat_rate',
+                        method_title: 'Delivery',
+                        total: zone.fee,
+                        zone_id: zone.id,
+                        zone_title: zone.title,
+                    }
+                }
             } else {
-                this.newOrderTotal = Number(this.order.total) - Number(this.varAmount).toFixed(2);
+                this.shipping_line = {
+                    method_id: 'local_pickup',
+                    method_title: 'Collection',
+                    total: 0,
+                    zone_id: 0,
+                    zone_title: '',
+                }
             }
-            this.showCalculator = false;
+
+            let diference = Number(this.shipping_line.total) - Number(shipping_total);
+            if (this.order.payment_method === 'online') {
+                this.costTotal = (Number(cost_total) + Number(diference)).toFixed(2);
+            } else {
+                this.orderTotal = (Number(total) + Number(diference)).toFixed(2);
+            }
         }
     },
     mounted() {

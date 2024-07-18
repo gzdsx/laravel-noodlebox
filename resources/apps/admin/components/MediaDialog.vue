@@ -242,7 +242,7 @@ export default {
             });
 
             this.uploading = true;
-            ApiService.post('/materials/upload', formData, {
+            ApiService.post('/materials', formData, {
                 timeout: 0,
                 headers: {'Content-type': 'multipart/form-data'},
                 onUploadProgress: evt => {
@@ -326,8 +326,8 @@ export default {
             this.fetchList();
         },
         fetchTypes() {
-            MaterialService.get('types').then(response => {
-                this.types = response.data;
+            MaterialService.get('options').then(response => {
+                this.types = response.data.types;
             });
         }
     },

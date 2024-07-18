@@ -7,11 +7,11 @@ const PostService = {
     get(id) {
         return ApiService.get('/posts/' + id);
     },
-    store(post) {
-        return ApiService.post('/posts', {post});
+    store(data) {
+        return ApiService.post('/posts', data);
     },
-    update(id, post) {
-        return ApiService.put('/posts/' + id, {post});
+    update(id, data) {
+        return ApiService.put('/posts/' + id, data);
     },
     batchDelete(ids) {
         return ApiService.delete('posts/batch', {data:{ids}});

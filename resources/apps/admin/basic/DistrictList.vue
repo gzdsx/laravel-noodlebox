@@ -121,7 +121,7 @@ export default {
             this.$router.push('/district/list?parent_id=' + id);
         },
         onShowEdit(d) {
-            this.district = d;
+            this.district = {...d};
             this.showDialog = true;
         },
         onShowAdd() {
@@ -139,7 +139,7 @@ export default {
             }
 
             if (district.id) {
-                ApiService.put('/districts/' + district.id, {district}).then(() => {
+                ApiService.put('/districts/' + district.id, district).then(() => {
                     this.fetchList();
                     this.district = {};
                     this.showDialog = false;
@@ -147,7 +147,7 @@ export default {
                 });
             } else {
                 district.parent_id = this.parent_id;
-                ApiService.post('/districts', {district}).then(() => {
+                ApiService.post('/districts', district).then(() => {
                     this.fetchList();
                     this.district = {};
                     this.showDialog = false;

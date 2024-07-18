@@ -397,7 +397,7 @@ var render = exports.render = function render() {
       staticClass: "text-safety-orange font-weight-bold"
     }, [_vm._v("\n                                Points: " + _vm._s(item.pointTotal) + "\n                            ")]) : _vm._e()]), _vm._v(" "), _c("div", {
       staticClass: "cart-item__price text-bull-cyan"
-    }, [_vm._v("€" + _vm._s(item.price))]), _vm._v(" "), item.purchase_via === "point" || item.purchase_via === "lottery" ? _c("div", {
+    }, [_vm._v("€" + _vm._s(item.price))]), _vm._v(" "), item.meta_data.purchase_via === "point" || item.meta_data.purchase_via === "lottery" ? _c("div", {
       staticClass: "cart-item__qty text-safety-orange"
     }, [_vm._v("\n                            " + _vm._s(item.quantity) + "\n                        ")]) : _c("div", {
       staticClass: "cart-item__qty"

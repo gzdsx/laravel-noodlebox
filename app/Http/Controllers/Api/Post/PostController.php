@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\Post;
 
 
-use App\Http\Controllers\Api\BaseController;
 use App\Traits\RestApis\PostApis;
+use App\Http\Controllers\Api\BaseController;
 
 class PostController extends BaseController
 {

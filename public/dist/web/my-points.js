@@ -97,8 +97,6 @@ var render = exports.render = function render() {
     staticClass: "text-safety-orange mb-4"
   }, [_vm._v("My Noodle Box Points: " + _vm._s(_vm.points.toLocaleString()))]), _vm._v(" "), _c("h5", {
     staticClass: "text-safety-orange"
-  }, [_vm._v("Ways to gain more points:")]), _vm._v(" "), _vm._m(0), _vm._v(" "), _c("h5", {
-    staticClass: "text-safety-orange"
   }, [_vm._v("Referral Link")]), _vm._v(" "), _c("div", {
     staticClass: "my-account-block"
   }, [_c("p", {
@@ -136,7 +134,7 @@ var render = exports.render = function render() {
     staticClass: "text-safety-orange mt-5"
   }, [_vm._v("Point Details")]), _vm._v(" "), _c("table", {
     staticClass: "list-table"
-  }, [_vm._m(1), _vm._v(" "), _vm._m(2), _vm._v(" "), _c("tbody", _vm._l(_vm.dataList, function (item, index) {
+  }, [_vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _c("tbody", _vm._l(_vm.dataList, function (item, index) {
     return _c("tr", {
       key: index
     }, [_c("td", {
@@ -167,12 +165,6 @@ var render = exports.render = function render() {
   })], 1)]);
 };
 var staticRenderFns = exports.staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
-  return _c("div", {
-    staticClass: "my-account-block"
-  }, [_c("p", [_vm._v("\n            On social media, share the exclusive referral links we provide for you (updated every 7 days), and earn\n            5\n            points for every recommended purchase! It’s very easy to get started. Just paste the referral link below\n            into your social media post. Be sure to briefly explain why you like our food or service. When your\n            friends\n            click the link and make a purchase, you will receive 30 points, which you can redeem for discounts on\n            future\n            purchases and enter our prize wheel/treasure chest. Thank you for helping us spread the word!\n        ")]), _vm._v(" "), _c("p", [_vm._v("You can check your points status in the (view points log).")])]);
-}, function () {
   var _vm = this,
     _c = _vm._self._c;
   return _c("colgroup", [_c("col", {

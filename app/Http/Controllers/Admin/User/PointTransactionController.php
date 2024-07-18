@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\User;
 
+use App\Models\UserPointTransaction;
 use App\Http\Controllers\Admin\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\UserPointTransaction;
 use Illuminate\Http\Request;
 
 class PointTransactionController extends BaseController

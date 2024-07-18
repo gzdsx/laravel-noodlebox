@@ -57,7 +57,7 @@ trait ProductApis
     public function store(Request $request, $id = null)
     {
         $product = DB::transaction(function () use ($request, $id) {
-            $newProduct = collect($request->input('product', []));
+            $newProduct = collect($request->all());
             $model = $this->repository()->findOrNew($id);
             $model->fill($newProduct->toArray());
             $model->save();
@@ -81,7 +81,7 @@ trait ProductApis
                     $model->images()->updateOrCreate(['id' => $v['id'] ?? 0], $v);
                 }
 
-                if (!$model->image){
+                if (!$model->image) {
                     if ($first = $images->first()) {
                         $model->image = $first['image'] ?? null;
                         $model->save();
@@ -114,20 +114,22 @@ trait ProductApis
         return json_success($product);
     }
 
+    public function update(Request $request, $id)
+    {
+        return $this->store($request, $id);
+    }
+
     /**
+     * @param $id
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
      */
-    public function batchDelete(Request $request)
+    public function destroy($id, Request $request)
     {
-        $ids = $request->input('ids');
-        if (is_array($ids)) {
-            $this->repository()->whereKey($ids)->get()->each->delete();
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
         } else {
-            if ($model = $this->repository()->find($request->input('ids'))) {
-                $model->delete();
-            }
+            $this->repository()->findOrFail($id)->delete();
         }
         return json_success();
     }

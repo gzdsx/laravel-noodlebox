@@ -1,16 +1,16 @@
 <template>
     <main-layout>
         <div class="d-flex" slot="header">
-            <h2 class="flex-grow-1">POS机管理</h2>
+            <h2 class="flex-grow-1">{{$t('pos_machines.title')}}</h2>
             <div>
-                <el-button type="primary" size="small" @click="onShowAdd">新增POS</el-button>
+                <el-button type="primary" size="small" @click="onShowAdd">{{$t('pos_machines.addnew')}}</el-button>
             </div>
         </div>
         <section class="page-section">
             <el-table :data="dataList" :loading="loading" @selection-change="onSelectionChange">
                 <el-table-column width="45" type="selection"/>
-                <el-table-column prop="name" label="名称"/>
-                <el-table-column prop="base_amount" width="200" label="底金"/>
+                <el-table-column prop="name" :label="$t('common.name')"/>
+                <el-table-column prop="base_amount" width="200" :label="$t('pos_machines.base_amount')"/>
                 <el-table-column width="100" label="Status">
                     <template slot-scope="scope">
                         <el-tag :type="scope.row.deliveryer ?'success':'danger'">{{
@@ -29,7 +29,7 @@
                     <el-button size="small" type="primary" :disabled="selectionIds.length===0" @click="onDelete">
                         {{ $t('common.batch_delete') }}
                     </el-button>
-                    <el-button size="small" type="info" @click="showSettlement=true">收银机结算</el-button>
+                    <el-button size="small" type="info" @click="showSettlement=true">{{$t('pos_machines.settlement')}}</el-button>
                 </div>
                 <el-pagination
                         background
@@ -41,22 +41,22 @@
                 />
             </div>
         </section>
-        <el-dialog title="编辑POS" closeable :visible.sync="showDialog" :close-on-click-modal="false"
+        <el-dialog title="Edit POS" closeable :visible.sync="showDialog" :close-on-click-modal="false"
                    :close-on-press-escape="false">
             <el-form size="medium" label-width="120px" style="width: 400px;">
-                <el-form-item label="名称">
+                <el-form-item :label="$t('pos_machines.name')">
                     <el-input v-model="model.name"/>
                 </el-form-item>
-                <el-form-item label="底金">
+                <el-form-item :label="$t('pos_machines.base_amount')">
                     <el-input v-model="model.base_amount"/>
                 </el-form-item>
-                <el-form-item label="状态">
+                <el-form-item :label="$t('common.status')">
                     <el-select v-model="model.status">
-                        <el-option label="使用中" value="inuse"/>
-                        <el-option label="空闲中" value="idle"/>
+                        <el-option :label="$t('pos_machines.statuses.inuse')" value="inuse"/>
+                        <el-option :label="$t('pos_machines.statuses.idle')" value="idle"/>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="前台收银机">
+                <el-form-item :label="$t('pos_machines.use_as_cashier')">
                     <el-switch v-model="model.is_cashier" :inactive-value="0" :active-value="1"/>
                 </el-form-item>
                 <el-form-item>
@@ -120,14 +120,14 @@ export default {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
-                    this.$message.success('资料已更新');
+                    this.$message.success('Pos Updated!');
                 });
             } else {
                 ApiService.post('/pos-machines', model).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
-                    this.$message.success('信息保存成功');
+                    this.$message.success('Pos Saved!');
                 });
             }
         },

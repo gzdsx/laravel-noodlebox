@@ -12,7 +12,6 @@
                         <h3 class="my-name">{{$my->nickname}}</h3>
                         <div class="d-flex justify-content-between">
                             <span>{{'ID:'.$my->id}}</span>
-                            <a href="{{url('logout')}}">Logout</a>
                         </div>
                     </div>
                 </div>

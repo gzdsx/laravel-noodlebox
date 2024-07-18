@@ -1,42 +1,73 @@
 <template>
     <main-layout>
         <div class="d-flex" slot="header">
-            <h2 class="flex-grow-1">订单管理</h2>
+            <h2 class="flex-grow-1">{{ $t('order.manage') }}</h2>
         </div>
 
         <div class="page-section">
-            <div class="dsxui-form-inline">
-                <div class="form-item">
-                    <div class="form-item-label">订单编号</div>
-                    <el-input size="medium" class="w200" v-model="params.order_no"/>
-                </div>
-                <div class="form-item">
-                    <div class="form-item-label">买家账号</div>
-                    <el-input size="medium" class="w200" v-model="params.buyer_name"/>
-                </div>
-                <div class="form-item">
-                    <div class="form-item-label">商品名称</div>
-                    <el-input size="medium" class="w200" v-model="params.title"/>
-                </div>
-                <div class="form-item">
-                    <el-button size="medium" type="primary" @click="onSearch">查询</el-button>
-                </div>
-            </div>
+            <el-form :inline="true" size="medium" label-width="80px">
+                <el-form-item :label="$t('order.no')">
+                    <el-input class="w200" v-model="params.order_no"/>
+                </el-form-item>
+                <el-form-item label="Deliveryer">
+                    <el-select v-model="params.deliveryer" clearable>
+                        <el-option
+                            v-for="item in deliveryerList"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="CreatedV">
+                    <el-select v-model="params.created_via" clearable>
+                        <el-option
+                            v-for="item in ['checkout', 'app','pos']"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="PaymentM">
+                    <el-select v-model="params.payment_method" clearable>
+                        <el-option label="Online" value="Online"/>
+                        <el-option label="card" value="Card"/>
+                        <el-option label="cash" value="Cash"/>
+                        <el-option label="customize" value="Customize"/>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="Date">
+                    <el-date-picker
+                        class="w200"
+                        type="date"
+                        format="yyyy-MM-dd"
+                        value-format="yyyy-MM-dd"
+                        v-model="params.date"
+                        clearable
+                    />
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="onSearch">{{ $t('common.search') }}</el-button>
+                    <el-button @click="clearSearch">Clear</el-button>
+                </el-form-item>
+            </el-form>
         </div>
-        <div class="page-section">
+
+        <div class="page-section" v-loading="loading">
             <div class="table-edit-header">
                 <el-tabs @tab-click="onClickTab" value="all">
-                    <el-tab-pane label="全部" name="all"/>
-                    <el-tab-pane label="待付款" name="pending"/>
-                    <el-tab-pane label="处理中" name="processing"/>
-                    <el-tab-pane label="配送中" name="deliverying"/>
-                    <el-tab-pane label="已完成" name="completed"/>
-                    <el-tab-pane label="已取消" name="canceled"/>
+                    <el-tab-pane :label="$t('common.all')" name="all"/>
+                    <el-tab-pane :label="$t('order.status_options.pending')" name="pending"/>
+                    <el-tab-pane :label="$t('order.status_options.processing')" name="processing"/>
+                    <el-tab-pane :label="$t('order.status_options.delivering')" name="deliverying"/>
+                    <el-tab-pane :label="$t('order.status_options.completed')" name="completed"/>
+                    <el-tab-pane :label="$t('order.status_options.cancelled')" name="canceled"/>
                 </el-tabs>
             </div>
-            <el-table :data="dataList" v-loading="loading" @selection-change="onSelectionChange">
+            <el-table :data="dataList" @selection-change="onSelectionChange">
                 <el-table-column width="45" type="selection"/>
-                <el-table-column width="auto" label="Order">
+                <el-table-column width="200" label="Order">
                     <template slot-scope="scope">
                         <div class="post-column-title">
                             <router-link :to="'/order/detail/' + scope.row.id" target="_blank">
@@ -54,10 +85,11 @@
                 </el-table-column>
                 <el-table-column label="Ship to" width="200">
                     <template slot-scope="scope">
-                        <div style="line-height: 1.1"><small>{{ formatAddress(scope.row.shipping) }}</small></div>
+                        <div style="line-height: 1.1">
+                            <small>{{ formatAddress(scope.row.shipping) }}</small>
+                        </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="Status" width="100" prop="status"/>
                 <el-table-column label="Date" width="170" prop="created_at"/>
                 <el-table-column label="Driver" width="100" prop="driver">
                     <template slot-scope="scope">
@@ -68,24 +100,36 @@
                         <div><strong>{{ scope.row.short_code }}</strong></div>
                     </template>
                 </el-table-column>
-                <el-table-column label="Shipping M" width="100" prop="shipping_method">
+                <el-table-column width="120" label="Status">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.shipping_line">
+                        <el-tag type="success" v-if="scope.row.status==='completed'">{{ scope.row.status|capitalize }}
+                        </el-tag>
+                        <el-tag type="danger" v-else>{{ scope.row.status|capitalize }}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="ShippingM" width="100" prop="shipping_method">
+                    <template slot-scope="scope">
+                        <div v-if="scope.row.shipping_line.method_id=='flat_rate'">
                             <div>{{ scope.row.shipping_line.method_title }}</div>
-                            <small>{{ scope.row.shipping_line.zone_title}}</small>
+                            <small>{{ scope.row.shipping_line.zone_title }}</small>
+                        </div>
+                        <div v-else>
+                            Collection
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="Total" width="80">
+                <el-table-column label="Total" width="80" fixed="right">
                     <template slot-scope="scope">
-                        {{ '€' + scope.row.total }}
+                        <div>{{ '€' + scope.row.total }}</div>
+                        <small class="text-danger">{{ scope.row.payment_method | capitalize }}</small>
                     </template>
                 </el-table-column>
-                <el-table-column label="Created Via" width="100" prop="created_via"/>
-                <el-table-column label="Actions" width="100" align="right" fixed="right">
+                <el-table-column label="CreatedV" width="90" prop="created_via" fixed="right"/>
+                <el-table-column label="Actions" width="90" align="right" fixed="right">
                     <template slot-scope="scope">
                         <div>
-                            <el-button size="mini" type="text" @click="onDispose(scope.row)">处理订单</el-button>
+                            <el-button size="mini" type="text" @click="onDispose(scope.row)">{{ $t('order.dispose') }}
+                            </el-button>
                         </div>
                         <div>
                             <el-button size="mini" type="text" @click="onPrint(scope.row)">Print</el-button>
@@ -94,24 +138,30 @@
                 </el-table-column>
             </el-table>
             <div class="table-edit-footer">
-                <el-button size="small" type="primary" :disabled="selectionIds.length===0" @click="onBatchDelete">
-                    批量删除
+                <el-button
+                    size="small"
+                    type="primary"
+                    :disabled="selectionIds.length===0"
+                    @click="onBatchDelete"
+                    v-if="userInfo.capability==='administrator'"
+                >
+                    {{ $t('common.batch_delete') }}
                 </el-button>
                 <div class="flex"></div>
                 <el-pagination
-                        background
-                        layout="prev, pager, next, total"
-                        :total="total"
-                        :page-size="pageSize"
-                        :current-page="page"
-                        @current-change="onPageChange"
+                    background
+                    layout="prev, pager, next, total"
+                    :total="total"
+                    :page-size="pageSize"
+                    :current-page="page"
+                    @current-change="onPageChange"
                 />
             </div>
         </div>
         <dialog-dispose-order
-                :order="currentOrder"
-                @update="fetchList"
-                v-model="showOrderDialog"
+            :order="currentOrder"
+            @update="fetchList"
+            v-model="showOrderDialog"
         />
     </main-layout>
 </template>
@@ -127,18 +177,27 @@ export default {
     mixins: [Pagination],
     data() {
         return {
+            pageSize: 40,
             params: {
                 order_no: '',
                 buyer_name: '',
-                status: 'all'
+                status: 'all',
+                date: '',
+                deliveryer: '',
             },
             showOrderDialog: false,
             currentOrder: {},
             invoceLink: '',
-            interval: null
+            interval: null,
+            dateRange: [],
+            deliveryerList: []
         }
     },
-
+    computed: {
+        userInfo() {
+            return this.$store.state.userInfo;
+        },
+    },
     methods: {
         listApi() {
             return '/orders';
@@ -154,12 +213,12 @@ export default {
             this.deleteOrders([id]);
         },
         deleteOrders(ids) {
-            this.$confirm('此操作将永久删除所选订单, 是否继续?', '提示', {
+            this.$confirm(this.$t('common.delete_tips'), this.$t('common.delete_confirm'), {
                 type: 'warning'
             }).then(() => {
                 this.loading = true;
                 ApiService.delete('/orders/batch', {data: {ids}}).then(() => {
-                    this.fetchList();
+                    this.dataList = this.dataList.filter(it => !ids.includes(it.id));
                 }).catch(reason => {
                     this.$message.error(reason.message);
                 }).finally(() => {
@@ -199,10 +258,10 @@ export default {
                 addressline += ',' + address.postalcode;
             }
 
-            return addressline;
+            return address.formatted_address;
         },
         onPrint(order) {
-            this.$confirm('是否打印订单?', '提示', {
+            this.$confirm(this.$t('order.print_confirm'), this.$t('common.delete_confirm'), {
                 type: 'warning'
             }).then(() => {
                 ApiService.get('/orders/' + order.id + '/print').then(response => {
@@ -213,10 +272,27 @@ export default {
             }).catch(() => {
 
             });
+        },
+        fetchDeliveryerList() {
+            ApiService.get('/deliveryers?limit=100').then(response => {
+                this.deliveryerList = response.data.items;
+            }).catch(reason => {
+                this.$message.error(reason.message);
+            });
+        },
+        clearSearch() {
+            this.params = {
+                order_no: '',
+                buyer_name: '',
+                status: 'all',
+                date: '',
+                deliveryer: '',
+            };
         }
     },
     mounted() {
         this.fetchList();
+        this.fetchDeliveryerList();
         this.interval = setInterval(() => {
             this.fetchList();
         }, 60000);

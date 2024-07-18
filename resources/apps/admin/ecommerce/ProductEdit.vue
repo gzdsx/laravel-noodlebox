@@ -1,13 +1,13 @@
 <template>
     <main-layout>
         <div class="d-flex" slot="header">
-            <h2 class="header-left">编辑产品</h2>
+            <h2 class="header-left">{{ $t('product.edit') }}</h2>
             <div class="header-right">
                 <a :href="product.url" target="_blank" v-if="product.id">
-                    <el-button size="small">{{ $t('post.preview') }}</el-button>
+                    <el-button size="small">{{ $t('common.preview') }}</el-button>
                 </a>
                 <router-link to="/product/new">
-                    <el-button size="small" type="primary">添加产品</el-button>
+                    <el-button size="small" type="primary">{{ $t('product.add') }}</el-button>
                 </router-link>
             </div>
         </div>
@@ -17,10 +17,10 @@
                 <el-form size="medium" label-width="100px">
                     <div class="post-card">
                         <div class="post-card-header">
-                            <h2>产品信息</h2>
+                            <h2>{{ $t('product.infomation') }}</h2>
                         </div>
                         <div class="post-card-body">
-                            <el-form-item label="商品图片">
+                            <el-form-item :label="$t('product.images')">
                                 <vuedraggable class="dsxui-uploader" v-model="images" draggable=".draggable">
                                     <div class="dsxui-uploader-item draggable"
                                          v-for="(img,idx) in images"
@@ -34,9 +34,9 @@
                                         <i class="el-icon-plus dsxui-uploader-icon"></i>
                                     </div>
                                 </vuedraggable>
-                                <p>建议尺寸：800*800像素，拖拽图片可以调整顺序，最多上传5张。</p>
+                                <p>{{ $t('product.images_tips') }}</p>
                             </el-form-item>
-                            <el-form-item label="产品名称">
+                            <el-form-item :label="$t('product.name')">
                                 <el-input type="text" v-model="product.title"/>
                             </el-form-item>
                             <el-form-item :label="$t('common.url')">
@@ -44,13 +44,13 @@
                                     <span slot="prepend">{{ siteUrl }}/product/</span>
                                 </el-input>
                             </el-form-item>
-                            <el-form-item label="关键词">
+                            <el-form-item :label="$t('common.keywords')">
                                 <el-input type="text" v-model="product.keywords"/>
                             </el-form-item>
-                            <el-form-item label="简短描述">
+                            <el-form-item :label="$t('product.description')">
                                 <wang-editor v-model="product.description" height="200" ref="description"/>
                             </el-form-item>
-                            <el-form-item label="徽章">
+                            <el-form-item :label="$t('product.badge')">
                                 <div class="badges-wrapper">
                                     <div class="badge-item" v-for="(badge,idx) in meta_data.badges" :key="idx">
                                         <img :src="badge" alt="">
@@ -61,28 +61,28 @@
                                     </div>
                                 </div>
                             </el-form-item>
-                            <el-form-item label="新品">
+                            <el-form-item :label="$t('product.new')">
                                 <el-switch
                                     v-model="product.is_new"
                                     :active-value="1"
                                     :inactive-value="0"
                                 />
                             </el-form-item>
-                            <el-form-item label="热销商品">
+                            <el-form-item :label="$t('product.hot')">
                                 <el-switch
                                     v-model="product.is_hot"
                                     :active-value="1"
                                     :inactive-value="0"
                                 />
                             </el-form-item>
-                            <el-form-item label="积分换购">
+                            <el-form-item :label="$t('product.purchase_via_points')">
                                 <el-switch
                                     v-model="product.allow_point_purchase"
                                     :active-value="1"
                                     :inactive-value="0"
                                 />
                             </el-form-item>
-                            <el-form-item label="积分价格">
+                            <el-form-item :label="$t('product.point_price')">
                                 <el-input type="number" class="w200" v-model="product.point_price" :min="0"
                                           :max="99999999"/>
                             </el-form-item>
@@ -91,24 +91,24 @@
 
                     <div class="post-card">
                         <div class="post-card-header">
-                            <h2>型号价格与库存</h2>
+                            <h2>{{ $t('product.model_price_inventory') }}</h2>
                         </div>
                         <div class="post-card-body">
-                            <el-form-item label="价格与库存" v-if="product.has_sku_attr">
+                            <el-form-item :label="$t('shop.price_inventory')" v-if="product.has_sku_attr">
                                 <sku-panel
-                                        @change="onSkuChange"
+                                    @change="onSkuChange"
                                 />
                             </el-form-item>
                             <div v-else>
-                                <el-form-item label="一口价">
+                                <el-form-item :label="$t('product.buyout_price')">
                                     <el-input type="text" class="w200" v-model="product.price" :min="0"
                                               :max="99999999"/>
                                 </el-form-item>
-                                <el-form-item label="正常价">
+                                <el-form-item :label="$t('product.regular_price')">
                                     <el-input type="text" class="w200" v-model="product.regular_price" :min="0"
                                               :max="99999999"/>
                                 </el-form-item>
-                                <el-form-item label="库存数量">
+                                <el-form-item :label="$t('product.inventory')">
                                     <el-input type="number" class="w200" v-model="product.stock" :min="0"
                                               :max="9999999"/>
                                 </el-form-item>
@@ -118,7 +118,7 @@
 
                     <div class="post-card">
                         <div class="post-card-header">
-                            <h2>变量和价格</h2>
+                            <h2>{{ $t('product.variation_and_price') }}</h2>
                         </div>
                         <div class="post-card-body">
                             <variation-panel v-model="product.variation_list"/>
@@ -127,7 +127,7 @@
 
                     <div class="post-card">
                         <div class="post-card-header">
-                            <h2>附加选项(多选)</h2>
+                            <h2>{{ $t('product.additional_options') }}</h2>
                         </div>
                         <div class="post-card-body">
                             <addition-options-panel :additional-options="product.additional_options"/>
@@ -136,7 +136,7 @@
 
                     <div class="post-card">
                         <div class="post-card-header">
-                            <h2>宝贝详情</h2>
+                            <h2>{{ $t('product.detail') }}</h2>
                         </div>
                         <div class="post-card-body">
                             <wang-editor v-model="content.content" ref="editor"/>
@@ -147,7 +147,7 @@
             <div class="post-body-box">
                 <div class="post-card">
                     <div class="post-card-header">
-                        <h2>{{ $t('post.category') }}</h2>
+                        <h2>{{ $t('product.category') }}</h2>
                     </div>
                     <div class="post-card-body">
                         <div class="category-box">
@@ -160,7 +160,7 @@
 
                 <div class="post-card">
                     <div class="post-card-header">
-                        <h2>{{ $t('post.featured_image') }}</h2>
+                        <h2>{{ $t('common.featured_image') }}</h2>
                     </div>
                     <div class="post-card-body">
                         <div class="feature-image-box" @click="selectFeatureImage">
@@ -171,48 +171,48 @@
 
                 <div class="post-card">
                     <div class="post-card-header">
-                        <h2>其他属性</h2>
+                        <h2>{{ $t('product.attributes') }}</h2>
                     </div>
                     <div class="post-card-body">
-                        <div class="form-label">关联门店</div>
+                        <div class="form-label">{{ $t('product.related_shop') }}</div>
                         <el-select size="medium" class="w-100" v-model="product.shop_id" placeholder="请选择">
                             <el-option
-                                    v-for="(shop,index) in shopList"
-                                    :key="index"
-                                    :label="shop.name"
-                                    :value="shop.id"
+                                v-for="(shop,index) in shopList"
+                                :key="index"
+                                :label="shop.name"
+                                :value="shop.id"
                             />
                         </el-select>
-                        <div class="form-label">产品销量</div>
+                        <div class="form-label">{{ $t('product.sales') }}</div>
                         <el-input type="text" size="medium" v-model="product.sold" :min="0" :max="99999999"/>
-                        <div class="form-label">产品积分</div>
+                        <div class="form-label">{{ $t('product.points') }}</div>
                         <el-input type="text" size="medium" v-model="product.points" :min="0" :max="99999999"/>
-                        <div class="form-label">显示顺序</div>
+                        <div class="form-label">{{ $t('product.sort_num') }}</div>
                         <el-input type="text" size="medium" v-model="product.sort_num" :min="0" :max="99999999"/>
-                        <div class="form-label">辣度</div>
-                        <el-select v-model="meta_data.spicy" class="w-100" size="medium" placeholder="请选择" clearable>
+                        <div class="form-label">{{ $t('product.spicy') }}</div>
+                        <el-select v-model="meta_data.spicy" class="w-100" size="medium" clearable>
                             <el-option
-                                    v-for="(item,index) in [
-                                        {label:'不辣',value:''},
-                                        {label:'微辣',value:'slightly'},
-                                        {label:'中辣',value:'medium'},
-                                        {label:'超辣',value:'super'},
+                                v-for="(item,index) in [
+                                        {label:$t('product.spicies.none'),value:''},
+                                        {label:$t('product.spicies.slightly'),value:'slightly'},
+                                        {label:$t('product.spicies.medium'),value:'medium'},
+                                        {label:$t('product.spicies.super'),value:'super'},
                                     ]"
-                                    :key="index"
-                                    :label="item.label"
-                                    :value="item.value"
+                                :key="index"
+                                :label="item.label"
+                                :value="item.value"
                             />
                         </el-select>
-                        <div class="form-label">图标</div>
+                        <div class="form-label">{{$t('product.icon')}}</div>
                         <el-select v-model="product.icon" class="w-100" size="medium" placeholder="请选择" clearable>
                             <el-option
-                                    v-for="(item,index) in [
+                                v-for="(item,index) in [
                                         {label:'New',value:'new'},
                                         {label:'Hot',value:'hot'},
                                     ]"
-                                    :key="index"
-                                    :label="item.label"
-                                    :value="item.value"
+                                :key="index"
+                                :label="item.label"
+                                :value="item.value"
                             />
                         </el-select>
                     </div>
@@ -221,8 +221,8 @@
         </section>
 
         <fixed-bottom>
-            <el-button @click="onSubmit('draft')">放入仓库</el-button>
-            <el-button type="primary" @click="onSubmit('onsale')">上架出售</el-button>
+            <el-button @click="onSubmit('draft')">{{$t('product.save_as_draft')}}</el-button>
+            <el-button type="primary" @click="onSubmit('onsale')">{{ $t('product.save_as_sale')}}</el-button>
         </fixed-bottom>
         <media-dialog v-model="showMediaDialog" :multiple="multipleMedia" :max-count="maxImageCount"
                       @confirm="selectedMedia"/>
@@ -236,9 +236,8 @@ import ProductService from "../utils/ProductService";
 import CategoryService from "../utils/CategoryService";
 import ShopService from "../utils/ShopService";
 import ApiService from "../utils/ApiService";
-import CategoryCheckboxList from "../components/CategoryCheckboxList.vue";
+import CategoryCheckboxList from "../category/CategoryCheckboxList.vue";
 import VariationPanel from "./VariationPanel.vue";
-import variationList from "./VariationList.vue";
 import AdditionOptionsPanel from "./AdditionOptionsPanel.vue";
 import BadgePanel from "../components/BadgePanel.vue";
 
@@ -420,7 +419,7 @@ export default {
             if (product.id) {
                 ProductService.updateProduct(product.id, product).then(() => {
                     this.$message.success('产品已更新');
-                    //this.$router.history.go(0);
+                    this.$router.history.go(0);
                 }).catch(reason => {
                     this.$message.error(reason.message);
                 }).finally(() => {

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 
 class DeliveryerSettlement extends Command
 {
@@ -39,11 +40,11 @@ class DeliveryerSettlement extends Command
     {
         $deliveryers = \App\Models\Deliveryer::all();
         foreach ($deliveryers as $deliveryer) {
-            $orders = $deliveryer->orders;
-            $base_amount = 0;
-            foreach ($deliveryer->posMachines as $posMachine) {
-                $base_amount += $posMachine->base_amount;
-            }
+
+            $base_amount = $deliveryer->base_amount;
+//            foreach ($deliveryer->posMachines as $posMachine) {
+//                $base_amount += $posMachine->base_amount;
+//            }
 
             $shipping_total = 0;
             $cash_total = 0;
@@ -51,6 +52,9 @@ class DeliveryerSettlement extends Command
             $card_total = 0;
             $cost_total = 0;
 
+            $time_start = Carbon::createFromTimeString(settings('opening_hours_start'))->subDay();
+            $time_end = Carbon::createFromTimeString(settings('opening_hours_end'));
+            $orders = $deliveryer->orders()->whereBetween('created_at', [$time_start, $time_end])->get();
             foreach ($orders as $order) {
                 $shipping_total += $order->shipping_total;
                 if ($order->payment_method == 'cash') {
@@ -77,8 +81,7 @@ class DeliveryerSettlement extends Command
             $transaction->online_total = $online_total;
             $transaction->card_total = $card_total;
             $transaction->cost_total = $cost_total;
-            $transaction->total = ($base_amount + $cash_total + $cost_total) - $shipping_total;
-            $transaction->notes = 'Settled at ' . now()->format('Y-m-d');
+            $transaction->total = ($cash_total + $cost_total) - $shipping_total;
             $transaction->save();
         }
 

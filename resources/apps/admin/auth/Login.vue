@@ -1,11 +1,11 @@
 <template>
     <div class="admin-login">
         <div class="form-wrapper">
-            <h1 class="form-header">{{ $t('login.system_login') }}</h1>
+            <h1 class="form-header">{{ messages['system_login'] }}</h1>
             <el-form>
                 <el-form-item>
                     <el-input
-                        :placeholder="$t('login.account_tips')"
+                        :placeholder="messages['account_tips']"
                         v-model="account"
                     >
                         <div class="svg" slot="prepend">
@@ -19,7 +19,7 @@
                 </el-form-item>
                 <el-form-item>
                     <el-input
-                        :placeholder="$t('login.password_tips')"
+                        :placeholder="messages['password_tips']"
                         v-model="password"
                         type="password"
                     >
@@ -33,7 +33,10 @@
                     </el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button class="w-100" type="primary" @click="submit">{{ $t('login.login') }}</el-button>
+                    <el-button :loading="loading" class="w-100" type="primary" @click="submit">{{
+                            messages['login']
+                        }}
+                    </el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -49,32 +52,36 @@ export default {
     data() {
         return {
             account: '',
-            password: ''
+            password: '',
+            loading: false,
+            messages
         }
     },
     methods: {
         submit() {
             const {account, password} = this;
             if (!account) {
-                this.$message.error(this.$t('login.please enter account'));
+                this.$message.error(this.messages['please enter account']);
                 return false;
             }
 
             if (!password) {
-                this.$message.error(this.$t('login.please enter password'));
+                this.$message.error(this.messages['please enter password']);
                 return false;
             }
 
+            this.loading = true;
             ApiService.post('/login', {account, password}).then(response => {
-                const {access_token} = response.data;
+                const {access_token, capability} = response.data;
                 if (access_token) {
                     AuthService.updateToken(access_token);
-                    this.$router.replace('/');
+                    // this.$router.replace('/');
+                    window.location.replace('/vue-admin/');
                 }
             }).catch(reason => {
                 this.$message.error(reason.message);
             }).finally(() => {
-
+                this.loading = false;
             });
         }
     }
@@ -82,5 +89,7 @@ export default {
 </script>
 
 <style scoped>
-
+html, body {
+    background-color: #2E3A4D;
+}
 </style>

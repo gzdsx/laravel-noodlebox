@@ -1,9 +1,9 @@
 <template>
     <main-layout>
         <div class="d-flex" slot="header">
-            <h2 class="header-left">照片墙</h2>
+            <h2 class="header-left">{{$t('photo_wall.page_title')}}</h2>
             <div class="header-right">
-                <el-button type="primary" size="small" @click="showDialog=true">添加照片</el-button>
+                <el-button type="primary" size="small" @click="showDialog=true">{{$t('photo_wall.addnew')}}</el-button>
             </div>
         </div>
         <section class="page-section">

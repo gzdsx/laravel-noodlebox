@@ -20,9 +20,13 @@ export default {
     name: "CheckoutUsePoints",
     props: {
         subtotal: {
-            type: Number|String,
+            type: Number | String,
             default: 0
         },
+        defaultPoints: {
+            type: Number | String,
+            default: 0
+        }
     },
     data() {
         return {
@@ -33,18 +37,24 @@ export default {
             }
         }
     },
+    watch: {
+        defaultPoints(val) {
+            this.points = val;
+        }
+    },
     methods: {
         handleSubmit() {
-            let {subtotal, points} = this;
-            HttpClient.post('/checkout/use-points', {subtotal, points}).then((response) => {
-                this.points = response.data.points;
-                this.$emit('change', {
-                    points: response.data.points,
-                    points_total: response.data.points_total
-                });
-            }).catch((error) => {
-                console.log(error.message);
-            });
+            // let {subtotal, points} = this;
+            // HttpClient.post('/checkout/use-points', {subtotal, points}).then((response) => {
+            //     this.points = response.data.points;
+            //     this.$emit('change', {
+            //         points: response.data.points,
+            //         points_total: response.data.points_total
+            //     });
+            // }).catch((error) => {
+            //     console.log(error.message);
+            // });
+            this.$emit('submit', this.points);
         },
         fetchPointsAccount() {
             HttpClient.get('/my/points').then((response) => {

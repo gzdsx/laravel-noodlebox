@@ -1,6 +1,6 @@
 <template>
     <el-dialog
-            title="收银机结算"
+            :title="$t('transaction.cashier_settlement')"
             width="75%"
             :visible="value"
             :close-on-click-modal="false"
@@ -10,17 +10,17 @@
             @close="$emit('input', false)"
     >
         <el-descriptions title="" direction="vertical" :column="4" border>
-            <el-descriptions-item label="底金">{{ settlement.pos_base_amount }}</el-descriptions-item>
-            <el-descriptions-item label="配送费">{{ settlement.shipping_total }}</el-descriptions-item>
-            <el-descriptions-item label="现金支付">{{ settlement.cash_total }}</el-descriptions-item>
-            <el-descriptions-item label="在线支付">{{ settlement.online_total }}</el-descriptions-item>
-            <el-descriptions-item label="卡支付">{{ settlement.card_total }}</el-descriptions-item>
-            <el-descriptions-item label="总计收入">{{ settlement.total }}</el-descriptions-item>
-            <el-descriptions-item label="退款">{{ settlement.refund_total }}</el-descriptions-item>
-            <el-descriptions-item label="实际现金收入">{{ settlement.cash_profit_total }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.base_amount')">{{ settlement.pos_base_amount }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.shipping_total')">{{ settlement.shipping_total }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.cash_total')">{{ settlement.cash_total }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.online_total')">{{ settlement.online_total }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.card_total')">{{ settlement.card_total }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.total')">{{ settlement.total }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.refund_total')">{{ settlement.refund_total }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.cash_profit_total')">{{ settlement.cash_profit_total }}</el-descriptions-item>
         </el-descriptions>
         <el-form size="medium" label-position="top" style="margin-top:20px;">
-            <el-form-item label="备注">
+            <el-form-item :label="$t('transaction.notes')">
                 <el-input v-model="notes" type="textarea" rows="3" class="w500" placeholder=""/>
             </el-form-item>
             <el-form-item>
@@ -75,7 +75,7 @@ export default {
             ApiService.post('/cashier/transactions', {
                 notes: this.notes
             }).then(() => {
-                this.$message.success('结算成功');
+                this.$message.success('Settlement success');
                 this.$emit('input', false);
             });
         },

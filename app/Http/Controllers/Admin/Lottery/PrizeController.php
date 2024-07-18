@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Lottery;
 
+use App\Models\LotteryPrize;
 use App\Http\Controllers\Admin\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\LotteryPrize;
 use Illuminate\Http\Request;
 
 class PrizeController extends BaseController
@@ -22,7 +22,7 @@ class PrizeController extends BaseController
     {
         $query = $this->repository();
         return json_success([
-            'count' => $query->count(),
+            'total' => $query->count(),
             'items' => $query->offset($request->input('offset', 0))
                 ->limit($request->input('limit', 20))
                 ->get()
@@ -52,20 +52,24 @@ class PrizeController extends BaseController
         return json_success($model);
     }
 
+    public function update(Request $request, $id)
+    {
+        return $this->store($request, $id);
+    }
+
     public function batchUpdate(Request $request)
     {
         $this->repository()->whereKey($request->input('ids', []))->update($request->input('data', []));
         return json_success();
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function batchDestroy(Request $request)
+    public function destroy($id, Request $request)
     {
-        $ids = $request->input('ids', []);
-        $this->repository()->whereKey($ids)->delete();
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->delete();
+        } else {
+            $this->repository()->findOrFail($id)->delete();
+        }
         return json_success();
     }
 }

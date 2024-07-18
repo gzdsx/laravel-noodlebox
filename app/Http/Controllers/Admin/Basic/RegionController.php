@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Basic;
 
+use App\Models\Region;
 use App\Http\Controllers\Admin\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\Region;
 use Illuminate\Http\Request;
 
 class RegionController extends BaseController

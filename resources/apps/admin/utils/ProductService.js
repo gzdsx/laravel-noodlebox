@@ -7,11 +7,11 @@ const ProductService = {
     getProduct(id) {
         return ApiService.get('/products/' + id);
     },
-    storeProduct(product) {
-        return ApiService.post('/products', {product});
+    storeProduct(data) {
+        return ApiService.post('/products', data);
     },
-    updateProduct(id, product) {
-        return ApiService.put('/products/' + id, {product});
+    updateProduct(id, data) {
+        return ApiService.put('/products/' + id, data);
     },
     deleteProducts(ids) {
         return ApiService.delete('/products/batch', {data: {ids}});

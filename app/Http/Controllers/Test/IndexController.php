@@ -2,28 +2,11 @@
 
 namespace App\Http\Controllers\Test;
 
-use App\Events\OrderChanged;
-use App\Events\OrderCreated;
+use App\Jobs\DownloadProductImage;
+use App\Models\Product;
 use App\Http\Controllers\Controller;
-use App\Jobs\SyncUsers;
-use App\Mail\TestMail;
-use App\Models\DeliveryerTransaction;
-use App\Models\Order;
-use App\Models\User;
-use App\Models\UserAddress;
-use App\Support\BulkSMS;
-use App\Support\PrintNode;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Str;
-use Srmklive\PayPal\Facades\PayPal;
 
 class IndexController extends Controller
 {
@@ -34,7 +17,10 @@ class IndexController extends Controller
         //return Carbon::createFromTimeString($time_start)->subDay()->toDateTimeString();
 
         //User::whereKey(1000000)->update(['password'=>bcrypt('12341234')]);
-        dd(settings());
+
+       $product = Product::where('image', 'like', '%noodlebox.ie%')->first();
+
+       $this->dispatchSync(new DownloadProductImage($product));
     }
 
     function generateCombinations($options)

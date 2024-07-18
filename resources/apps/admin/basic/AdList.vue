@@ -23,17 +23,19 @@
                 </el-table-column>
             </el-table>
             <div class="tablenav-bottom">
-                <el-button size="small" type="primary" :disabled="selectionIds.length===0" @click="onDelete">
-                    {{ $t('common.batch_delete') }}
-                </el-button>
-                <el-button size="small" :disabled="selectionIds.length===0"
-                           @click="onBatchUpdate({available:1})">
-                    {{ $t('common.activate') }}
-                </el-button>
-                <el-button size="small" :disabled="selectionIds.length===0"
-                           @click="onBatchUpdate({available:0})">
-                    {{ $t('common.deactivate') }}
-                </el-button>
+                <div class="tablenav-actions">
+                    <el-button size="small" type="primary" :disabled="selectionIds.length===0" @click="onDelete">
+                        {{ $t('common.batch_delete') }}
+                    </el-button>
+                    <el-button size="small" :disabled="selectionIds.length===0"
+                               @click="onBatchUpdate({available:1})">
+                        {{ $t('common.activate') }}
+                    </el-button>
+                    <el-button size="small" :disabled="selectionIds.length===0"
+                               @click="onBatchUpdate({available:0})">
+                        {{ $t('common.deactivate') }}
+                    </el-button>
+                </div>
             </div>
         </section>
 
@@ -137,14 +139,14 @@ export default {
             }
 
             if (ad.id) {
-                ApiService.put('/ads/' + ad.id, {ad}).then(() => {
+                ApiService.put('/ads/' + ad.id, ad).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
                     this.$message.success(this.$t('ad.updated'));
                 });
             } else {
-                ApiService.post('/ads', {ad}).then(() => {
+                ApiService.post('/ads', ad).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
@@ -157,7 +159,7 @@ export default {
             this.showDialog = true;
         },
         onShowEdit(d) {
-            this.ad = d;
+            this.ad = {...d};
             if (this.ad.data === null) {
                 this.ad.data = {};
             }
@@ -170,6 +172,9 @@ export default {
             let ids = this.selectionIds.map((d) => d.id);
             ApiService.put('/ads/batch', {ids, data}).then(() => {
                 this.fetchList();
+                this.$message.success(this.$t('common.updated'));
+            }).catch((reason) => {
+                this.$message.error(reason.message);
             });
         },
     },

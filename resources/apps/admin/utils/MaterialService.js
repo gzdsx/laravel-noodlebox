@@ -7,8 +7,8 @@ const MaterialService = {
     get(id) {
         return ApiService.get('/materials/' + id);
     },
-    update(id, material) {
-        return ApiService.put('/materials/' + id, {material});
+    update(id, data) {
+        return ApiService.put('/materials/' + id, data);
     },
     batchDelete(ids) {
         return ApiService.delete('/materials/batch', {data: {ids}});

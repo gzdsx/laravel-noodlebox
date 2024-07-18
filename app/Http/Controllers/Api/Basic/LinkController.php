@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\Basic;
 
-use App\Http\Controllers\Api\BaseController;
 use App\Models\Link;
+use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 
 class LinkController extends BaseController

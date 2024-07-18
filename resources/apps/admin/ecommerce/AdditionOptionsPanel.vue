@@ -4,9 +4,9 @@
             <div v-if="additionalOptions.length">
                 <div class="variation-list">
                     <div class="variation-list__item">
-                        <div class="col-label">选项名称</div>
-                        <div class="col-price">价格</div>
-                        <div class="col-price">默认选择</div>
+                        <div class="col-label">{{$t('variations.option_name')}}</div>
+                        <div class="col-price">{{$t('variations.price')}}</div>
+                        <div class="col-price">{{$t('variations.default_select')}}</div>
                     </div>
                     <vuedraggable class="variation-list__sortable" v-model="additionalOptions" draggable=".draggable"
                                   handle=".mover">
@@ -37,10 +37,10 @@
             <div>
                 <el-button class="sku-item-add" size="small" icon="el-icon-plus"
                            @click="onAddOption">
-                    添加选项
+                    {{$t('variations.add_option')}}
                 </el-button>
                 <el-button size="medium" type="text" @click="showDoalog=true">
-                    选择常用选项
+                    {{$t('variations.choose_options')}}
                 </el-button>
             </div>
         </div>

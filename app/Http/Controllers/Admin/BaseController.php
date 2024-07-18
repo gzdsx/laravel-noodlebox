@@ -23,7 +23,8 @@ class BaseController extends Controller
                 return redirect()->to(admin_url('login?redirect=' . url()->current()));
             }
 
-            if (!Auth::user()->isAdmin()) {
+            $capability = $req->user()->getMeta('capability');
+            if (!in_array($capability, ['administrator', 'manager'])) {
                 abort(403, '你没有此项权限');
             }
 

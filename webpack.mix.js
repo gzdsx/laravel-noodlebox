@@ -37,11 +37,11 @@ mix.vue({version: 2});
  |
  */
 
-mix.js('resources/js/vue.js', 'public/lib/vue/vue-chunk.js');
-//h5
-//mix.js('resources/apps/h5/index.js', 'public/dist/h5');
 //后台
+mix.js('resources/apps/admin/vendors.js', 'public/dist/admin').vue();
 mix.js('resources/apps/admin/app.js', 'public/dist/admin').vue();
+mix.js('resources/apps/admin/login.js', 'public/dist/admin').vue();
+
 mix.js('resources/apps/home/app.js', 'public/dist/home').vue();
 mix.js('resources/apps/web/vendor.js', 'public/dist/web').vue();
 mix.js('resources/apps/web/runtime.js', 'public/dist/web').vue();

@@ -32,7 +32,31 @@ export default {
 
                 }
             }
-        }
+        },
+        onError: {
+            type: Function,
+            default() {
+                return (err) => {
+
+                }
+            }
+        },
+        onInit: {
+            type: Function,
+            default() {
+                return (data, actions) => {
+
+                }
+            }
+        },
+        onClick: {
+            type: Function,
+            default() {
+                return (data, actions) => {
+
+                }
+            }
+        },
     },
     methods: {},
     mounted() {
@@ -51,9 +75,11 @@ export default {
 
                         },
                         onClick: async (data, actions) => {
-
+                            return this.onClick(data, actions);
                         },
                         createOrder: async (data, actions) => {
+                            //console.log(data);
+                            //console.log(actions);
                             return this.createOrder(data, actions);
                         },
                         onApprove: async (data, actions) => {
@@ -63,7 +89,7 @@ export default {
                             return this.onCancel(data, actions);
                         },
                         onError: async (err) => {
-                            console.log(err);
+                            return this.onError(err);
                         }
                     })
                     .render("#paypal-buttons-id")

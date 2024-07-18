@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use App\Http\Controllers\Api\BaseController;
 use App\Models\User;
 use App\Models\UserConnect;
 use App\Traits\WeChat\WechatDefaultConfig;
+use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 
 class OfficialAccountController extends BaseController

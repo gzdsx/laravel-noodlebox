@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\Api\BaseController;
-use App\Models\User;
 use App\Models\Captcha;
+use App\Models\User;
+use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 
 class LoginController extends BaseController

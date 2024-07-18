@@ -17,37 +17,37 @@
                 </el-form-item>
                 <el-form-item :label="$t('settings.description')">
                     <el-input type="textarea" class="w500" rows="5" v-model="settings.description"/>
-                    <div class="el-form-tips">{{ $t('settings.description_tips')}}</div>
+                    <div class="el-form-tips">{{ $t('settings.description_tips') }}</div>
                 </el-form-item>
                 <el-form-item :label="$t('settings.site_language')">
                     <el-select v-model="settings.language">
-                        <el-option value="zh_CN" label="简体中文"/>
                         <el-option value="en" label="English"/>
+                        <el-option value="zh-CN" label="简体中文"/>
                     </el-select>
                 </el-form-item>
                 <el-form-item :label="$t('settings.admin_email')">
                     <el-input class="w500" v-model="settings.admin_email"/>
-                    <div class="el-form-tips">{{ $t('settings.admin_email_tips')}}</div>
+                    <div class="el-form-tips">{{ $t('settings.admin_email_tips') }}</div>
                 </el-form-item>
                 <el-form-item :label="$t('settings.icp')">
                     <el-input type="text" class="w500" v-model="settings.icp"/>
                     <div class="el-form-tips">
-                        {{$t('settings.icp_tips')}}
+                        {{ $t('settings.icp_tips') }}
                     </div>
                 </el-form-item>
                 <el-form-item :label="$t('settings.copyright')">
                     <el-input type="text" class="w500" v-model="settings.copyright"/>
-                    <div class="el-form-tips">{{ $t('settings.copyright_tips')}}</div>
+                    <div class="el-form-tips">{{ $t('settings.copyright_tips') }}</div>
                 </el-form-item>
                 <el-form-item :label="$t('settings.stats_code')">
                     <el-input type="textarea" class="w500" rows="8" v-model="settings.statcode"/>
                     <div class="el-form-tips">
-                        {{$t('settings.stats_code_tips')}}
+                        {{ $t('settings.stats_code_tips') }}
                     </div>
                 </el-form-item>
 
                 <el-form-item>
-                    <el-button type="primary" size="medium" @click="onSubmit">{{ $t('settings.save')}}</el-button>
+                    <el-button type="primary" size="medium" @click="onSubmit">{{ $t('settings.save') }}</el-button>
                 </el-form-item>
             </el-form>
         </section>
@@ -77,6 +77,9 @@ export default {
             this.key = key;
             this.showMediaDialog = true;
         },
+        updated() {
+            this.$i18n.locale = this.settings.language;
+        }
     }
 }
 </script>

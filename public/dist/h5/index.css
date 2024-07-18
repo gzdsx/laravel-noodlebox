@@ -1295,6 +1295,7 @@
 
 .dsxui-form-inline {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
 }
 .dsxui-form-inline .form-item {

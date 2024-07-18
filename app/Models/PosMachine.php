@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $status
  * @property int $deliveryer_id
  * @property int $is_cashier
+ * @property-read \App\Models\Deliveryer|null $deliveryer
  * @method static \Illuminate\Database\Eloquent\Builder|PosMachine newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PosMachine newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PosMachine query()

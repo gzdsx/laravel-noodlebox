@@ -43,7 +43,6 @@ class DownloadProductImage implements ShouldQueue
                         'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0',
                         'Accept' => 'application/json'
                     ],
-                    'proxy' => 'socks5://127.0.0.1:1089'
                 ]);
 
                 $filename = str_replace('https://noodlebox.ie/wp-content/uploads', 'image', $this->product->image);

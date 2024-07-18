@@ -44,23 +44,40 @@ trait BlockApis
 
     /**
      * @param Request $request
-     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $id = null)
+    public function store(Request $request)
     {
-        $model = $this->repository()->findOrNew($id);
-        $model->fill($request->input('block', []))->save();
+        $model = $this->repository()->make();
+        $model->fill($request->all())->save();
         return json_success($model);
     }
 
     /**
      * @param Request $request
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function batchDestroy(Request $request)
+    public function update(Request $request, $id)
     {
-        $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
+        $model = $this->repository()->findOrNew($id);
+        $model->fill($request->all())->save();
+        return json_success($model);
+    }
+
+    /**
+     * @param $id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id, Request $request)
+    {
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
+        } else {
+            $this->repository()->findOrFail($id)->delete();
+        }
+
         return json_success();
     }
 }

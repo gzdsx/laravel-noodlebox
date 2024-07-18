@@ -80,14 +80,14 @@ export default {
             }
 
             if (menu.id) {
-                ApiService.put('/menus/' + menu.id, {menu}).then(() => {
+                ApiService.put('/menus/' + menu.id, menu).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
                     this.$message.success(this.$t('menu.updated'));
                 });
             } else {
-                ApiService.post('/menus', {menu}).then(() => {
+                ApiService.post('/menus', menu).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
@@ -100,7 +100,7 @@ export default {
             this.showDialog = true;
         },
         onShowEdit(d) {
-            this.menu = d;
+            this.menu = {...d};
             this.showDialog = true;
         },
         onSelectionChange(val) {

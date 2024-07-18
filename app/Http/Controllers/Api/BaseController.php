@@ -16,4 +16,25 @@ class BaseController extends Controller
     {
 
     }
+
+    /**
+     * @param $data
+     * @param $options
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function success($data = [], $options = JSON_UNESCAPED_UNICODE)
+    {
+        return json_success($data, $options);
+    }
+
+    /**
+     * @param $message
+     * @param $code
+     * @param $errors
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function error($message, $code = 422, $errors = null)
+    {
+        return json_error($message, $code, $errors);
+    }
 }

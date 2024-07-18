@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Ecommerce;
 
+use App\Models\PosMachine;
 use App\Http\Controllers\Admin\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\PosMachine;
 use Illuminate\Http\Request;
 
 class PosMachineController extends BaseController
@@ -14,6 +14,10 @@ class PosMachineController extends BaseController
         return PosMachine::query();
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         $query = $this->repository();
@@ -38,6 +42,11 @@ class PosMachineController extends BaseController
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request, $id = 0)
     {
         $request->validate([
@@ -54,11 +63,36 @@ class PosMachineController extends BaseController
 
     /**
      * @param Request $request
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function batchDestroy(Request $request)
+    public function update(Request $request, $id)
     {
-        $this->repository()->whereKey($request->input('ids', []))->delete();
+        return $this->store($request, $id);
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show($id)
+    {
+        $model = $this->repository()->find($id);
+        return json_success($model);
+    }
+
+    /**
+     * @param $id
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id, Request $request)
+    {
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->delete();
+        } else {
+            $this->repository()->whereKey($id)->delete();
+        }
         return json_success();
     }
 }

@@ -29,7 +29,7 @@ trait MaterialApis
      * @throws \Psr\Container\NotFoundExceptionInterface
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function upload(Request $request)
+    public function store(Request $request)
     {
         if (!$file = $request->file('file')) {
             return $this->uploadFail($request);
@@ -278,38 +278,6 @@ trait MaterialApis
     }
 
     /**
-     * @param $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy($id)
-    {
-        if ($model = $this->repository()->find($id)) {
-            $model->delete();
-        }
-
-        return json_success();
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function batchDestroy(Request $request)
-    {
-        $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
-        return $this->deletedSuccess($request);
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function deletedSuccess(Request $request)
-    {
-        return json_success();
-    }
-
-    /**
      * @param Request $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
@@ -317,16 +285,34 @@ trait MaterialApis
     public function update(Request $request, $id)
     {
         $model = $this->repository()->findOrNew($id);
-        $model->fill($request->input('material', []))->save();
+        $model->fill($request->all())->save();
 
         return json_success($model);
     }
 
     /**
+     * @param $id
+     * @param Request $request
      * @return JsonResponse
      */
-    public function types()
+    public function destroy($id, Request $request)
     {
-        return json_success(trans('material.types'));
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->get()->each->delete();
+        } else {
+            $this->repository()->findOrFail($id)->delete();
+        }
+
+        return json_success();
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function options()
+    {
+        return json_success([
+            'types' => trans('material.types'),
+        ]);
     }
 }

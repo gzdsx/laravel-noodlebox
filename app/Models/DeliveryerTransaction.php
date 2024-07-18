@@ -19,8 +19,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $card_total
  * @property string $cost_total
  * @property string $total
+ * @property string|null $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Deliveryer|null $deliveryer
  * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction query()
@@ -34,6 +36,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereOnlineTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereShippingTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereUpdatedAt($value)
  * @mixin \Eloquent

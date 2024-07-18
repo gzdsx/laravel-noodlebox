@@ -29,6 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read int|null $orders_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PosMachine> $posMachines
  * @property-read int|null $pos_machines_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeliveryerTransaction> $transactions
+ * @property-read int|null $transactions_count
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer query()

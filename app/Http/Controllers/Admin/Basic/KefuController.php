@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Basic;
 
-use App\Http\Controllers\Admin\BaseController;
 use App\Models\Kefu;
+use App\Http\Controllers\Admin\BaseController;
 use Illuminate\Http\Request;
 
 class KefuController extends BaseController
@@ -32,21 +32,36 @@ class KefuController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $id = 0)
+    public function store(Request $request)
     {
-        $model = $this->repository()->findOrNew($id);
-        $model->fill($request->input('kefu', []))->save();
+        $model = $this->repository()->make();
+        $model->fill($request->all())->save();
 
         return json_success($model);
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function batchDestroy(Request $request)
+    public function show($id)
     {
-        $this->repository()->whereKey($request->input('ids', []))->delete();
+        $model = $this->repository()->findOrNew($id);
+        return json_success($model);
+    }
+
+    public function destroy($id, Request $request)
+    {
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->delete();
+        } else {
+            $this->repository()->whereKey($id)->delete();
+        }
+
         return json_success();
+    }
+
+    public function update(Request $request, $id)
+    {
+        $model = $this->repository()->findOrNew($id);
+        $model->fill($request->all())->save();
+
+        return json_success($model);
     }
 }

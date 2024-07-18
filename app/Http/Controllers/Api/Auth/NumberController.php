@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\Auth;
 
 use AlibabaCloud\Client\AlibabaCloud;
 use AlibabaCloud\Dypnsapi\Dypnsapi;
-use App\Http\Controllers\Api\BaseController;
 use App\Models\User;
+use App\Http\Controllers\Api\BaseController;
 use EasyWeChat\Kernel\Exceptions\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;

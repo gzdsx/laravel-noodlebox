@@ -438,14 +438,16 @@ var _default2 = exports["default"] = {
       var options = this.options,
         additional_options = this.additional_options,
         usePointPurchase = this.usePointPurchase;
+      var purchase_via = usePointPurchase ? 'point' : 'order';
       _HttpClient["default"].post('/carts', {
         product_id: this.product.id,
         quantity: this.quantity,
         meta_data: {
           options: options,
-          additional_options: additional_options
+          additional_options: additional_options,
+          purchase_via: purchase_via
         },
-        purchase_via: usePointPurchase ? 'point' : 'order'
+        purchase_via: purchase_via
       }).then(function (res) {
         window.dispatchEvent(new Event('cartChanged'));
         _this.$showToast('Added to cart successfully!');
@@ -453,28 +455,6 @@ var _default2 = exports["default"] = {
       })["catch"](function (reason) {
         console.log(reason);
       })["finally"](function () {});
-    },
-    saveToCart: function saveToCart() {
-      var product = this.product,
-        finalPrice = this.finalPrice,
-        quantity = this.quantity,
-        options = this.options,
-        additional_options = this.additional_options,
-        usePointPurchase = this.usePointPurchase;
-      var cart = new _CartService["default"]();
-      cart.addToCart({
-        product_id: product.id,
-        title: product.title,
-        image: product.image,
-        price: finalPrice,
-        quantity: quantity,
-        options: options,
-        additional_options: additional_options,
-        usePointPurchase: usePointPurchase,
-        point_price: product.point_price
-      });
-      this.$showToast('Added to cart successfully!');
-      this.$emit('added', cart.getCartItems());
     }
   },
   mounted: function mounted() {}

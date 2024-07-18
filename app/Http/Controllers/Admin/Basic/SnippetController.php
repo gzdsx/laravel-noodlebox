@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Basic;
 
+use App\Models\Snippet;
 use App\Http\Controllers\Admin\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\Snippet;
 use Illuminate\Http\Request;
 
 class SnippetController extends BaseController

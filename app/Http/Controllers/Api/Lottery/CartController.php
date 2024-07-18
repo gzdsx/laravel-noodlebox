@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\Lottery;
 
+use App\Models\LotteryCart;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\LotteryCart;
 use Illuminate\Http\Request;
 
 class CartController extends BaseController

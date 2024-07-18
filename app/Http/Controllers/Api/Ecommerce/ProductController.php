@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\Ecommerce;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Api\BaseController;
 use App\Traits\RestApis\ProductApis;
+use App\Http\Controllers\Api\BaseController;
+use Illuminate\Http\Request;
 
 class ProductController extends BaseController
 {

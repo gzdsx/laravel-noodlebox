@@ -195,7 +195,7 @@ export default {
                 return false;
             }
 
-            ApiService.post('/menu-items', {item}).then(() => {
+            ApiService.post('/menus/items', item).then(() => {
                 this.resetData();
                 this.fetchList();
                 this.showDialog = false;
@@ -215,7 +215,7 @@ export default {
             this.$confirm(this.$t('common.delete_tips'), this.$t('delete_confirm'), {
                 type: 'warning'
             }).then(() => {
-                ApiService.delete('/menu-items/batch', {data: {ids: [id]}}).then(() => {
+                ApiService.delete('/menus/items/batch', {data: {ids: [id]}}).then(() => {
                     this.fetchList();
                 });
             });
@@ -228,7 +228,7 @@ export default {
         },
         onToggle(item) {
             let {id} = item;
-            ApiService.post('/menu-items/toggle', {id}).then(() => {
+            ApiService.post(`/menus/items/${id}/toggle`).then(() => {
                 item.hide = item.hide === 0 ? 1 : 0;
             });
         }

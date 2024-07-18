@@ -173,8 +173,8 @@ export default {
             });
         },
         fetchTypes() {
-            MaterialService.get('types').then(res => {
-                this.types = res.data;
+            MaterialService.get('options').then(res => {
+                this.types = res.data.types;
             });
         }
     },

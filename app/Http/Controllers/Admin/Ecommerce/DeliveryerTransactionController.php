@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Ecommerce;
 
+use App\Models\DeliveryerTransaction;
 use App\Http\Controllers\Admin\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\DeliveryerTransaction;
 use Illuminate\Http\Request;
 
 class DeliveryerTransactionController extends BaseController

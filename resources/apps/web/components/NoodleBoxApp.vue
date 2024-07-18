@@ -69,6 +69,10 @@ export default {
         let items = document.querySelectorAll('.add-to-cart');
         items.forEach(item => {
             item.addEventListener('click', (e) => {
+                if (!window.noodlebox.user.id){
+                    this.showLogin = true;
+                    return false;
+                }
                 const id = e.target.getAttribute('data-id');
                 this.loading = true;
                 HttpClient.get(`/products/${id}`).then(response => {

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Lottery;
 
+use App\Models\LotteryRecord;
 use App\Http\Controllers\Admin\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\LotteryRecord;
 use Illuminate\Http\Request;
 
 class RecordController extends BaseController
@@ -32,14 +32,32 @@ class RecordController extends BaseController
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function batchDestroy(Request $request)
+    public function show($id)
     {
-        $ids = $request->input('ids', []);
-        $this->repository()->whereKey($ids)->delete();
+        $model = $this->repository()->findOrFail($id);
+        return json_success($model);
+    }
+
+    public function store(Request $request, $id = 0)
+    {
+        $model = $this->repository()->findOrNew($id);
+        $model->fill($request->all());
+        $model->save();
+        return json_success($model);
+    }
+
+    public function update($id)
+    {
+
+    }
+
+    public function destroy($id, Request $request)
+    {
+        if ($id == 'batch'){
+            $this->repository()->whereKey($request->input('ids', []))->delete();
+        }else{
+            $this->repository()->findOrFail($id)->delete();
+        }
         return json_success();
     }
 }

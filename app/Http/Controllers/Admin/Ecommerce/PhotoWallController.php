@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Ecommerce;
 
+use App\Models\PhotoWall;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Controllers\Controller;
-use App\Models\PhotoWall;
 use Illuminate\Http\Request;
 
 class PhotoWallController extends BaseController
@@ -33,7 +33,7 @@ class PhotoWallController extends BaseController
         return json_success($model);
     }
 
-    public function store(Request $request, $id)
+    public function store(Request $request)
     {
         $model = $this->repository()->create($request->all());
         return json_success($model);

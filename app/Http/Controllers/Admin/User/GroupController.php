@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin\User;
 
 
-use App\Http\Controllers\Admin\BaseController;
 use App\Models\UserGroup;
+use App\Http\Controllers\Admin\BaseController;
 use Illuminate\Http\Request;
 
 class GroupController extends BaseController

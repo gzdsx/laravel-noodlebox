@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
 use App\Models\Captcha;
 use App\Models\User;
 use App\Models\UserPhone;
 use App\Providers\RouteServiceProvider;
 use App\Traits\Auth\UserLogin;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

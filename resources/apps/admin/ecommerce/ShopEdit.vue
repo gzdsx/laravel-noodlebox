@@ -1,25 +1,25 @@
 <template>
     <main-layout>
         <div class="d-flex" slot="header">
-            <h2>编辑门店</h2>
+            <h2>{{$t('shop.edit')}}</h2>
         </div>
         <section class="page-section">
             <el-form ref="form" size="medium" label-width="80px">
-                <el-form-item label="门店标志">
+                <el-form-item :label="$t('shop.logo')">
                     <div class="img-120" @click="selectLogo">
                         <featured-image :src="shop.logo"/>
                     </div>
                 </el-form-item>
-                <el-form-item label="店铺名称">
+                <el-form-item :label="$t('shop.name')">
                     <el-input class="w500" v-model="shop.name"/>
                 </el-form-item>
-                <el-form-item label="店铺地址">
+                <el-form-item :label="$t('shop.region')">
                     <el-input class="w500" readonly v-model="region" @focus="showMap=true"/>
                 </el-form-item>
-                <el-form-item label="详细地址">
+                <el-form-item :label="$t('shop.address')">
                     <el-input class="w500" v-model="shop.address_1"/>
                 </el-form-item>
-                <el-form-item label="店内照片">
+                <el-form-item :label="$t('shop.images')">
                     <vuedraggable class="dsxui-uploader" v-model="images" draggable=".draggable">
                         <div class="dsxui-uploader-item draggable"
                              v-for="(img,idx) in images"
@@ -32,16 +32,16 @@
                             <i class="el-icon-plus dsxui-uploader-icon"></i>
                         </div>
                     </vuedraggable>
-                    <p>建议尺寸：800*800像素，拖拽图片可以调整顺序，最多上传10张。</p>
+                    <p>{{$t('shop.images_tips')}}</p>
                 </el-form-item>
-                <el-form-item label="门店介绍">
+                <el-form-item :label="$t('shop.description')">
                     <el-input type="textarea" class="w500" rows="10" v-model="shop.description"/>
                 </el-form-item>
             </el-form>
         </section>
         <fixed-bottom>
-            <el-button class="w100" @click="$router.go(-1)">取消</el-button>
-            <el-button class="w100" type="primary" @click="onSubmit">保存</el-button>
+            <el-button class="w100" @click="$router.go(-1)">{{$t('common.cancel')}}</el-button>
+            <el-button class="w100" type="primary" @click="onSubmit">{{$t('common.save')}}</el-button>
         </fixed-bottom>
         <media-dialog
                 v-model="showImagePicker"

@@ -98,14 +98,14 @@ export default {
             }
 
             if (block.id) {
-                ApiService.put('/blocks/' + block.id, {block}).then(() => {
+                ApiService.put('/blocks/' + block.id, block).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
                     this.$message.success(this.$t('block.updated'));
                 });
             } else {
-                ApiService.post('/blocks', {block}).then(response => {
+                ApiService.post('/blocks', block).then(response => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;

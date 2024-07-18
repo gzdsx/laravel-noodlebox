@@ -1,7 +1,9 @@
 <?php namespace App\ModelFilters;
 
+use App\Models\Order;
 use EloquentFilter\ModelFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 
 class OrderFilter extends ModelFilter
@@ -17,29 +19,29 @@ class OrderFilter extends ModelFilter
     public function tab($tab)
     {
         if ($tab == 'waitPay') {
-            return $this->where('order_status', 'unpaid');
+            return $this->where('status', Order::ORDER_STATUS_PENDING);
         }
         if ($tab == 'waitSend') {
-            return $this->where('order_status', 'paid');
+            return $this->where('status', Order::ORDER_STATUS_PROCESSIING);
         }
         if ($tab == 'waitConfirm') {
-            return $this->where('order_status', 'send');
+            return $this->where('status', Order::ORDER_STATUS_DELIVERING);
         }
         if ($tab == 'waitRate') {
-            return $this->where('order_status', 'success')->where('buyer_rate', 0);
+            return $this->where('status', 'success')->where('buyer_rate', 0);
         }
         if ($tab == 'refunding') {
-            return $this->where('order_status', 'refunding');
+            return $this->where('status', 'refunding');
         }
         if ($tab == 'closed') {
-            return $this->where('order_state', 'closed');
+            return $this->where('status', 'closed');
         }
         return $this;
     }
 
     public function orderNo($order_no)
     {
-        return $this->where('order_no', $order_no);
+        return $this->where('order_no', $order_no)->orWhere('short_code', $order_no);
     }
 
     public function shopName($name)
@@ -93,9 +95,9 @@ class OrderFilter extends ModelFilter
      * @param $time
      * @return OrderFilter|\Illuminate\Database\Query\Builder
      */
-    public function timeBegin($time)
+    public function timeStart($time)
     {
-        return $this->whereDate('created_at', '>=', Date::make($time));
+        return $this->where('created_at', '>=', $time);
     }
 
     /**
@@ -104,6 +106,29 @@ class OrderFilter extends ModelFilter
      */
     public function timeEnd($time)
     {
-        return $this->whereDate('created_at', '<=', Date::make($time));
+        return $this->where('created_at', '<=', $time);
+    }
+
+    public function date($date)
+    {
+        $date = substr($date, 0, 10);
+        $start = Carbon::createFromTimeString($date . ' ' . settings('opening_hours_end'));
+        $end = Carbon::createFromTimeString($date . ' ' . settings('opening_hours_start'))->addDay();
+        return $this->whereBetween('created_at', [$start, $end]);
+    }
+
+    public function deliveryer($deliveryer)
+    {
+        return $this->where('deliveryer_id', $deliveryer);
+    }
+
+    public function createdVia($via)
+    {
+        return $this->where('created_via', $via);
+    }
+
+    public function paymentMethod($method)
+    {
+        return $this->where('payment_method', $method);
     }
 }

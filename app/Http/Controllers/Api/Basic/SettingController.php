@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\Basic;
 
-use App\Http\Controllers\Api\BaseController;
 use App\Models\Setting;
+use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 
 class SettingController extends BaseController

@@ -5,11 +5,11 @@
                       handle=".sku-mover">
             <div class="sku-classify sku-draggable" v-for="(v,index) in variationList" :key="index">
                 <div class="sku-classify-header sku-mover">
-                    <div class="sku-classify-attribute">变量名称:</div>
+                    <div class="sku-classify-attribute">{{$t('variations.name')}}:</div>
                     <div class="sku-classify-select">
                         <el-input size="medium" v-model="v.name"/>
                         <el-button size="medium" type="text" @click="chooseVariation(v)">
-                            选择常用变量
+                            {{$t('variations.select_commonly')}}
                         </el-button>
                     </div>
                     <div class="flex"></div>
@@ -19,9 +19,9 @@
                     <div v-if="v.options.length">
                         <div class="variation-list">
                             <div class="variation-list__item">
-                                <div class="col-label">选项名称</div>
-                                <div class="col-price">价格</div>
-                                <div class="col-price">默认选择</div>
+                                <div class="col-label">{{$t('variations.option_name')}}</div>
+                                <div class="col-price">{{$t('variations.price')}}</div>
+                                <div class="col-price">{{$t('variations.default_select')}}</div>
                             </div>
                             <vuedraggable class="variation-list__sortable" v-model="v.options" draggable=".draggable"
                                           handle=".mover">
@@ -58,7 +58,7 @@
                     <div>
                         <el-button class="sku-item-add" size="small" icon="el-icon-plus"
                                    @click="onAddOption(v)">
-                            添加选项
+                            {{$t('variations.add_option')}}
                         </el-button>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
         </vuedraggable>
         <div class="sku-operate-buttons">
             <el-button size="small" icon="el-icon-plus" @click="onAddVariation">
-                添加变量
+                {{ $t('variations.addnew')}}
             </el-button>
         </div>
         <dialog-choose-variation @select="onSelectedOptions" v-model="showDoalog"/>

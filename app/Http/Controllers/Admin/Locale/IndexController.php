@@ -8,15 +8,15 @@ use Illuminate\Support\Facades\App;
 
 class IndexController extends Controller
 {
-    public function messages($locale = null)
+    public function messages()
     {
-        if (!$locale) {
-            $locale = App::getLocale();
-            //$locale = settings('language', 'zh_CN');
-        }
+        $locale = App::getLocale();
         return json_success([
             'locale' => $locale,
-            'messages' => trans('admin', [], $locale)
+            'messages' => [
+                'en' => trans('admin', [], 'en'),
+                'zh-CN' => trans('admin', [], 'zh-CN')
+            ]
         ]);
     }
 

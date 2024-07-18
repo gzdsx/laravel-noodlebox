@@ -117,9 +117,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'national_number',
         'phone_number'
     ];
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'metas'];
     protected $appends = [
-        'status_des'
+        'status_des',
+        'meta_data'
     ];
     protected $casts = [
         'email_verified_at' => 'datetime',
@@ -156,7 +157,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getAvatarAttribute($value)
     {
-        return $value ? image_url($value) : asset('images/common/avatar_default.png');
+        return $value ? image_url($value) : asset('images/noodlebox/avatar.png');
     }
 
     /**
@@ -264,15 +265,6 @@ class User extends Authenticatable implements MustVerifyEmail
     public function metas()
     {
         return $this->hasMany(UserMeta::class, 'user_id', 'id');
-    }
-
-    /**
-     * @param $associative
-     * @return mixed
-     */
-    public function getRoles($associative = null)
-    {
-        return json_decode($this->getMeta('capabilities'), $associative);
     }
 
     public function updateRole($role)

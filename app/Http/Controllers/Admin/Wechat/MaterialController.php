@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Wechat;
 
-use App\Http\Controllers\Admin\BaseController;
 use App\Traits\WeChat\WechatDefaultConfig;
+use App\Http\Controllers\Admin\BaseController;
 use Illuminate\Http\Request;
 
 class MaterialController extends BaseController

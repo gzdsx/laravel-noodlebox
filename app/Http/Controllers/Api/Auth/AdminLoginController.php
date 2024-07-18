@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Traits\Auth\UserLogin;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Controllers\Controller;
-use App\Traits\Auth\UserLogin;
 use Illuminate\Http\Request;
 
 class AdminLoginController extends BaseController

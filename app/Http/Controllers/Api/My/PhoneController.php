@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\My;
 
-use App\Http\Controllers\Api\BaseController;
 use App\Models\Captcha;
 use App\Models\UserPhone;
+use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 
 class PhoneController extends BaseController
@@ -18,21 +18,7 @@ class PhoneController extends BaseController
 
         $national_number = $request->input('national_number');
         $phone_number = $request->input('phone_number');
-        $phone_number = preg_replace("/\s/", '', $phone_number);
-
-        if (!$phone_number) {
-            return json_success(false);
-        }
-
-        if (substr($phone_number, 0, 1) != '0') {
-            $phone_number = '0' . $phone_number;
-        }
-
-        $verified = UserPhone::where([
-            'user_id' => auth()->id(),
-            'national_number' => $national_number,
-            'phone_number' => $phone_number,
-        ])->exists();
+        $verified = UserPhone::checkPhoneNumber(auth()->id(), $phone_number, $national_number);
 
         return json_success($verified);
     }

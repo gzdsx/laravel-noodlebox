@@ -58,6 +58,11 @@ class OrderItem extends Model
     ];
     public $timestamps = false;
 
+    public function getTotalAttribute($value)
+    {
+        return format_amount($this->price * $this->quantity);
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

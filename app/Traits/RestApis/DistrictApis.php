@@ -45,11 +45,10 @@ trait DistrictApis
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $id)
+    public function store(Request $request, $id = null)
     {
-        $newDistrict = $request->input('district', []);
         $model = $this->repository()->findOrNew($id);
-        $model->fill($newDistrict);
+        $model->fill($request->all());
 
         if (!$model->pinyin) {
             $model->pinyin = Pinyin::permalink($model->name, '');
@@ -60,17 +59,27 @@ trait DistrictApis
         }
 
         $model->save();
-
         return json_success($model);
     }
 
     /**
      * @param Request $request
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function batchDestroy(Request $request)
+    public function update(Request $request, $id)
     {
-        $this->repository()->whereKey($request->input('ids', []))->delete();
+        return $this->store($request, $id);
+    }
+
+    public function destroy($id, Request $request)
+    {
+        if ($id == 'batch') {
+            $this->repository()->whereKey($request->input('ids', []))->delete();
+        } else {
+            $this->repository()->findOrFail($id)->delete();
+        }
+
         return json_success();
     }
 }

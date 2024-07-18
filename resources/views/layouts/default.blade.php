@@ -56,8 +56,8 @@
 @yield('footer', view('web.footer'))
 @yield('footer-after')
 <div id="noodlebox"></div>
-{!! settings('statcode') !!}
 <script src="{{asset('dist/web/runtime.js?v='.appversion())}}" type="text/javascript"></script>
 @yield('footer-scripts')
+{!! settings('statcode') !!}
 </body>
 </html>

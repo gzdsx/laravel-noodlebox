@@ -73,20 +73,22 @@
                         <span>OR</span>
                     </div>
 
-                    <div class="auth-socials">
-                        <a href="{{url('auth/google')}}">
+                    <div class="form-group">
+                        <a href="/auth/google" class="btn btn-light btn-block btn-lg">
                             <i class="bi bi-google"></i>
-                        </a>
-                        <a href="{{url('auth/facebook')}}">
-                            <i class="bi bi-facebook"></i>
-                        </a>
-                        <a href="{{url('auth/github')}}">
-                            <i class="bi bi-github"></i>
-                        </a>
-                        <a href="{{url('auth/twitter')}}">
-                            <i class="bi bi-twitter"></i>
+                            <span>Login with Google</span>
                         </a>
                     </div>
+                    <p class="text-bull-cyan">
+                        <small>
+                            By creating an account or signing in, I agree to the
+                            <a href="/terms"
+                               target="_blank"
+                               class="text-safety-orange">Terms</a>
+                            of Use and have read our
+                            <a href="/privacy" target="_blank" class="text-safety-orange">Privacy</a> Policy.
+                        </small>
+                    </p>
                 </div>
             </div>
         </div>

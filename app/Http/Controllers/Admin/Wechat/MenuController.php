@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Wechat;
 
-use App\Http\Controllers\Admin\BaseController;
 use App\Models\WechatMenu;
 use App\Traits\WeChat\WechatDefaultConfig;
+use App\Http\Controllers\Admin\BaseController;
 use Illuminate\Http\Request;
 
 class MenuController extends BaseController

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\Auth;
 
 
-use App\Http\Controllers\Api\BaseController;
 use App\Models\User;
 use App\Traits\Auth\UserRegister;
+use App\Http\Controllers\Api\BaseController;
 use Illuminate\Http\Request;
 
 class RegisterController extends BaseController

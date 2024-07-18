@@ -14,12 +14,12 @@
                 v-loading="loading"
                 style="width: 100%">
             <el-table-column
-                    prop="order_no"
+                    prop="short_code"
                     label="订单号"
             />
             <el-table-column
                     prop="total"
-                    label="订单金额"
+                    label="订单总价"
                     width="180">
             </el-table-column>
             <el-table-column

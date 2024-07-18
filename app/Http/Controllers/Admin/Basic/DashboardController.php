@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin\Basic;
 
-use App\Http\Controllers\Admin\BaseController;
 use App\Models\Material;
 use App\Models\Post;
 use App\Models\User;
+use App\Http\Controllers\Admin\BaseController;
 use Illuminate\Http\Request;
 
 class DashboardController extends BaseController

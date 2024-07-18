@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Post;
 
-use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Traits\RestApis\PostApis;
+use App\Http\Controllers\Controller;
 
 class PostController extends Controller
 {

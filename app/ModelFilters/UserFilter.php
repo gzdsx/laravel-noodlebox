@@ -50,10 +50,23 @@ class UserFilter extends ModelFilter
 
     public function status($status)
     {
-        if (is_numeric($status)) {
-            return $this->where('status', $status);
+        if ($status == 'forbidden') {
+            return $this->where('freeze', 1);
         }
 
         return $this;
+    }
+
+    public function role($role)
+    {
+        if ($role == 'administrator' || $role == 'manager') {
+            return $this->whereHas('metas', function ($query) use ($role) {
+                return $query->where('meta_key', 'capability')->where('meta_value', $role);
+            });
+        }
+
+        return $this->whereHas('metas', function ($query) use ($role) {
+            return $query->where('meta_key', 'capability')->where('meta_value', $role);
+        })->orDoesntHave('metas');
     }
 }

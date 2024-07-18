@@ -19,6 +19,7 @@ Route::get('table', 'Test\IndexController@table');
 Route::namespace('Web')->group(function () {
     Route::get('/', 'IndexController@index');
     Route::get('vue-admin', 'AdminController@index');
+    Route::get('vue-admin/login', 'AdminController@showLogin');
     Route::get('search', 'SearchController@index');
     Route::get('post/{cate?}', 'PostController@index')->where('cate', '[0-9]+');
     Route::get('post/{slug}', 'PostController@show');

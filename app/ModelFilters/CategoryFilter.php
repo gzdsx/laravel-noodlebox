@@ -40,7 +40,6 @@ class CategoryFilter extends ModelFilter
         } else {
             $excludes = explode(',', $exclude);
         }
-
         return $this->whereNotIn('id', $excludes);
     }
 

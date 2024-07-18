@@ -14,6 +14,18 @@ const store = new Vuex.Store({
             state.userInfo = {};
             state.isSignined = true;
         }
+    },
+    actions: {
+        signin(context, userInfo) {
+            context.commit('signin', userInfo);
+        },
+        signout(context) {
+            context.commit('signout');
+        }
+    },
+    getters: {
+        isSignined: state => state.isSignined,
+        userInfo: state => state.userInfo
     }
 });
 
