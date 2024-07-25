@@ -42,9 +42,30 @@
     }
 }
 
+.window-cookie {
+    position: fixed;
+    background-color: #000;
+    color: #ffffff;
+    padding: 2rem;
+    left: 1rem;
+    bottom: 1rem;
+    width: 500px;
+    border-radius: 0.6rem;
+    z-index: 100;
+}
+
 @media (max-width: 768px) {
     .footer-row {
         flex-direction: column;
         row-gap: 10px;
+    }
+
+    .window-cookie {
+        border-radius: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        z-index: 1000;
     }
 }

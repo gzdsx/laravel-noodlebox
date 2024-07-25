@@ -170,10 +170,12 @@ var _NoodleDialogLogin = _interopRequireDefault(__webpack_require__(/*! ./Noodle
 var _CartService = _interopRequireDefault(__webpack_require__(/*! ../CartService */ "./resources/apps/web/CartService.js"));
 var _DialogLottery = _interopRequireDefault(__webpack_require__(/*! ../lottery/DialogLottery.vue */ "./resources/apps/web/lottery/DialogLottery.vue"));
 var _LotteryApp = _interopRequireDefault(__webpack_require__(/*! ../lottery/LotteryApp.vue */ "./resources/apps/web/lottery/LotteryApp.vue"));
+var _NoodleCookieWindow = _interopRequireDefault(__webpack_require__(/*! ./NoodleCookieWindow.vue */ "./resources/apps/web/components/NoodleCookieWindow.vue"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var _default = exports["default"] = {
   name: "NoodleBoxApp",
   components: {
+    NoodleCookieWindow: _NoodleCookieWindow["default"],
     LotteryApp: _LotteryApp["default"],
     DialogLottery: _DialogLottery["default"],
     NoodleDialogLogin: _NoodleDialogLogin["default"],
@@ -188,12 +190,17 @@ var _default = exports["default"] = {
       loading: false,
       product: {},
       curImage: {},
-      showLogin: false
+      showLogin: false,
+      showCookie: false
     };
   },
   methods: {
     close: function close() {
       this.visible = false;
+    },
+    onAcceptCookie: function onAcceptCookie() {
+      window.localStorage.setItem('CookieStatus', 'yes');
+      this.showCookie = false;
     }
   },
   mounted: function mounted() {
@@ -231,6 +238,36 @@ var _default = exports["default"] = {
       //window.location.href = '/login?redirect=' + window.location.href;
       _this.showLogin = true;
     });
+    try {
+      this.showCookie = window.localStorage.getItem('CookieStatus') !== 'yes';
+    } catch (e) {}
+  }
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=script&lang=js":
+/*!******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=script&lang=js ***!
+  \******************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _default = exports["default"] = {
+  name: "NoodleCookieWindow",
+  methods: {
+    accept: function accept() {
+      this.$emit('accept');
+    },
+    reject: function reject() {
+      this.$emit('reject');
+    }
   }
 };
 
@@ -481,8 +518,12 @@ var _default = exports["default"] = {
         national_number: national_number,
         vercode: this.vercode,
         remember: remember
-      }).then(function () {
-        _this2.$emit('logined');
+      }).then(function (resp) {
+        if (resp.data.code) {
+          _this2.errors.vercode = resp.data.message;
+        } else {
+          _this2.$emit('logined');
+        }
       })["catch"](function (reason) {
         _this2.errors.vercode = reason.response.data.message;
       })["finally"](function () {
@@ -508,11 +549,15 @@ var _default = exports["default"] = {
         email: email,
         password: password,
         remember: remember
-      }).then(function () {
-        _this3.$emit('logined');
+      }).then(function (resp) {
+        if (resp.data.code) {
+          _this3.errors.password = resp.data.message;
+        } else {
+          _this3.$emit('logined');
+        }
       })["catch"](function (reason) {
         _this3.loading = false;
-        _this3.errors.password = reason.message;
+        _this3.errors.password = reason.response.data.message;
       });
     }
   }
@@ -648,18 +693,22 @@ var _default2 = exports["default"] = {
       if (Array.isArray(this.product.variation_list)) {
         this.product.variation_list.map(function (item) {
           item.options.map(function (option) {
-            if (option.selected && /\d+/.test(option.price)) {
-              price += parseFloat(option.price);
+            if (option.selected) {
               options[item.name] = option.title;
+              if (/\d+/.test(option.price)) {
+                price += parseFloat(option.price);
+              }
             }
           });
         });
       }
       if (Array.isArray(this.product.additional_options)) {
         this.product.additional_options.map(function (option) {
-          if (option.selected && /\d+/.test(option.price)) {
-            price += parseFloat(option.price);
+          if (option.selected) {
             additional_options.push(option.title);
+            if (/\d+/.test(option.price)) {
+              price += parseFloat(option.price);
+            }
           }
         });
       }
@@ -697,6 +746,7 @@ var _default2 = exports["default"] = {
         purchase_via: purchase_via
       }).then(function (res) {
         window.dispatchEvent(new Event('cartChanged'));
+        window.dispatchEvent(new Event('pointChanged'));
         _this.$showToast('Added to cart successfully!');
         _this.$emit('added');
       })["catch"](function (reason) {
@@ -935,6 +985,7 @@ var _default = exports["default"] = {
     onDraw: function onDraw(prize) {
       this.prize = prize;
       this.showPrize = true;
+      window.dispatchEvent(new Event('pointChanged'));
     },
     onError: function onError(reason) {
       this.error = reason.message;
@@ -1419,9 +1470,64 @@ var render = exports.render = function render() {
       },
       expression: "showLogin"
     }
-  }), _vm._v(" "), _c("lottery-app")], 1);
+  }), _vm._v(" "), _c("lottery-app"), _vm._v(" "), _vm.showCookie ? _c("noodle-cookie-window", {
+    on: {
+      reject: function reject($event) {
+        _vm.showCookie = false;
+      },
+      accept: _vm.onAcceptCookie
+    }
+  }) : _vm._e()], 1);
 };
 var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=template&id=776255fc&scoped=true":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=template&id=776255fc&scoped=true ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "window-cookie"
+  }, [_vm._m(0), _vm._v(" "), _c("div", {
+    staticClass: "row justify-content-center gap-1"
+  }, [_c("button", {
+    staticClass: "btn btn-primary",
+    on: {
+      click: _vm.accept
+    }
+  }, [_vm._v("Accept all cookies")]), _vm._v(" "), _c("button", {
+    staticClass: "btn btn-secondary",
+    on: {
+      click: _vm.reject
+    }
+  }, [_vm._v("Reject all cookies")])])]);
+};
+var staticRenderFns = exports.staticRenderFns = [function () {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("div", {
+    staticClass: "mb-4"
+  }, [_vm._v("\n        By clicking “Accept all cookies”, you agree Noodlebox can store cookies on your device and disclose\n        information in accordance with our "), _c("a", {
+    attrs: {
+      href: "/privacy",
+      target: "_blank"
+    }
+  }, [_vm._v("Cookie Policy")]), _vm._v(".\n    ")]);
+}];
 render._withStripped = true;
 
 /***/ }),
@@ -6559,6 +6665,46 @@ component.options.__file = "resources/apps/web/components/NoodleBoxApp.vue"
 
 /***/ }),
 
+/***/ "./resources/apps/web/components/NoodleCookieWindow.vue":
+/*!**************************************************************!*\
+  !*** ./resources/apps/web/components/NoodleCookieWindow.vue ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _NoodleCookieWindow_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _NoodleCookieWindow_vue_vue_type_template_id_776255fc_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./NoodleCookieWindow.vue?vue&type=template&id=776255fc&scoped=true */ "./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=template&id=776255fc&scoped=true");
+/* harmony import */ var _NoodleCookieWindow_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./NoodleCookieWindow.vue?vue&type=script&lang=js */ "./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _NoodleCookieWindow_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _NoodleCookieWindow_vue_vue_type_template_id_776255fc_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _NoodleCookieWindow_vue_vue_type_template_id_776255fc_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "776255fc",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/web/components/NoodleCookieWindow.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/apps/web/components/NoodleDialog.vue":
 /*!********************************************************!*\
   !*** ./resources/apps/web/components/NoodleDialog.vue ***!
@@ -7132,6 +7278,23 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=script&lang=js":
+/*!**************************************************************************************!*\
+  !*** ./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=script&lang=js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleCookieWindow_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleCookieWindow_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./NoodleCookieWindow.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleCookieWindow_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/apps/web/components/NoodleDialog.vue?vue&type=script&lang=js":
 /*!********************************************************************************!*\
   !*** ./resources/apps/web/components/NoodleDialog.vue?vue&type=script&lang=js ***!
@@ -7403,6 +7566,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleBoxApp_vue_vue_type_template_id_1f230444_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleBoxApp_vue_vue_type_template_id_1f230444_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./NoodleBoxApp.vue?vue&type=template&id=1f230444&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleBoxApp.vue?vue&type=template&id=1f230444&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=template&id=776255fc&scoped=true":
+/*!********************************************************************************************************!*\
+  !*** ./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=template&id=776255fc&scoped=true ***!
+  \********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleCookieWindow_vue_vue_type_template_id_776255fc_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleCookieWindow_vue_vue_type_template_id_776255fc_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleCookieWindow_vue_vue_type_template_id_776255fc_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_NoodleCookieWindow_vue_vue_type_template_id_776255fc_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./NoodleCookieWindow.vue?vue&type=template&id=776255fc&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/web/components/NoodleCookieWindow.vue?vue&type=template&id=776255fc&scoped=true");
 
 
 /***/ }),

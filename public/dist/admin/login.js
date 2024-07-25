@@ -88,6 +88,7 @@ var render = exports.render = function render() {
     staticClass: "form-header"
   }, [_vm._v(_vm._s(_vm.messages["system_login"]))]), _vm._v(" "), _c("el-form", [_c("el-form-item", [_c("el-input", {
     attrs: {
+      "auto-complete": "off",
       placeholder: _vm.messages["account_tips"]
     },
     model: {
@@ -118,6 +119,7 @@ var render = exports.render = function render() {
     }
   })])])])], 1), _vm._v(" "), _c("el-form-item", [_c("el-input", {
     attrs: {
+      "auto-complete": "off",
       placeholder: _vm.messages["password_tips"],
       type: "password"
     },

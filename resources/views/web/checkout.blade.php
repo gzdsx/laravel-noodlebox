@@ -12,5 +12,5 @@
 @endsection
 
 @section('footer-scripts')
-    <script src="{{ asset('dist/web/checkout.js?v='.appversion()) }}" type="text/javascript"></script>
+    <script src="{{ mix_asset('dist/web/checkout.js') }}" type="text/javascript"></script>
 @endsection

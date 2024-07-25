@@ -128,5 +128,5 @@
 @stop
 
 @section('footer-scripts')
-    <script src="{{ asset('dist/web/product.js?v='.appversion()) }}" type="text/javascript"></script>
+    <script src="{{ mix_asset('dist/web/product.js') }}" type="text/javascript"></script>
 @endsection

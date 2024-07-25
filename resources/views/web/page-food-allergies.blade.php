@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="page-banner">
-        <img src="https://noodlebox.gzdsx.cn/storage/image/2024/03/rmixvP3ywRWRlvWHPOGVNyilUlCtOoM6l8CGwvJ9.jpg" alt="">
+        <img src="{{asset('storage/image/2024/03/rmixvP3ywRWRlvWHPOGVNyilUlCtOoM6l8CGwvJ9.jpg')}}" alt="">
     </div>
     <div class="page-section">
         <div class="container">

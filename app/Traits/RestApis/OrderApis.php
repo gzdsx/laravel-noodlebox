@@ -4,13 +4,16 @@ namespace App\Traits\RestApis;
 
 use App\Events\OrderChanged;
 use App\Events\OrderCreated;
+use App\Http\Requests\OrderCreateRequest;
 use App\Models\Cart;
 use App\Models\Deliveryer;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\OrderNote;
 use App\Models\ShippingZone;
 use App\Models\UserPhone;
 use App\Models\UserPointTransaction;
+use App\Support\Paypal;
 use App\Support\TradeUtil;
 use \Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,6 +22,33 @@ use Illuminate\Support\Facades\DB;
 
 trait OrderApis
 {
+    protected function getPaymentMethods()
+    {
+        return [
+            [
+                'id' => 'online',
+                'title' => 'Pay Online (PayPal & Credit Car)',
+                'description' => 'Pay Online (PayPal & Credit Car)',
+                'fee' => '0.50',
+                'img' => asset('images/noodlebox/Full_Online.png')
+            ],
+            [
+                'id' => 'card',
+                'title' => 'Pay by Card Reader',
+                'description' => 'Pay by Card Reader',
+                'fee' => '0.50',
+                'img' => asset('images/noodlebox/pay_by_card.png')
+            ],
+            [
+                'id' => 'cash',
+                'title' => 'Pay Cash',
+                'description' => 'Pay Cash',
+                'fee' => '0.00',
+                'img' => asset('images/noodlebox/pay_cash.png')
+            ]
+        ];
+    }
+
     /**
      * @return \App\Models\Order|Builder|\Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -58,92 +88,108 @@ trait OrderApis
     }
 
     /**
-     * @param Request $request
+     * @param OrderCreateRequest $request
      * @return mixed
      * @throws \Throwable
      */
-    public function store(Request $request)
+    public function store(OrderCreateRequest $request)
     {
-        $this->validate($request, [
-            'payment_method' => 'required',
-            'shipping_line' => 'required',
-            'shipping' => 'required',
-            'items' => 'required',
-        ]);
-
         return DB::transaction(function () use ($request) {
             $order = $this->repository()->make();
             $order->order_no = TradeUtil::createOrderNo();
-            $order->out_trade_no = TradeUtil::createOutTradeNo();
+            $order->out_trade_no = $request->input('out_trade_no');
             $order->payment_method = $request->input('payment_method');
-            $order->payment_method_title = $request->input('payment_method_title');
             $order->shipping_method = $request->input('shipping_method', Order::SHIPPING_METHOD_LOCALPICKUP);
-            $order->shipping_line = $request->input('shipping_line', []);
             $order->buyer_note = $request->input('buyer_note');
             $order->shipping = $request->input('shipping', []);
             $order->billing = $request->input('billing', []);
             $order->created_via = $request->input('created_via', 'checkout');
+            $order->status = Order::ORDER_STATUS_PROCESSIING;
 
             $buyer = Auth::user();
             $order->buyer_id = $buyer->id;
             $order->buyer_name = $buyer->nickname;
 
-            $phone_number = $order->shipping['phone_number'] ?? '';
-            $national_number = $order->shipping['national_number'] ?? '';
-            if (!UserPhone::checkPhoneNumber($buyer->id, $phone_number, $national_number)) {
-                //abort(422, 'Phone number not verified');
+            $total = 0;
+            $mata_data = [];
+            $order->shipping_total = 0;
+            if ($order->shipping_method == Order::SHIPPING_METHOD_FLATRATE) {
+                $zone = ShippingZone::findOrNew($request->shipping_zone_id);
+                $order->shipping_line = [
+                    'method_id' => Order::SHIPPING_METHOD_FLATRATE,
+                    'method_title' => 'Delivery',
+                    'zone_id' => $zone->id,
+                    'zone_title' => $zone->title,
+                    'total' => $zone->fee
+                ];
+                $order->shipping_total = $zone->fee ?: 0;
+                $total = bcadd($total, $order->shipping_total, 2);
+            } else {
+                $order->shipping_line = [];
             }
 
-            $total = 0;
-            $fee_lines = $request->input('fee_lines', []);
-            foreach ($fee_lines as $fee_line) {
-                $total += $fee_line['total'] ?? 0;
+            $fee_lines = [];
+            $payment_method = $request->input('payment_method') ?: 'onine';
+            foreach ($this->getPaymentMethods() as $method) {
+                if ($payment_method == $method['id']) {
+                    if ($method['fee'] > 0) {
+                        $fee_lines[] = [
+                            'name' => 'ADM Fee',
+                            'total' => format_amount($method['fee'])
+                        ];
+                        $total = bcadd($total, $method['fee'], 2);
+                    }
+                }
             }
             $order->fee_lines = $fee_lines;
+            $order->payment_method = $payment_method;
 
-            if ($order->shipping_method == Order::SHIPPING_METHOD_FLATRATE) {
-                $order->shipping_total = $order->shipping_line['total'] ?? 0;
-                $total += $order->shipping_total;
+            $discount_lines = [];
+            $use_points_value = $request->input('use_points_value', 0);
+            $meta_data['use_points_value'] = $use_points_value;
+
+            if ($use_points_value > 0) {
+                $exchange_rate = settings('points_exchange_rate', 1);
+                $use_points_amount = bcmul($use_points_value, $exchange_rate, 2);
+                $discount_lines[] = [
+                    'name' => 'Points deduction',
+                    'total' => $use_points_amount
+                ];
+                $total = bcsub($total, $use_points_amount, 2);
+                $order->discount_total = bcadd($order->discount_total, $use_points_amount, 2);
             }
-
-            $discount_total = 0;
-            $discount_lines = $request->input('discount_lines', []);
-            foreach ($discount_lines as $discount_line) {
-                $total -= $discount_line['total'] ?? 0;
-                $discount_total += $discount_line['total'] ?? 0;
-            }
-
             $order->discount_lines = $discount_lines;
-            $order->discount_total = $discount_total;
-            $order->save();
 
-            //return json_success($request->all());
-            $meta_data = $request->input('meta_data', []);
+            //赢取积分总额
+            $earn_points_total = 0;
+            //消费积分总额
+            $consume_points_total = 0;
+            $order_items = [];
+            $cart_items = $buyer->carts()->with(['product'])->get();
+            foreach ($cart_items as $item) {
+                $total = bcadd($total, $this->calculateItemTotal($item), 2);
+                $earn_points_total += $this->calculateItemEarnPoints($item);
+                $consume_points_total += $this->calculateItemComsumePoints($item);
+
+                $order_items[] = new OrderItem($item->toArray());
+            }
+
+            if ($consume_points_total > $buyer->points) {
+                abort(422, 'Insufficient points');
+            }
+
+            $order->total = $total;
+            if ($order->payment_method == 'online') {
+                $order->payment_at = now();
+            }
+            $order->save();
+            $order->items()->saveMany($order_items);
+
             foreach ($meta_data as $key => $value) {
                 $order->updateMeta($key, $value);
             }
 
-            $earn_points_total = 0;
-            $consume_points_total = 0;
-            $cart_items = $buyer->carts()->with(['product'])->get();
-            foreach ($cart_items as $item) {
-                $total += $this->calculateItemTotal($item);
-                $earn_points_total += $this->calculateItemEarnPoints($item);
-                $consume_points_total = $this->calculateItemComsumePoints($item);
-
-                $order->items()->create($item->only($item->getFillable()));
-            }
-
-            $order->total = $total;
-            $order->status = Order::ORDER_STATUS_PROCESSIING;
-            if ($order->payment_method == 'online') {
-                $order->payment_status = 1;
-                $order->payment_at = now();
-            }
-            $order->save();
-
             //积分抵扣现金
-            $use_points_value = $order->getMeta('use_points_value', 0);
             if ($use_points_value > 0) {
                 $buyer->points -= $use_points_value;
                 $buyer->save();
@@ -158,8 +204,8 @@ trait OrderApis
 
             //消费积分
             if ($consume_points_total > 0) {
-                $buyer->points -= $consume_points_total;
-                $buyer->save();
+                //$buyer->points -= $consume_points_total;
+                //$buyer->save();
 
                 $transaction = new UserPointTransaction();
                 $transaction->user_id = $buyer->id;
@@ -188,24 +234,15 @@ trait OrderApis
             Auth::user()->updateMeta('billing_address', $order->billing);
             Auth::user()->updateMeta('shipping_address', $order->shipping);
 
-            $model = $this->repository()->find($order->id);
-            $self_link = url('orders/' . $order->id);
-            $approval_link = url('orders/' . $order->id);
-
             Cart::whereUserId($buyer->id)->delete();
             return json_success([
-                'order' => $model,
+                'orderID' => $order->id,
                 'links' => [
                     [
-                        'rel' => 'self',
-                        'href' => $self_link,
+                        'href' => url('orders/' . $order->id),
                         'method' => 'GET',
-                    ],
-                    [
-                        'rel' => 'approval',
-                        'href' => $approval_link,
-                        'method' => 'GET',
-                    ],
+                        'rel' => 'approval'
+                    ]
                 ],
             ]);
         });
@@ -244,14 +281,35 @@ trait OrderApis
         }
 
         $is_modified = $order->is_modified;
-        if ($request->has('shipping_line')) {
+        if ($request->filled('shipping_method')) {
+            $shipping_method = $request->input('shipping_method');
+            if ($shipping_method != $order->shipping_method) {
+                $order_notes[] = 'Shipping method changed from ' . $order->shipping_method . ' to ' . $shipping_method . '.';
+                $order->shipping_method = $shipping_method;
+            }
+        }
+
+        if ($order->shipping_method == Order::SHIPPING_METHOD_LOCALPICKUP) {
+            $order->shipping_line = array_merge($order->shipping_line, [
+                'method_id' => Order::SHIPPING_METHOD_LOCALPICKUP,
+                'method_title' => 'Collection',
+            ]);
+            $order->shipping_total = 0;
+        } else {
             $shipping_line = $request->input('shipping_line');
-            if ($shipping_line['zone_id'] != $order->shipping_line['zone_id']) {
-                $order_notes[] = 'Order shipping method changed from ' . $order->shipping_line['method_title'] . ' to ' . $shipping_line['method_title'] . '.';
-                $order->shipping_line = $shipping_line;
-                $order->shipping_total = $shipping_line['total'] ?? 0;
+            $zone = ShippingZone::findOrNew($shipping_line['zone_id']);
+            if ($zone->id != $order->shipping_line['zone_id']) {
+                $order_notes[] = 'Shipping zone changed from ' . $order->shipping_line['zone_title'] . ' to ' . $zone->title . '.';
                 $is_modified = true;
             }
+            $order->shipping_line = [
+                'method_id' => Order::SHIPPING_METHOD_FLATRATE,
+                'method_title' => 'Delivery',
+                'zone_id' => $zone->id,
+                'zone_title' => $zone->title,
+                'total' => $zone->fee,
+            ];
+            $order->shipping_total = $zone->fee ?: 0;
         }
 
         if ($request->has('deliveryer_id')) {
@@ -295,7 +353,7 @@ trait OrderApis
             }
         }
 
-        if ($request->has('buyer_note')) {
+        if ($request->filled('buyer_note')) {
             $buyer_note = $request->input('buyer_note');
             if ($buyer_note != $order->buyer_note) {
                 $order->buyer_note = $request->input('buyer_note');
@@ -304,15 +362,27 @@ trait OrderApis
             }
         }
 
-        if ($request->has('fee_lines')) {
+        if ($request->filled('fee_lines')) {
             $order->fee_lines = $request->input('fee_lines', []);
         }
 
-        if ($request->has('discount_lines')) {
+        if ($request->filled('discount_lines')) {
             $order->discount_lines = $request->input('discount_lines', []);
         }
 
+        if ($request->filled('cost_total')) {
+            $cost_total = $request->input('cost_total');
+            if ($cost_total != $order->cost_total) {
+                $order_notes[] = 'Cost total changed from ' . $order->cost_total . ' to ' . $cost_total . '.';
+                $order->cost_total = $cost_total;
+                $is_modified = true;
+            }
+        }
+
         $order->is_modified = $is_modified;
+        if ($order->status == Order::ORDER_STATUS_COMPLETED && !$order->isCompleted()) {
+            $order->completed_at = now();
+        }
         $order->save();
 
         foreach ($order_notes as $content) {
@@ -371,5 +441,80 @@ trait OrderApis
         }
 
         return $points;
+    }
+
+    /**
+     * @param Order $order
+     * @return array|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    protected function createPaypalOrder(Order $order)
+    {
+        $shipping = $order->shipping ?: [];
+        $data = [
+            'intent' => 'CAPTURE',
+            'purchase_units' => [
+                [
+                    'amount' => [
+                        'value' => $order->total,
+                        'currency_code' => 'EUR',
+//                        'breakdown' => [
+//                            'item_total' => [
+//                                'currency_code' => 'EUR',
+//                                'value' => format_amount($item_total),
+//                            ],
+//                            'shipping' => [
+//                                'currency_code' => 'EUR',
+//                                'value' => $shipping_total,
+//                            ],
+//                            'handling' => [
+//                                'currency_code' => 'EUR',
+//                                'value' => format_amount($total - $item_total - $shipping_total),
+//                            ],
+//                        ],
+                    ],
+                    //'items' => $items
+                ],
+            ],
+            'payment_source' => [
+                'paypal' => [
+                    'experience_context' => [
+                        'brand_name' => 'Noodlebox',
+                        'landing_page_type' => 'LOGIN',
+                        'user_action' => 'PAY_NOW',
+                        'return_url' => route('paypal.return'),
+                        'cancel_url' => route('paypal.cancel'),
+                    ],
+                    //'email_address' => '',
+                    'name' => [
+                        'given_name' => $shipping['first_name'] ?? '',
+                        'surname' => $shipping['last_name'] ?? '',
+                    ],
+                    'address' => [
+                        'address_line_1' => $shipping['address_line_1'] ?? '',
+                        'address_line_2' => $shipping['address_line_2'] ?? '',
+                        'admin_area_2' => $shipping['city'] ?? '',
+                        'admin_area_1' => $shipping['state'] ?? '',
+                        'postal_code' => $shipping['zpostal_code'] ?? '',
+                        'country_code' => 'IR',
+                    ]
+                ],
+            ],
+        ];
+
+        //return $data;
+        try {
+            $json = Paypal::createOrder($data);
+            $res = json_decode($json, true);
+            $order->out_trade_no = $res['id'] ?? '';
+            $order->save();
+
+            return $res;
+        } catch (\Exception $e) {
+            return [
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ];
+        }
     }
 }

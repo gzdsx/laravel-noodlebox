@@ -1,6 +1,7 @@
 <?php
 
 // @formatter:off
+// phpcs:ignoreFile
 /**
  * A helper file for your Eloquent Models
  * Copy the phpDocs from this file to the correct Model,
@@ -43,6 +44,27 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Ad whereUpdatedAt($value)
  */
 	class Ad extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\Badge
+ *
+ * @property int $id
+ * @property string|null $type
+ * @property string|null $name
+ * @property string|null $icon
+ * @property int $sort_num
+ * @method static \Illuminate\Database\Eloquent\Builder|Badge newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Badge newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Badge query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Badge whereIcon($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Badge whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Badge whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Badge whereSortNum($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Badge whereType($value)
+ */
+	class Badge extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -98,33 +120,61 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * App\Models\Captcha
+ *
+ * @property int $id
+ * @property string|null $code 验证码
+ * @property string|null $phone 手机号
+ * @property string|null $email 邮箱
+ * @property \Illuminate\Support\Carbon|null $created_at 发送时间
+ * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
+ * @method static \Illuminate\Database\Eloquent\Builder|Captcha newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Captcha newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Captcha query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Captcha wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereUpdatedAt($value)
+ */
+	class Captcha extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\Cart
  *
  * @property int $id 主键
- * @property string $user_id 用户ID
+ * @property int $user_id 用户ID
  * @property int $shop_id 店铺ID
  * @property int $product_id 产品ID
  * @property string|null $title 产品标题
- * @property string $image 大图
+ * @property string|null $image 大图
+ * @property string $price 原始价格
  * @property int $quantity 产品数量
- * @property string $price 商品价格
  * @property int $sku_id SKU ID
  * @property string|null $sku_title SKU名称
- * @property array|null $meta_data 附加选项
+ * @property object|null $meta_data 元数据
+ * @property string|null $cart_hash
+ * @property string|null $purchase_via
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 修改时间
+ * @property-read mixed $total
  * @property-read \App\Models\Product|null $product
  * @property-read \App\Models\Shop|null $shop
  * @property-read \App\Models\ProductSku|null $sku
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Cart whereCartHash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereMetaData($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cart wherePurchaseVia($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereSkuId($value)
@@ -134,6 +184,51 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereUserId($value)
  */
 	class Cart extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\CashierTransaction
+ *
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $base_amount
+ * @property string $shipping_total
+ * @property string $online_total
+ * @property string $card_total
+ * @property string $cash_total
+ * @property string $cost_total
+ * @property string $refund_total
+ * @property string $actual_total
+ * @property string $pos_balance
+ * @property string $total
+ * @property string|null $notes
+ * @property string|null $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read mixed $net_total
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction query()
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereActualTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereBaseAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereCardTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereCashTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereCostTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereOnlineTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction wherePosBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereRefundTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereShippingTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction whereUserId($value)
+ */
+	class CashierTransaction extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -155,6 +250,8 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CategoryMeta> $metas
  * @property-read int|null $metas_count
  * @property-read Category|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read int|null $products_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $siblings
  * @property-read int|null $siblings_count
  * @method static \Illuminate\Database\Eloquent\Builder|Category filter(array $input = [], $filter = null)
@@ -247,12 +344,25 @@ namespace App\Models{
  * @property string $image 照片
  * @property float $lng 当前位置
  * @property float $lat 当前位置
+ * @property string $base_amount
+ * @property string|null $color
  * @property string|null $status 状态
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
+ * @property-read \Illuminate\Support\Collection $meta_data
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeliveryerMeta> $metas
+ * @property-read int|null $metas_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property-read int|null $orders_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PosMachine> $posMachines
+ * @property-read int|null $pos_machines_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeliveryerTransaction> $transactions
+ * @property-read int|null $transactions_count
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereBaseAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereColor($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereImage($value)
@@ -264,6 +374,67 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Deliveryer whereUpdatedAt($value)
  */
 	class Deliveryer extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\DeliveryerMeta
+ *
+ * @property int $meta_id
+ * @property int|null $deliveryer_id
+ * @property string|null $meta_key
+ * @property string|null $meta_value
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerMeta newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerMeta newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerMeta query()
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerMeta whereDeliveryerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerMeta whereMetaId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerMeta whereMetaKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerMeta whereMetaValue($value)
+ */
+	class DeliveryerMeta extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\DeliveryerTransaction
+ *
+ * @property int $id
+ * @property int $deliveryer_id
+ * @property string $base_amount 底金
+ * @property string $shipping_total
+ * @property string $online_total
+ * @property string $card_total
+ * @property string $cash_total
+ * @property string $cost_total
+ * @property string|null $actual_total
+ * @property string $total
+ * @property string|null $notes
+ * @property string|null $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Deliveryer|null $deliveryer
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property-read int|null $orders_count
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction query()
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereActualTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereBaseAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereCardTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereCashTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereCostTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereDeliveryerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereOnlineTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereShippingTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction whereUpdatedAt($value)
+ */
+	class DeliveryerTransaction extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -469,6 +640,108 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * App\Models\LotteryCart
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string|null $name
+ * @property string|null $image
+ * @property int $quantity
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryCart newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryCart newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryCart query()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryCart whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryCart whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryCart whereImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryCart whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryCart whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryCart whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryCart whereUserId($value)
+ */
+	class LotteryCart extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\LotteryPrize
+ *
+ * @property int $id
+ * @property string|null $type
+ * @property string|null $name
+ * @property string|null $image
+ * @property int|null $points
+ * @property int $stock
+ * @property float $probability
+ * @property int $product_id
+ * @property int $status
+ * @property int $sort_num
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize query()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize wherePoints($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereProbability($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereSortNum($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereStock($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryPrize whereUpdatedAt($value)
+ */
+	class LotteryPrize extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\LotteryRecord
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string|null $name
+ * @property string|null $image
+ * @property int $points
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord query()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord wherePoints($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotteryRecord whereUserId($value)
+ */
+	class LotteryRecord extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\LotterySetting
+ *
+ * @property string $skey
+ * @property string|null $svalue
+ * @method static \Illuminate\Database\Eloquent\Builder|LotterySetting newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotterySetting newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotterySetting query()
+ * @method static \Illuminate\Database\Eloquent\Builder|LotterySetting whereSkey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LotterySetting whereSvalue($value)
+ */
+	class LotterySetting extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\Material
  *
  * @property int $id
@@ -606,26 +879,28 @@ namespace App\Models{
 /**
  * App\Models\Order
  *
- * @property int $order_id 主键
+ * @property int $id 主键
  * @property string|null $order_no 订单编号
  * @property int $order_type 订单类型,1=普通订单,2=拼单,3=超市订单,4=外卖订单
  * @property int $shop_id 门店ID
  * @property string|null $shop_name 门店名称
  * @property int $buyer_id 买家ID
  * @property string|null $buyer_name 买家账号
- * @property string|null $buyer_note 买家留言
+ * @property string|null $buyer_note 订单备注
  * @property int $seller_id 卖家ID
  * @property string|null $seller_name 卖家账号
  * @property string $discount_total 优惠金额
  * @property string $discount_tax 优惠税额
  * @property string $total
  * @property string $total_tax
+ * @property string $cost_total
  * @property int $prices_include_tax
  * @property string $payment_method
  * @property string|null $payment_method_title
  * @property int $payment_status 支付状态，1=已支付，0=未支付
  * @property \Illuminate\Support\Carbon|null $payment_at 付款时间
- * @property int $shipping_method 配送方式
+ * @property string|null $shipping_method
+ * @property array $shipping_line 配送区域
  * @property string $shipping_total 配送费
  * @property string $shipping_tax
  * @property int $shipping_status 发货状态，0=未发货，1=已发货
@@ -639,19 +914,31 @@ namespace App\Models{
  * @property array|null $discount_lines 优惠列表
  * @property array|null $shipping 配送地址
  * @property array|null $billing 账单地址
+ * @property int $deliveryer_id 配送员
+ * @property string|null $created_via
  * @property string $status 订单状态
+ * @property string|null $short_code
+ * @property int $is_modified
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
+ * @property \Illuminate\Support\Carbon|null $completed_at 完成时间
  * @property-read \App\Models\User|null $buyer
+ * @property-read \App\Models\Deliveryer|null $deliveryer
+ * @property-read mixed $links
+ * @property-read \Illuminate\Support\Collection $meta_data
  * @property-read array|\Illuminate\Contracts\Translation\Translator|string|null $pay_status_des
  * @property-read mixed|null $status_des
+ * @property-read mixed $subtotal
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderItem> $items
  * @property-read int|null $items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderMeta> $metas
+ * @property-read int|null $metas_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderNote> $notes
  * @property-read int|null $notes_count
  * @property-read \App\Models\User|null $seller
  * @property-read \App\Models\Shop|null $shop
  * @property-read \App\Models\UserTransaction|null $transaction
+ * @method static \Illuminate\Database\Eloquent\Builder|Order completed()
  * @method static \Illuminate\Database\Eloquent\Builder|Order filter(array $input = [], $filter = null)
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
@@ -665,14 +952,19 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereBuyerName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereBuyerNote($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereBuyerRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereCompletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereCostTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereCreatedVia($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereDeliveryerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountLines($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountTax($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDiscountTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereEndsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereFeeLines($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereIsModified($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereLike(string $column, string $value, string $boolean = 'and')
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereOrderNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereOrderType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereOutTradeNo($value)
@@ -687,12 +979,14 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereSellerRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShipping($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingLine($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingTax($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShippingTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShopName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereShortCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereTotalTax($value)
@@ -705,7 +999,7 @@ namespace App\Models{
 /**
  * App\Models\OrderItem
  *
- * @property int $trade_id 主键
+ * @property int $id 主键
  * @property int $order_id 订单ID
  * @property int $product_id 商品ID
  * @property string|null $title 商品名称
@@ -716,12 +1010,15 @@ namespace App\Models{
  * @property int|null $sku_id 属性ID
  * @property string|null $sku_title 商品属性
  * @property int $is_gift 是否赠品
- * @property string $status 交易状态
+ * @property string $subtotal 小计
+ * @property string $total 合计
  * @property-read \App\Models\Order|null $order
+ * @property-read \App\Models\Product|null $product
  * @property-read \App\Models\Refund|null $refund
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereIsGift($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereMetaData($value)
@@ -731,11 +1028,30 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereSkuId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereSkuTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereSubtotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereTradeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereTotal($value)
  */
 	class OrderItem extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\OrderMeta
+ *
+ * @property int $meta_id
+ * @property int $order_id
+ * @property string|null $meta_key
+ * @property string|null $meta_value
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMeta newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMeta newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMeta query()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMeta whereMetaId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMeta whereMetaKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMeta whereMetaValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMeta whereOrderId($value)
+ */
+	class OrderMeta extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -855,6 +1171,32 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|PhotoWall whereUpdatedAt($value)
  */
 	class PhotoWall extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\PosMachine
+ *
+ * @property int $id
+ * @property string|null $name
+ * @property string $base_amount
+ * @property int|null $sort_num
+ * @property string $status
+ * @property int $deliveryer_id
+ * @property int $is_cashier
+ * @property-read \App\Models\Deliveryer|null $deliveryer
+ * @method static \Illuminate\Database\Eloquent\Builder|PosMachine newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|PosMachine newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|PosMachine query()
+ * @method static \Illuminate\Database\Eloquent\Builder|PosMachine whereBaseAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PosMachine whereDeliveryerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PosMachine whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PosMachine whereIsCashier($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PosMachine whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PosMachine whereSortNum($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PosMachine whereStatus($value)
+ */
+	class PosMachine extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -1046,7 +1388,7 @@ namespace App\Models{
  * @property int $meta_id
  * @property int $post_id
  * @property string $meta_key
- * @property mixed $meta_value
+ * @property string|null $meta_value
  * @method static \Illuminate\Database\Eloquent\Builder|PostMeta newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PostMeta newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PostMeta query()
@@ -1093,8 +1435,7 @@ namespace App\Models{
  * @property int $is_new 是否新品
  * @property int $is_hot 是否热销
  * @property int $is_recommend 仓储推荐
- * @property int $is_promotion 是否促销
- * @property int $is_top 是否置顶
+ * @property int $sticky 是否置顶
  * @property int $free_delivery 免运费
  * @property int $template_id 运费模板
  * @property int $is_weight_template 是否按重量计价
@@ -1102,8 +1443,13 @@ namespace App\Models{
  * @property int $brand_id 品牌
  * @property string $status 商品状态
  * @property string|null $tax_status 含税状态
+ * @property int $points 赠送积分
  * @property string|null $keywords 关键词
  * @property string|null $description 简短描述
+ * @property int $sort_num 排序
+ * @property string|null $icon 图标
+ * @property int $allow_point_purchase
+ * @property int $point_price
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
@@ -1134,6 +1480,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Product query()
  * @method static \Illuminate\Database\Eloquent\Builder|Product simplePaginateFilter(?int $perPage = null, ?int $columns = [], ?int $pageName = 'page', ?int $page = null)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereAdditionalOptions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereAllowPointPurchase($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereAttrList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereBeginsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereBrandId($value)
@@ -1144,23 +1491,26 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereEndsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereFreeDelivery($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereHasSkuAttr($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereIcon($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsHot($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsNew($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsPromotion($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsRecommend($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsTop($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereIsWeightTemplate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereKeywords($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereLike(string $column, string $value, string $boolean = 'and')
+ * @method static \Illuminate\Database\Eloquent\Builder|Product wherePointPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product wherePoints($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product wherePurchaseLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereRegularPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereSold($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereSortNum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product whereSticky($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereStock($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereTaxStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Product whereTemplateId($value)
@@ -1575,6 +1925,29 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * App\Models\Role
+ *
+ * @property int $id
+ * @property string|null $name
+ * @property string|null $identifier
+ * @property string|null $type
+ * @property array|null $permissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Role newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereIdentifier($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role wherePermissions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereType($value)
+ */
+	class Role extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\Setting
  *
  * @property string $skey 标识
@@ -1793,15 +2166,16 @@ namespace App\Models{
  * @property int $id 主键
  * @property int $gid 管理权限
  * @property string|null $nickname 昵称
- * @property string|null $phone 手机号
  * @property string|null $email 邮箱
+ * @property string|null $national_number
+ * @property string|null $phone_number
  * @property string|null $avatar 头像
  * @property string|null $password 密码
  * @property string|null $remember_token
  * @property int $freeze 冻结
- * @property int $email_status 邮箱验证状态
- * @property int $name_status 实名认证状态
  * @property int $status 状态
+ * @property int $points 积分
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property-read \App\Models\UserAccount|null $account
@@ -1818,7 +2192,10 @@ namespace App\Models{
  * @property-read int|null $collected_posts_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserConnect> $connects
  * @property-read int|null $connects_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserCreditCard> $creditCards
+ * @property-read int|null $credit_cards_count
  * @property-read \Illuminate\Support\Collection $meta_data
+ * @property mixed $meta_value
  * @property-read array|string|null $status_des
  * @property-read \App\Models\UserGroup|null $group
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserLog> $logs
@@ -1847,21 +2224,22 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|User whereBeginsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereEndsWith(string $column, string $value, string $boolean = 'and')
  * @method static \Illuminate\Database\Eloquent\Builder|User whereFreeze($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereGid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereLike(string $column, string $value, string $boolean = 'and')
- * @method static \Illuminate\Database\Eloquent\Builder|User whereNameStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereNationalNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePhoneNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePoints($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  */
-	class User extends \Eloquent {}
+	class User extends \Eloquent implements \Illuminate\Contracts\Auth\MustVerifyEmail {}
 }
 
 namespace App\Models{
@@ -1911,13 +2289,15 @@ namespace App\Models{
  * @property int $id 主键
  * @property int $user_id 用户ID
  * @property string|null $tag 标签
- * @property string|null $name 姓名
+ * @property string|null $first_name 姓名
+ * @property string|null $last_name
  * @property string|null $phone 电话
  * @property string|null $country
  * @property string|null $state 省
  * @property string|null $city 市
  * @property string|null $county 区县
- * @property string|null $address 详细地址
+ * @property string|null $address_line_1 详细地址
+ * @property string|null $address_line_2 详细地址
  * @property float $latitude 纬度
  * @property float $longitude 经度
  * @property string|null $postalcode 邮编
@@ -1927,15 +2307,17 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress query()
- * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereAddressLine1($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereAddressLine2($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereCity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereCountry($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereCounty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereFirstName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereIsdefault($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereLastName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereLatitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereLongitude($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress wherePostalcode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserAddress whereState($value)
@@ -2042,6 +2424,33 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * App\Models\UserCreditCard
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string|null $name 名称
+ * @property string|null $card_no 卡号
+ * @property string|null $expiration 有效期
+ * @property \Illuminate\Support\Carbon|null $created_at 创建时间
+ * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
+ * @property \Illuminate\Support\Carbon|null $last_use_at 最后使用时间
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard query()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard whereCardNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard whereExpiration($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard whereLastUseAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserCreditCard whereUserId($value)
+ */
+	class UserCreditCard extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\UserGroup
  *
  * @property int $gid 主键
@@ -2108,6 +2517,63 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|UserMeta whereUserId($value)
  */
 	class UserMeta extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\UserPhone
+ *
+ * @property int $id 主键
+ * @property int $user_id 用户ID
+ * @property string|null $national_number 国家代码
+ * @property string|null $phone_number 电话号码
+ * @property \Illuminate\Support\Carbon|null $verified_at 验证时间
+ * @property \Illuminate\Support\Carbon|null $created_at 创建时间
+ * @property \Illuminate\Support\Carbon|null $updated_at 绑定时间
+ * @property-read \Illuminate\Support\Collection $meta_data
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone query()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereNationalNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone wherePhoneNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereVerifiedAt($value)
+ */
+	class UserPhone extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\UserPointTransaction
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property int $type
+ * @property int $points
+ * @property string|null $detail
+ * @property int $order_id
+ * @property int $order_item_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction query()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction whereDetail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction whereOrderItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction wherePoints($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPointTransaction whereUserId($value)
+ */
+	class UserPointTransaction extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -2192,31 +2658,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|UserTransaction whereUserId($value)
  */
 	class UserTransaction extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * App\Models\UserVerify
- *
- * @property int $id
- * @property string|null $code 验证码
- * @property string|null $phone 手机号
- * @property string|null $email 邮箱
- * @property int $used 已使用
- * @property \Illuminate\Support\Carbon|null $created_at 发送时间
- * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
- * @method static \Illuminate\Database\Eloquent\Builder|Captcha newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Captcha newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Captcha query()
- * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Captcha wherePhone($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Captcha whereUsed($value)
- */
-	class UserVerify extends \Eloquent {}
 }
 
 namespace App\Models{

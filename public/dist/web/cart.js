@@ -53,6 +53,7 @@ var _default = exports["default"] = {
       var id = item.id;
       _HttpClient["default"]["delete"]('/carts/' + id).then(function (res) {
         window.dispatchEvent(new Event('cartChanged'));
+        window.dispatchEvent(new Event('pointChanged'));
         _this.cart_items = _this.cart_items.filter(function (item) {
           return item.id !== id;
         });
@@ -232,8 +233,12 @@ var _default = exports["default"] = {
         national_number: national_number,
         vercode: this.vercode,
         remember: remember
-      }).then(function () {
-        _this2.$emit('logined');
+      }).then(function (resp) {
+        if (resp.data.code) {
+          _this2.errors.vercode = resp.data.message;
+        } else {
+          _this2.$emit('logined');
+        }
       })["catch"](function (reason) {
         _this2.errors.vercode = reason.response.data.message;
       })["finally"](function () {
@@ -259,11 +264,15 @@ var _default = exports["default"] = {
         email: email,
         password: password,
         remember: remember
-      }).then(function () {
-        _this3.$emit('logined');
+      }).then(function (resp) {
+        if (resp.data.code) {
+          _this3.errors.password = resp.data.message;
+        } else {
+          _this3.$emit('logined');
+        }
       })["catch"](function (reason) {
         _this3.loading = false;
-        _this3.errors.password = reason.message;
+        _this3.errors.password = reason.response.data.message;
       });
     }
   }

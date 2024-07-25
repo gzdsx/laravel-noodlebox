@@ -37,6 +37,7 @@ class RegisterController extends Controller
 
     protected function registered()
     {
-        return redirect()->route('verification.notice');
+        //return redirect()->route('verification.notice');
+        return redirect()->route('my-account');
     }
 }

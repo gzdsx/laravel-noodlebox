@@ -15,10 +15,7 @@ mix.webpackConfig({
     // }
 });
 
-if (mix.inProduction()) {
-    mix.version();
-}
-
+mix.version();
 mix.disableNotifications();
 mix.options({
     processCssUrls: false

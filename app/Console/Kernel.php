@@ -3,6 +3,8 @@
 namespace App\Console;
 
 
+use App\Models\Deliveryer;
+use App\Models\PosMachine;
 use App\Traits\WeChat\WechatDefaultConfig;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -29,15 +31,23 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('cashier-settlement')
-            ->dailyAt(settings('opening_hours_end'));
-
+//        $schedule->command('cashier-settlement')
+//            ->dailyAt(settings('opening_hours_end'));
+//
         $schedule->command('deliveryer-settlement')
             ->dailyAt(settings('opening_hours_end'));
 
-//        $schedule->call(function (){
-//            Artisan::call('cashier-settlement');
-//        })->everyMinute();
+        $schedule->call(function () {
+            PosMachine::query()->update([
+                'status' => PosMachine::STATUS_IDLE,
+                'deliveryer_id' => 0,
+                'base_amount' => 0
+            ]);
+            Deliveryer::query()->update([
+                'status' => 'offline',
+                'base_amount' => 0
+            ]);
+        })->dailyAt(settings('opening_hours_end'));
     }
 
     /**

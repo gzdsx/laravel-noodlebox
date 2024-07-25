@@ -1,25 +1,43 @@
 <template>
-    <el-dialog :title="$t('Deliveryer Transaction')" closeable :visible.sync="value" :close-on-click-modal="false"
+    <el-dialog :title="$t('Driver Report')" closeable :visible.sync="value" :close-on-click-modal="false"
                :close-on-press-escape="false" width="60%" @close="close">
         <el-table :data="orders" border>
             <el-table-column :label="$t('order.no')" prop="short_code"/>
             <el-table-column :label="$t('order.shipping_zone')" prop="shipping_line.zone_title"/>
             <el-table-column :label="$t('order.shipping_total')" prop="shipping_total"/>
-            <el-table-column :label="$t('Cost F')" prop="meta_data.cost_total"/>
+            <el-table-column :label="$t('Cost F')" prop="cost_total"/>
             <el-table-column :label="$t('order.total')" prop="total"/>
             <el-table-column :label="$t('order.payment_method')" prop="payment_method"/>
         </el-table>
         <el-descriptions title="" direction="vertical" :column="4" border>
-            <el-descriptions-item :label="$t('transaction.base_amount')">{{ transaction.base_amount }}</el-descriptions-item>
-            <el-descriptions-item :label="$t('transaction.shipping_total')">{{ transaction.shipping_total }}</el-descriptions-item>
-            <el-descriptions-item :label="$t('transaction.cash_total')">{{ transaction.cash_total }}</el-descriptions-item>
-            <el-descriptions-item :label="$t('transaction.online_total')">{{ transaction.online_total }}</el-descriptions-item>
-            <el-descriptions-item :label="$t('transaction.card_total')">{{ transaction.card_total }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.base_amount')">{{
+                    transaction.base_amount
+                }}
+            </el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.shipping_total')">{{
+                    transaction.shipping_total
+                }}
+            </el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.online_total')">{{
+                    transaction.online_total
+                }}
+            </el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.card_total')">{{
+                    transaction.card_total
+                }}
+            </el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.cash_total')">{{
+                    transaction.cash_total
+                }}
+            </el-descriptions-item>
             <el-descriptions-item label="Cost Total">{{ transaction.cost_total }}</el-descriptions-item>
-            <el-descriptions-item :label="$t('transaction.total')">{{ transaction.total }}</el-descriptions-item>
+            <el-descriptions-item :label="$t('transaction.actual_total')">{{
+                    transaction.actual_total
+                }}
+            </el-descriptions-item>
         </el-descriptions>
-        <el-form size="medium" label-position="top" style="margin-top:20px;">
-            <el-form-item label="Status">
+        <el-form size="medium" :inline="true" style="margin-top:20px;" v-if="transaction.status!=='settled'">
+            <el-form-item>
                 <el-select v-model="transaction.status">
                     <el-option :label="$t('transaction.status_options.settled')" value="settled"/>
                     <el-option :label="$t('transaction.status_options.pending')" value="pending"/>
@@ -55,14 +73,14 @@ export default {
                     cash_total: 0,
                     card_total: 0,
                     cost_total: 0,
-                    status:'pending',
+                    status: 'pending',
                 }
             }
         }
     },
     data() {
         return {
-            orders:[]
+            orders: []
         }
     },
     watch: {
@@ -75,14 +93,15 @@ export default {
             this.$emit('input', false);
         },
         handleSubmit() {
-            let {status,notes,id} = this.transaction;
-            ApiService.put('/deliveryers/transactions/'+id, {status,notes}).then(() => {
+            let {status, notes, id, deliveryer_id} = this.transaction;
+            ApiService.put(`/deliveryers/${deliveryer_id}/transactions/${id}`, {status, notes}).then(() => {
                 this.$message.success('Submitted Success');
                 this.$emit('input', false);
             });
         },
         loadOrders() {
-            ApiService.get('/deliveryers/'+this.transaction.deliveryer_id+'/orders').then(response => {
+            let {deliveryer_id} = this.transaction;
+            ApiService.get('/deliveryers/' + deliveryer_id + '/orders').then(response => {
                 this.orders = response.data.items;
             });
         },

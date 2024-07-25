@@ -17,19 +17,18 @@
     <meta property="og:site_name" content="{{settings('sitename')}}" />
     <meta property="og:modified_time" content="{{now()}}" />
     <meta property="og:image" content="@yield('og-image',settings('logo'))" />
-    <link href="https://noodlebox.ie" rel="dns-prefetch">
     <link href="{{settings('favicon')}}" rel="icon">
-    <link href="{{asset('lib/bootstrap/bootstrap.min.css?v='.appversion())}}" rel="stylesheet" type="text/css">
+    <link href="{{mix_asset('lib/bootstrap/bootstrap.min.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('lib/bootstrap-icons/bootstrap-icons.min.css?v=1.10.5')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('lib/swiper/swiper-bundle.css?v=8.4.7')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('lib/fancybox/fancybox.css')}}" rel="stylesheet" type="text/css">
-    <link href="{{asset('dist/web/index.css?v='.appversion())}}" rel="stylesheet" type="text/css">
+    <link href="{{mix_asset('dist/web/index.css')}}" rel="stylesheet" type="text/css">
 @yield('styles')
     <script src="{{asset('lib/jquery.min.js?v=3.4.0')}}" type="text/javascript"></script>
     <script src="{{asset('lib/fancybox/fancybox.umd.js')}}" type="text/javascript"></script>
     <script src="{{asset('lib/bootstrap/bootstrap.bundle.min.js?v=4.6.2')}}" type="text/javascript"></script>
     <script src="{{asset('lib/swiper/swiper-bundle.min.js?v=8.4.7')}}" type="text/javascript"></script>
-    <script src="{{asset('dist/web/vendor.js?v='.appversion())}}" type="text/javascript"></script>
+    <script src="{{mix_asset('dist/web/vendor.js')}}" type="text/javascript"></script>
 @yield('scripts')
     <script>
         window.noodlebox = {
@@ -56,7 +55,7 @@
 @yield('footer', view('web.footer'))
 @yield('footer-after')
 <div id="noodlebox"></div>
-<script src="{{asset('dist/web/runtime.js?v='.appversion())}}" type="text/javascript"></script>
+<script src="{{mix_asset('dist/web/runtime.js')}}" type="text/javascript"></script>
 @yield('footer-scripts')
 {!! settings('statcode') !!}
 </body>

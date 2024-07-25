@@ -13,10 +13,10 @@
                         <a href="{{url('points-mall')}}" class="text-safety-orange">Points Mall</a>
                     </h2>
                     <ul class="points-mall-tags">
-                        @foreach($tags as $tag)
+                        @foreach($points_mall_categories as $cat)
                             <li class="tag-item">
-                                <a href="{{route('points-mall',['tag'=>$tag])}}"
-                                   class="tag-link-{{$loop->index}}">{{$tag}}</a>
+                                <a href="{{route('points-mall',['slug'=>$cat->slug])}}"
+                                   class="tag-link-{{$loop->index}}">{{$cat->name}}</a>
                             </li>
                         @endforeach
                     </ul>
@@ -27,7 +27,8 @@
                             <div class="product-item">
                                 <div class="product-item__image">
                                     <a href="{{$prod->url}}" title="{{$prod->title}}">
-                                        <img src="{{asset('images/noodlebox/placeholder.png')}}" data-src="{{$prod->image}}" alt="{{$prod->title}}"/>
+                                        <img src="{{asset('images/noodlebox/placeholder.png')}}"
+                                             data-src="{{$prod->image}}" alt="{{$prod->title}}"/>
                                     </a>
                                 </div>
                                 <div class="product-item__title">

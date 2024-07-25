@@ -16,21 +16,18 @@
                         <el-form-item :label="$t('order.shipping_address')">
                             <div style="line-height: 1.4; padding-top:8px;">
                                 <div>{{ shipping.first_name }}</div>
-                                <div>{{ shipping.address_line_1 }}</div>
-                                <div v-if="shipping.county">{{ shipping.county }}</div>
-                                <div v-if="shipping.city">{{ shipping.city }}</div>
-                                <div v-if="shipping.state">{{ shipping.state }}</div>
-                                <div v-if="shipping.phone">
-                                    <span>+{{ shipping.phone.national_number }}</span>
-                                    <span>{{ shipping.phone.phone_number }}</span>
+                                <div v-if="shipping.phone_number">
+                                    <span>+{{ shipping.national_number }}</span>
+                                    <span>{{ shipping.phone_number }}</span>
                                 </div>
+                                <div>{{ shipping.formatted_address }}</div>
                             </div>
                         </el-form-item>
                         <el-form-item :label="$t('order.shipping_method')">
                             <el-select
                                 size="medium"
                                 class="w300"
-                                v-model="shipping_line.method_id"
+                                v-model="order.shipping_method"
                                 @change="onShippingMethodChange"
                             >
                                 <el-option
@@ -41,22 +38,22 @@
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item :label="$t('order.shipping_zone')" v-if="shipping_line.method_id==='flat_rate'">
+                        <el-form-item :label="$t('order.shipping_zone')" v-if="order.shipping_method==='flat_rate'">
                             <el-select
                                 size="medium"
                                 class="w300"
-                                v-model="shippingZoneIndex"
+                                v-model="shipping_line.zone_id"
                                 @change="onShippingMethodChange"
                             >
                                 <el-option
                                     v-for="(v,k) in shippingZones"
                                     :label="v.title+'(€'+v.fee+')'"
-                                    :value="k"
+                                    :value="v.id"
                                     :key="k"
                                 />
                             </el-select>
                         </el-form-item>
-                        <el-form-item :label="$t('order.deliveryer')" v-if="shipping_line.method_id==='flat_rate'">
+                        <el-form-item :label="$t('order.deliveryer')" v-if="order.shipping_method==='flat_rate'">
                             <el-select size="medium" class="w300" v-model="order.deliveryer_id">
                                 <el-option
                                     v-for="(v,k) in deliveryerList"
@@ -80,15 +77,24 @@
                             <el-input
                                 class="w300"
                                 type="number"
-                                :value="orderTotal"
-                            />
+                                :disabled="order.payment_method==='online'"
+                                v-model="newTotalValue"
+                            >
+                                <div slot="prepend">{{ newOrderTotal }}</div>
+                                <el-button
+                                    type="primary"
+                                    :disabled="order.payment_method==='online'"
+                                    @click="newOrderTotal=newTotalValue;newTotalValue=0" slot="append">Confirm
+                                </el-button>
+                            </el-input>
                         </el-form-item>
                         <el-form-item label="Cost Fee">
                             <div class="d-flex">
                                 <el-input
                                     class="w300"
                                     type="number"
-                                    v-model="order.cost_total"
+                                    :disabled="order.payment_method!=='online'"
+                                    v-model="newCostTotal"
                                 />
                             </div>
                         </el-form-item>
@@ -165,7 +171,8 @@ export default {
             default() {
                 return {
                     status: 'pending',
-                    deliveryer_id: ''
+                    deliveryer_id: '',
+                    shipping_method: ''
                 }
             }
         }
@@ -192,7 +199,12 @@ export default {
                 },
                 {
                     id: 'card',
-                    title: 'Pay by Card Reader',
+                    title: 'Pay by Card Reader(Unpaid)',
+                    fee: 0.5,
+                },
+                {
+                    id: 'card_reader',
+                    title: 'Pay by Card Reader(Paid)',
                     fee: 0.5,
                 },
                 {
@@ -210,9 +222,8 @@ export default {
                 'flat_rate': 'Delivery',
                 'local_pickup': 'Collection',
             },
-            shippingZones: [],
-            shippingZoneIndex: 0,
             shipping: {},
+            shippingZones: [],
             shipping_line: {
                 method_id: 'local_pickup',
                 method_title: 'Collection',
@@ -222,43 +233,40 @@ export default {
                 zone_title: ''
             },
             meta_data: {
-                cost_total: 0,
                 payment_with_cash_value: 0
             },
             order_notes: [],
-            orderTotal: 0,
+            newOrderTotal: 0,
+            newCostTotal: 0,
+            newShippingTotal: 0,
             payment_method: 'online',
+            newTotalValue: 0
         }
     },
     computed: {
         payByCardValue() {
-            return (this.orderTotal - this.meta_data.payment_with_cash_value).toFixed(2);
+            return (this.newOrderTotal - this.meta_data.payment_with_cash_value).toFixed(2);
         },
     },
     watch: {
-        value(val) {
-            if (val) {
-                this.fetchOrderNotes();
-                let {shipping, shipping_line, meta_data, total} = this.order;
-                this.shipping = shipping || {};
-                this.shipping_line = {
-                    ...this.shipping_line,
-                    ...shipping_line
-                }
-                this.meta_data = {
-                    ...this.meta_data,
-                    ...meta_data,
-                }
-
-                if (shipping_line.zone_id > 0) {
-                    this.shippingZoneIndex = this.shippingZones.findIndex(item => item.id === shipping_line.zone_id);
-                }
-
-                this.payment_method = this.order.payment_method || 'online';
-
-                this.orderTotal = total;
-                this.costTotal = this.meta_data.cost_total;
+        order(newVal) {
+            this.fetchOrderNotes();
+            let {shipping, shipping_line, shipping_total, cost_total, total, meta_data} = newVal;
+            this.shipping = shipping || {};
+            this.shipping_line = {
+                ...this.shipping_line,
+                ...shipping_line
             }
+            this.meta_data = {
+                ...this.meta_data,
+                ...meta_data,
+            }
+
+            this.payment_method = this.order.payment_method || 'online';
+
+            this.newOrderTotal = total;
+            this.newCostTotal = cost_total;
+            this.newShippingTotal = shipping_total;
         },
     },
     methods: {
@@ -271,7 +279,7 @@ export default {
             });
         },
         fetchDeliveryerList() {
-            this.$get('/deliveryers?limit=100').then(response => {
+            this.$get('/deliveryers?limit=100&status=online').then(response => {
                 this.deliveryerList = this.deliveryerList.concat(response.data.items);
             });
         },
@@ -291,9 +299,9 @@ export default {
                 status,
                 buyer_note,
                 deliveryer_id,
-                cost_total
+                shipping_method
             } = this.order;
-            let {shipping_line, orderTotal, payByCardValue, payment_method} = this;
+            let {shipping_line, payByCardValue, payment_method} = this;
             let payment_method_title = this.paymentMethodList.filter(item => item.id === payment_method)[0].title;
             let meta_data = {
                 ...this.meta_data,
@@ -302,7 +310,9 @@ export default {
 
             this.loading = true;
             ApiService.put(`/orders/${id}`, {
-                cost_total,
+                total: this.newOrderTotal,
+                cost_total: this.newCostTotal,
+                shipping_method,
                 shipping_line,
                 payment_method,
                 payment_method_title,
@@ -310,7 +320,6 @@ export default {
                 buyer_note,
                 meta_data,
                 status,
-                total: orderTotal,
             }).then(() => {
                 this.$message.success('Order Updated!');
                 this.$emit('update');
@@ -319,39 +328,33 @@ export default {
                 this.$emit('input', false);
             });
         },
-        subTotal(item) {
-            return item.price * item.quantity;
-        },
         onShippingMethodChange() {
-            let {total, shipping_total} = this.order;
-            let cost_total = this.meta_data.cost_total || 0;
-            if (this.shipping_line.method_id === 'flat_rate') {
-                let zone = this.shippingZones[this.shippingZoneIndex];
-                if (zone) {
-                    this.shipping_line = {
-                        method_id: 'flat_rate',
-                        method_title: 'Delivery',
-                        total: zone.fee,
-                        zone_id: zone.id,
-                        zone_title: zone.title,
+            let {total, shipping_total, cost_total, shipping_method} = this.order;
+            if (shipping_method === 'flat_rate') {
+                if (this.shipping_line.zone_id) {
+                    for (let zone of this.shippingZones) {
+                        if (zone.id === this.shipping_line.zone_id) {
+                            this.newShippingTotal = zone.fee;
+                        }
                     }
+                } else {
+                    let zone = this.shippingZones[0];
+                    this.newShippingTotal = zone.fee;
+                    this.shipping_line.zone_id = zone.id;
                 }
             } else {
-                this.shipping_line = {
-                    method_id: 'local_pickup',
-                    method_title: 'Collection',
-                    total: 0,
-                    zone_id: 0,
-                    zone_title: '',
-                }
+                this.newShippingTotal = 0;
             }
 
-            let diference = Number(this.shipping_line.total) - Number(shipping_total);
+            console.log(this.newShippingTotal, shipping_total, cost_total);
+            let diference = Number(this.newShippingTotal) - Number(shipping_total);
             if (this.order.payment_method === 'online') {
-                this.costTotal = (Number(cost_total) + Number(diference)).toFixed(2);
+                this.newCostTotal = (Number(cost_total) + Number(diference)).toFixed(2);
             } else {
-                this.orderTotal = (Number(total) + Number(diference)).toFixed(2);
+                this.newOrderTotal = (Number(total) + Number(diference)).toFixed(2);
             }
+
+            console.log(this.newCostTotal);
         }
     },
     mounted() {

@@ -9,7 +9,9 @@ use App\Models\OrderMeta;
 use App\Models\ShippingZone;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Controllers\Controller;
+use App\Support\Paypal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class CheckoutController extends BaseController
 {
@@ -65,171 +67,102 @@ class CheckoutController extends BaseController
             $points = $max_points;
         }
 
-        return [
-            'points' => $points,
-            'points_total' => $points * $exchange_rate,
-        ];
-    }
-
-    public function usePoints(Request $request)
-    {
-        $user = auth()->user();
-        $points = $request->input('points', 0);
-        $subtotal = $request->input('subtotal', 0);
-        $exchange_rate = settings('points_exchange_rate', 1);
-
-        if ($points > $user->points) {
-            $points = $user->points;
-        }
-
-        $max_points = floor($subtotal / $exchange_rate);
-        if ($points > $max_points) {
-            $points = $max_points;
-        }
-
-        return json_success([
-            'points' => $points,
-            'points_total' => $points * $exchange_rate,
-            'points_remain' => $user->points - $points,
-            'exchange_rate' => $exchange_rate
-        ]);
+        return $points;
     }
 
     public function order(Request $request)
     {
-        $user = $request->user();
-        $order = new Order();
-        $order->total = 0;
-
-        $items = Cart::with(['product'])->where('user_id', $user->id)->get();
+        $total = 0;
+        $subtotal = 0;
+        $items = Cart::with(['product'])->where('user_id', $request->user()->id)->get();
         foreach ($items as $item) {
-            $order->items->push(new OrderItem([
-                'product_id' => $item->product_id,
-                'quantity' => $item->quantity,
-                'price' => $item->price,
-                'title' => $item->title,
-                'image' => $item->image,
-                'meta_data' => $item->meta_data,
-                'total' => $item->quantity * $item->price,
-            ]));
+            $simple_total = bcmul($item->price, $item->quantity, 2);
+            $subtotal = bcadd($subtotal, $simple_total, 2);
         }
-        $order->total += $order->subtotal;
+        $total = bcadd($total, $subtotal, 2);
 
         $shipping_total = 0;
-        $shipping_line = $request->input('shipping_line', []);
         $shipping_method = $request->input('shipping_method', Order::SHIPPING_METHOD_FLATRATE);
-
-        foreach ($this->shipping_methods as $method) {
-            if ($method['id'] == $shipping_method) {
-                $shipping_line['method_id'] = $method['id'];
-                $shipping_line['method_title'] = $method['title'];
-            }
-        }
-
+        $shipping_zone_id = $request->input('shipping_zone_id', 0);
         if ($shipping_method == Order::SHIPPING_METHOD_FLATRATE) {
-            $zone_id = $shipping_line['zone_id'] ?? 0;
-            if ($zone_id) {
-                $zone = ShippingZone::find($zone_id);
-            } else {
+            $zone = ShippingZone::find($shipping_zone_id);
+            if (!$zone) {
                 $zone = ShippingZone::first();
+                $shipping_zone_id = $zone->id;
             }
-
-            if ($zone) {
-                $shipping_line['zone_id'] = $zone->id;
-                $shipping_line['zone_title'] = $zone->title;
-                $shipping_line['total'] = $zone->fee;
-                $shipping_total = $zone->fee;
-            } else {
-                $shipping_line['total'] = '0.00';
-            }
+            $shipping_total = bcadd($shipping_total, $zone->fee, 2);
         } else {
-            $shipping_line['total'] = '0.00';
-            $shipping_line['zone_id'] = null;
-            $shipping_line['zone_title'] = null;
+            $shipping_total = bcadd($shipping_total, '0', 2);
         }
-        $order->total += $shipping_total;
-        $order->shipping_total = $shipping_total;
-        $order->shipping_line = $shipping_line;
-        $order->shipping_method = $shipping_method;
+        $total = bcadd($total, $shipping_total, 2);
 
         $fee_lines = [];
-        $payment_method = $request->input('payment_method', 'online');
+        $payment_method = $request->input('payment_method') ?: 'online';
         foreach ($this->getPaymentMethods() as $method) {
             if ($payment_method == $method['id']) {
-                $order->payment_method = $method['id'];
-                $order->payment_method_title = $method['title'];
-
                 if ($method['fee'] > 0) {
                     $fee_lines[] = [
-                        'name' => 'Commission',
+                        'name' => 'ADM Fee',
                         'total' => format_amount($method['fee'])
                     ];
-                    $order->total += $method['fee'];
+                    $total = bcadd($total, $method['fee'], 2);
                 }
             }
         }
-        $order->fee_lines = $fee_lines;
 
-        $discount_total = 0;
         $discount_lines = [];
-        $meta_data = collect($request->input('meta_data', []));
-        if ($meta_data->get('use_points_value', 0) > 0) {
-            $pointData = $this->calculatePoints($meta_data->get('use_points_value', 0), $order->subtotal);
-            $points = $pointData['points'];
-            $points_total = $pointData['points_total'];
-
+        $use_points_value = $request->input('use_points_value', 0);
+        if ($use_points_value > 0) {
+            $exchange_rate = settings('points_exchange_rate', 1);
+            $use_points_value = $this->calculatePoints($use_points_value, $subtotal, 2);
+            $use_points_amount = bcmul($use_points_value, $exchange_rate, 2);
             $discount_lines[] = [
-                'name' => 'Points',
-                'total' => format_amount($points_total),
+                'name' => 'Points deduction',
+                'total' => $use_points_amount
             ];
-            $discount_total += $points_total;
-            $meta_data->put('use_points_value', $points);
+            $total = bcsub($total, $use_points_amount, 2);
         }
-
-        foreach ($meta_data as $key => $value) {
-            $order->metas->push(new OrderMeta([
-                'meta_key' => $key,
-                'meta_value' => $value
-            ]));
-        }
-
-        $order->discount_lines = $discount_lines;
-        $order->discount_total = bcadd($discount_total, 0, 2);
-        $order->total = bcsub($order->total, $discount_total, 2);
 
         $shipping = $request->input('shipping', []);
-        if (!isset($shipping['first_name']) || empty($shipping['first_name'])) {
-            $order->shipping = array_merge([
-                'first_name' => '',
-                'last_name' => '',
-                'company' => '',
-                'address_1' => '',
-                'address_2' => '',
-                'city' => '',
-                'state' => '',
-                'postcode' => '',
-                'country' => 'IR',
-                'national_number' => $user->national_number,
-                'phone_number' => $user->phone_number,
-                'email' => $user->email,
-                'formatted_address' => ''
-            ], $user->getMeta('shipping_address', []));
-        } else {
-            $order->shipping = $shipping;
+        if (!isset($shipping['first_name']) || blank($shipping['first_name'])) {
+            $shipping = $request->user()->getMeta('shipping_address', []);
         }
 
-        return json_success($order);
+        return json_success(compact(
+            'items',
+            'total',
+            'subtotal',
+            'shipping',
+            'shipping_total',
+            'shipping_method',
+            'shipping_zone_id',
+            'payment_method',
+            'fee_lines',
+            'discount_lines',
+            'use_points_value'
+        ));
     }
 
     public function options()
     {
+        $in_delivery_hours = false;
+        $hour_start = Carbon::createFromTimeString(settings('delivery_hours_start', '09:00'));
+        $hour_end = Carbon::createFromTimeString(settings('delivery_hours_end', '09:00'));
+
+        if (now()->lte($hour_end) || now()->gte($hour_start)) {
+            $in_delivery_hours = true;
+        }
+
         return $this->success([
             'currency' => settings('currency', 'EUR'),
             'currency_symbol' => settings('currency_symbol', '€'),
             'enable_points_checkout' => settings('enable_points_checkout', 'no'),
             'shipping_methods' => $this->shipping_methods,
             'shipping_zones' => ShippingZone::all(),
-            'payment_methods' => $this->getPaymentMethods()
+            'payment_methods' => $this->getPaymentMethods(),
+            'paypal_client_id' => Paypal::getClientId(),
+            'in_delivery_hours' => $in_delivery_hours,
+            'order_warning' => settings('shop_order_warning')
         ]);
     }
 }

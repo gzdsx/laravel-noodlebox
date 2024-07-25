@@ -138,7 +138,7 @@ class User extends Authenticatable implements MustVerifyEmail
         });
 
         static::created(function (User $user) {
-            $user->account()->create();
+            $user->account()->firstOrCreate();
         });
 
         static::deleting(function (User $user) {

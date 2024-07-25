@@ -7,5 +7,5 @@
 @endsection
 
 @section('footer-scripts')
-    <script src="{{asset('dist/web/orders.js?v='.appversion())}}"></script>
+    <script src="{{mix_asset('dist/web/orders.js')}}"></script>
 @endsection

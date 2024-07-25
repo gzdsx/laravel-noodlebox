@@ -6,6 +6,7 @@ use App\Models\CashierTransaction;
 use App\Models\Order;
 use App\Models\PosMachine;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 
 class CashierSettlement extends Command
 {
@@ -46,12 +47,15 @@ class CashierSettlement extends Command
         $card_total = 0;
         $refund_total = 0;
         $shipping_total = 0;
-        $cash_profit_total = 0;
+        $cost_total = 0;
 
-        $orders = Order::where([])->get();
+        $time_start = Carbon::createFromTimeString(settings('opening_hours_start'))->subDay();
+        $time_end = Carbon::createFromTimeString(settings('opening_hours_end'));
+        $orders = Order::whereBetween('created_at', [$time_start, $time_end])->get();
         foreach ($orders as $order) {
             $total += $order->total;
             $shipping_total += $order->shipping_total;
+            $cost_total += $order->cost_total;
 
             if ($order->payment_method === 'cash') {
                 $cash_total += $order->total;
@@ -61,6 +65,7 @@ class CashierSettlement extends Command
                 $card_total += $order->total;
             } elseif ($order->payment_method === 'customize') {
                 $cash_total += $order->meta_data['payment_with_cash_value'] ?? 0;
+                $card_total += $order->meta_data['payment_with_card_value'] ?? 0;
             }
 
             if ($order->refund_at) {
@@ -68,22 +73,22 @@ class CashierSettlement extends Command
             }
         }
 
-        $pos_base_amount = 0;
-        $cashier_pos = PosMachine::where('is_cashier',1)->first();
-        if ($cashier_pos){
-            $pos_base_amount = $cashier_pos->base_amount;
+        $base_amount = 0;
+        $cashier_pos = PosMachine::where('is_cashier', 1)->first();
+        if ($cashier_pos) {
+            $base_amount = $cashier_pos->base_amount;
         }
 
         $model = CashierTransaction::query()->whereDate('created_at', now())->firstOrNew();
         $model->total = $total;
         $model->shipping_total = $shipping_total;
-        $model->cash_total = $cash_total;
         $model->online_total = $online_total;
         $model->card_total = $card_total;
+        $model->cash_total = $cash_total;
+        $model->cost_total = $cost_total;
         $model->refund_total = $refund_total;
-        $model->cash_profit_total = $cash_total - $refund_total;
-        $model->pos_base_amount = $pos_base_amount;
-        $model->notes = now()->format('Y-m-d');
+        $model->actual_total = ($cash_total + $cost_total - $refund_total - $shipping_total);
+        $model->base_amount = $base_amount;
         $model->save();
         return 0;
     }

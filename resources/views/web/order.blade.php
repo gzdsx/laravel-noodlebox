@@ -43,12 +43,12 @@
                         </div>
                         <div class="order-total">
                             <div class="order-total__label">Shipping</div>
-                            <div class="order-total__value">€{{$order->shipping_total}}</div>
+                            <div class="order-total__value">+€{{$order->shipping_total}}</div>
                         </div>
                         @foreach($order->fee_lines as $fee)
                             <div class="order-total">
                                 <div class="order-total__label">{{$fee['name']??''}}</div>
-                                <div class="order-total__value">€{{$fee['total']??''}}</div>
+                                <div class="order-total__value">+€{{$fee['total']??''}}</div>
                             </div>
                         @endforeach
                         @foreach($order->discount_lines as $discount)
@@ -66,20 +66,20 @@
                     <h3>Shipping Address</h3>
                     <div class="order-shipping">
                         <div>{{$order->shipping['first_name'] ?? ''}}</div>
-                        @if(isset($order->shipping['phone_number']))
+                        @isset($order->shipping['phone_number'])
                             <div>
                                 <span>+{{$order->shipping['national_number'] ?? ''}}</span>
                                 <span>{{$order->shipping['phone_number'] ?? ''}}</span>
                             </div>
-                        @endif
+                        @endisset
                         <div>
                             {{$order->shipping['formatted_address'] ?? ''}}
                         </div>
-                        @if(isset($order->shipping['postalcode']))
+                        @isset($order->shipping['postal_code'])
                             <div>
-                                {{$order->shipping['postalcode'] ?? ''}}
+                                {{$order->shipping['postal_code'] ?? ''}}
                             </div>
-                        @endif
+                        @endisset
                     </div>
                 </div>
             </div>

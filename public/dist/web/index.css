@@ -225,6 +225,12 @@ img, video {
   z-index: 100;
 }
 
+.message .links {
+  display: flex;
+  -moz-column-gap: 1rem;
+       column-gap: 1rem;
+}
+
 @media (min-width: 1200px) {
   .container {
     max-width: 1400px !important;
@@ -1563,10 +1569,30 @@ img, video {
   color: #f5f5f5;
 }
 
+.window-cookie {
+  position: fixed;
+  background-color: #000;
+  color: #ffffff;
+  padding: 2rem;
+  left: 1rem;
+  bottom: 1rem;
+  width: 500px;
+  border-radius: 0.6rem;
+  z-index: 100;
+}
+
 @media (max-width: 768px) {
   .footer-row {
     flex-direction: column;
     row-gap: 10px;
+  }
+  .window-cookie {
+    border-radius: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    z-index: 1000;
   }
 }
 .noodle-dialog {
@@ -1943,6 +1969,9 @@ img, video {
 }
 .checkout .label-radio .radio:checked + .radio-box:before {
   background-color: var(--bull-cyan) !important;
+}
+.checkout .invalid-feedback.show {
+  display: block;
 }
 
 @media (max-width: 768px) {

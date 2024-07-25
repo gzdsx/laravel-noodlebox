@@ -41,26 +41,32 @@ class PrizeController extends BaseController
 
     /**
      * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request)
+    {
+        $prize = $this->repository()->make();
+        $prize->fill($request->all());
+        $prize->save();
+        return json_success($prize);
+    }
+
+    /**
+     * @param Request $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $id = 0)
-    {
-        $model = $this->repository()->findOrNew($id);
-        $model->fill($request->input('prize', []));
-        $model->save();
-        return json_success($model);
-    }
-
     public function update(Request $request, $id)
     {
-        return $this->store($request, $id);
-    }
-
-    public function batchUpdate(Request $request)
-    {
-        $this->repository()->whereKey($request->input('ids', []))->update($request->input('data', []));
-        return json_success();
+        if ($id == 'batch'){
+            $this->repository()->whereKey($request->input('ids', []))->update($request->input('data', []));
+            return json_success();
+        }else{
+            $prize = $this->repository()->findOrFail($id);
+            $prize->fill($request->all());
+            $prize->save();
+            return json_success($prize);
+        }
     }
 
     public function destroy($id, Request $request)

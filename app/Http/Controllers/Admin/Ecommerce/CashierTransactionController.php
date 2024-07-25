@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Admin\Ecommerce;
 
+use App\Http\Controllers\Admin\BaseController;
+use App\Models\CashierTransaction;
 use App\Models\Order;
 use App\Http\Controllers\Controller;
+use App\Models\PosMachine;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
-class CashierTransactionController extends Controller
+class CashierTransactionController extends BaseController
 {
     /**
      * @return \App\Models\CashierTransaction|\Illuminate\Database\Eloquent\Builder
@@ -45,46 +49,19 @@ class CashierTransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $total = 0;
-        $cash_total = 0;
-        $online_total = 0;
-        $card_total = 0;
-        $refund_total = 0;
-        $shipping_total = 0;
-        $cash_profit_total = 0;
-
-        $orders = Order::where([])->get();
-        foreach ($orders as $order) {
-            $total += $order->total;
-            $shipping_total += $order->shipping_total;
-
-            if ($order->payment_method === 'cash') {
-                $cash_total += $order->total;
-            } elseif ($order->payment_method === 'online') {
-                $online_total += $order->total;
-            } elseif ($order->payment_method === 'card') {
-                $card_total += $order->total;
-            } elseif ($order->payment_method === 'customize') {
-                $cash_total += $order->meta_data['payment_with_cash_value'] ?? 0;
-            }
-
-            if ($order->refund_at) {
-                $refund_total += $order->total;
-            }
+        $transaction = $this->generateBilling();
+        $transaction->user()->associate($request->user());
+        if ($request->filled('pos_balance')) {
+            $transaction->pos_balance = $request->input('pos_balance');
         }
 
-        $model = $this->repository()->whereDate('created_at', now())->firstOrNew();
-        $model->total = $total;
-        $model->shipping_total = $shipping_total;
-        $model->cash_total = $cash_total;
-        $model->online_total = $online_total;
-        $model->card_total = $card_total;
-        $model->refund_total = $refund_total;
-        $model->cash_profit_total = $cash_total - $refund_total;
-        $model->notes = $request->input('notes');
-        $model->save();
+        if ($request->filled('status')) {
+            $transaction->status = $request->input('status');
+        }
 
-        return json_success($model);
+        $transaction->save();
+
+        return json_success($transaction);
     }
 
     /**
@@ -103,11 +80,16 @@ class CashierTransactionController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
-        //
+        $transaction = $this->repository()->findOrFail($id);
+        $transaction->status = $request->input('status');
+        $transaction->notes = $request->input('notes');
+        $transaction->save();
+
+        return json_success($transaction);
     }
 
     /**
@@ -125,5 +107,67 @@ class CashierTransactionController extends Controller
         }
 
         return json_success();
+    }
+
+    public function billing()
+    {
+        $transaction = $this->generateBilling();
+        return json_success($transaction);
+    }
+
+    protected function generateBilling()
+    {
+        $transaction = new CashierTransaction([
+            'base_amount' => 0,
+            'cost_total' => 0,
+            'shipping_total' => 0,
+            'cash_total' => 0,
+            'online_total' => 0,
+            'card_total' => 0,
+            'refund_total' => 0,
+            'actual_total' => 0,
+            'pos_balance' => 0,
+            'total' => 0,
+            'notes' => '',
+            'status' => 'pending'
+        ]);
+
+        $last = CashierTransaction::orderByDesc('created_at')->first();
+        if ($last) {
+            $orders = Order::completed()->where('completed_at', '>', $last->created_at)->get();
+            $transaction->base_amount = $last->pos_balance;
+            $transaction->pos_balance = $last->pos_balance;
+        } else {
+            $orders = Order::completed()->get();
+        }
+
+        if ($orders->count()) {
+            foreach ($orders as $order) {
+                $transaction->total = bcadd($transaction->total, $order->total, 2);
+                $transaction->cost_total = bcadd($transaction->cost_total, $order->cost_total, 2);
+                $transaction->shipping_total = bcadd($transaction->shipping_total, $order->shipping_total, 2);
+
+                if ($order->payment_method === 'cash' || $order->payment_method === 'card') {
+                    $transaction->cash_total = bcadd($transaction->cash_total, $order->total, 2);
+                } elseif ($order->payment_method === 'online') {
+                    $transaction->online_total = bcadd($transaction->online_total, $order->total, 2);
+                } elseif ($order->payment_method === 'card_reader') {
+                    $transaction->card_total = bcadd($transaction->card_total, $order->total, 2);
+                } elseif ($order->payment_method === 'customize') {
+                    $transaction->cash_total = bcadd($transaction->cash_total, floatval($order->getMeta('payment_with_cash_value', 0)), 2);
+                    $transaction->card_total = bcadd($transaction->card_total, floatval($order->getMeta('payment_with_card_value', 0)), 2);
+                }
+
+                if ($order->refund_at) {
+                    $transaction->refund_total = bcadd($transaction->refund_total, $order->total, 2);
+                }
+            }
+            $transaction->base_amount = format_amount(0);
+            $transaction->refund_total = format_amount($transaction->refund_total);
+            $transaction->actual_total = bcadd($transaction->cash_total, $transaction->cost_total, 2);
+            $transaction->actual_total = bcsub($transaction->actual_total, $transaction->shipping_total, 2);
+        }
+
+        return $transaction;
     }
 }

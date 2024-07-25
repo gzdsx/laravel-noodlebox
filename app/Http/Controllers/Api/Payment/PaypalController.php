@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers\Api\Payment;
 
+use App\Http\Requests\OrderCreateRequest;
+use App\Models\Cart;
+use App\Models\Order;
+use App\Models\ShippingZone;
 use App\Support\Paypal;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Controllers\Controller;
@@ -10,10 +14,71 @@ use Illuminate\Http\Request;
 
 class PaypalController extends BaseController
 {
-    public function createOrder(Request $request)
+    protected function getPaymentMethods()
     {
-        $total = $request->input('total', 0);
-        $shipping_total = $request->input('shipping_line.total', 0);
+        return [
+            [
+                'id' => 'online',
+                'title' => 'Pay Online (PayPal & Credit Car)',
+                'description' => 'Pay Online (PayPal & Credit Car)',
+                'fee' => '0.50',
+                'img' => asset('images/noodlebox/Full_Online.png')
+            ],
+            [
+                'id' => 'card',
+                'title' => 'Pay by Card Reader',
+                'description' => 'Pay by Card Reader',
+                'fee' => '0.50',
+                'img' => asset('images/noodlebox/pay_by_card.png')
+            ],
+            [
+                'id' => 'cash',
+                'title' => 'Pay Cash',
+                'description' => 'Pay Cash',
+                'fee' => '0.00',
+                'img' => asset('images/noodlebox/pay_cash.png')
+            ]
+        ];
+    }
+
+    public function createOrder(OrderCreateRequest $request)
+    {
+        $total = 0;
+        $subtotal = 0;
+        $items = Cart::where('user_id', $request->user()->id)->get();
+        foreach ($items as $item) {
+            $simple_total = bcmul($item->price, $item->quantity, 2);
+            $subtotal = bcadd($subtotal, $simple_total, 2);
+        }
+        $total = bcadd($total, $subtotal, 2);
+
+        $shipping_method = $request->input('shipping_method', Order::SHIPPING_METHOD_FLATRATE);
+        $shipping_zone_id = $request->input('shipping_zone_id', 0);
+        if ($shipping_method == Order::SHIPPING_METHOD_FLATRATE) {
+            $zone = ShippingZone::find($shipping_zone_id);
+            if (!$zone) {
+                $zone = ShippingZone::first();
+            }
+            $total = bcadd($total, $zone->fee, 2);
+        }
+
+        $payment_method = $request->input('payment_method') ?: 'card';
+        foreach ($this->getPaymentMethods() as $method) {
+            if ($payment_method == $method['id']) {
+                if ($method['fee'] > 0) {
+                    $total = bcadd($total, $method['fee'], 2);
+                }
+            }
+        }
+
+        $use_points_value = $request->input('use_points_value', 0);
+        if ($use_points_value > 0) {
+            $exchange_rate = settings('points_exchange_rate', 1);
+            $use_points_value = $this->calculatePoints($use_points_value, $subtotal);
+            $use_points_amount = bcmul($use_points_value, $exchange_rate, 2);
+            $total = bcsub($total, $use_points_amount, 2);
+        }
+
         $shipping = $request->input('shipping', []);
 
 //        $items = [];
@@ -71,11 +136,11 @@ class PaypalController extends BaseController
                         'surname' => $shipping['last_name'] ?? '',
                     ],
                     'address' => [
-                        'address_line_1' => $shipping['address_line_1'] ?? '',
-                        'address_line_2' => $shipping['address_line_2'] ?? '',
+                        'address_line_1' => $shipping['formatted_address'] ?? '',
+                        'address_line_2' => $shipping['address_2'] ?? '',
                         'admin_area_2' => $shipping['city'] ?? '',
                         'admin_area_1' => $shipping['state'] ?? '',
-                        'postal_code' => $shipping['zpostal_code'] ?? '',
+                        'postal_code' => $shipping['postal_code'] ?? '',
                         'country_code' => 'IR',
                     ]
                 ],
@@ -87,34 +152,24 @@ class PaypalController extends BaseController
             $json = Paypal::createOrder($data);
             return json_success(json_decode($json));
         } catch (\Exception $e) {
-            return json_error($e->getMessage(), 500, $request->input('orderData', []));
+            return json_error($e->getMessage(), 422, $request->all());
         }
     }
 
-
-    /**
-     * @return mixed
-     * @throws \Exception
-     */
-    protected function getPaypalToken()
+    protected function calculatePoints($points, $subtotal)
     {
-        return cache()->remember('paypal_token', 30000, function () {
-            $client = new Client();
-            $response = $client->request('POST', 'https://api.sandbox.paypal.com/v1/oauth2/token', [
-                'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ],
-                'form_params' => [
-                    'grant_type' => 'client_credentials',
-                ],
-                'auth' => [
-                    env('PAYPAL_SANDBOX_CLIENT_ID'),
-                    env('PAYPAL_SANDBOX_CLIENT_SECRET'),
-                ],
-            ]);
+        $user = auth()->user();
+        $exchange_rate = settings('points_exchange_rate', 1);
 
-            $data = json_decode($response->getBody()->getContents());
-            return $data->access_token;
-        });
+        if ($points > $user->points) {
+            $points = $user->points;
+        }
+
+        $max_points = floor($subtotal / $exchange_rate);
+        if ($points > $max_points) {
+            $points = $max_points;
+        }
+
+        return $points;
     }
 }

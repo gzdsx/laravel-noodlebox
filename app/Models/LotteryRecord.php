@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\HasDates;
+use App\Models\Traits\HasImageAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,9 +32,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class LotteryRecord extends Model
 {
-    use HasFactory, HasDates;
+    use HasFactory, HasDates, HasImageAttribute;
 
-    protected $table = 'lottery_record';
+    protected $table = 'lottery_records';
     protected $fillable = ['user_id', 'title', 'image', 'points'];
     protected $with = ['user'];
 

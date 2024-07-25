@@ -29,7 +29,6 @@
                     <el-button size="small" type="primary" :disabled="selectionIds.length===0" @click="onDelete">
                         {{ $t('common.batch_delete') }}
                     </el-button>
-                    <el-button size="small" type="info" @click="showSettlement=true">{{$t('pos_machines.settlement')}}</el-button>
                 </div>
                 <el-pagination
                         background
@@ -55,9 +54,6 @@
                         <el-option :label="$t('pos_machines.statuses.inuse')" value="inuse"/>
                         <el-option :label="$t('pos_machines.statuses.idle')" value="idle"/>
                     </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('pos_machines.use_as_cashier')">
-                    <el-switch v-model="model.is_cashier" :inactive-value="0" :active-value="1"/>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" class="w100" @click="onSubmit">{{ $t('common.submit') }}

@@ -9,6 +9,7 @@ use App\Support\PrintNode;
 use EloquentFilter\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 use Vinkla\Hashids\Facades\Hashids;
 
 
@@ -29,7 +30,7 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property string $discount_tax 优惠税额
  * @property string $total
  * @property string $total_tax
- * @property string|null $cost_total
+ * @property string $cost_total
  * @property int $prices_include_tax
  * @property string $payment_method
  * @property string|null $payment_method_title
@@ -72,9 +73,9 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderNote> $notes
  * @property-read int|null $notes_count
  * @property-read \App\Models\User|null $seller
- * @property-read \App\Models\ShippingZone|null $shippingZone
  * @property-read \App\Models\Shop|null $shop
  * @property-read \App\Models\UserTransaction|null $transaction
+ * @method static Builder|Order completed()
  * @method static Builder|Order filter(array $input = [], $filter = null)
  * @method static Builder|Order newModelQuery()
  * @method static Builder|Order newQuery()
@@ -153,8 +154,8 @@ class Order extends Model
     protected $fillable = [
         'id', 'order_no', 'order_type', 'shop_id', 'shop_name', 'buyer_id', 'buyer_name', 'buyer_note',
         'seller_id', 'seller_name', 'discount_total', 'discount_tax', 'total', 'total_tax', 'cost_total',
-        'prices_include_tax', 'payment_method', 'payment_method_title', 'payment_status', 'payment_at',
-        'shipping_method', 'shipping_line', 'shipping_total', 'shipping_tax', 'shipping_status', 'shipping_at',
+        'prices_include_tax', 'payment_method', 'payment_method_title', 'payment_at',
+        'shipping_method', 'shipping_line', 'shipping_total', 'shipping_tax', 'shipping_at',
         'buyer_rate', 'seller_rate', 'buyer_deleted', 'seller_deleted', 'out_trade_no', 'fee_lines', 'discount_lines',
         'shipping', 'billing', 'deliveryer_id', 'status', 'is_modified', 'short_code',
     ];
@@ -167,10 +168,10 @@ class Order extends Model
     protected $casts = [
         'fee_lines' => 'array',
         'discount_lines' => 'array',
-        'shipping' => 'array',
         'billing' => 'array',
-        'shipping_line' => 'json',
-        'meta_data' => 'json',
+        'shipping' => 'array',
+        'shipping_line' => 'array',
+        'meta_data' => 'array',
         'payment_at' => 'datetime',
         'shipping_at' => 'datetime',
         'completed_at' => 'datetime',
@@ -216,7 +217,10 @@ class Order extends Model
     public function getLinksAttribute()
     {
         return [
-            'invoice' => route('order.invoice', Hashids::encodeHex($this->id)),
+            'invoice' => [
+                'href' => URL::signedRoute('invoice.order', $this->id),
+                'method' => 'GET'
+            ],
         ];
     }
 
@@ -288,9 +292,9 @@ class Order extends Model
         return $this->belongsTo(Deliveryer::class, 'deliveryer_id', 'id');
     }
 
-    public function shippingZone()
+    public function scopeCompleted($query)
     {
-        return $this->belongsTo(ShippingZone::class, 'shipping_zone_id', 'id');
+        return $query->whereNotNull('completed_at');
     }
 
     /**
@@ -306,7 +310,6 @@ class Order extends Model
     {
         $this->forceFill([
             'status' => self::ORDER_STATUS_PROCESSIING,
-            'payment_status' => 1,
             'payment_at' => now()
         ])->save();
     }
@@ -316,7 +319,6 @@ class Order extends Model
     {
         $this->forceFill([
             'status' => self::ORDER_STATUS_PENDING,
-            'payment_status' => 0,
             'payment_at' => null
         ])->save();
     }
@@ -326,22 +328,13 @@ class Order extends Model
      */
     public function isPaid()
     {
-        return $this->payment_status == 1;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isUnPaid()
-    {
-        return $this->payment_status == 0;
+        return !is_null($this->payment_at);
     }
 
     public function markAsShipped()
     {
         $this->forceFill([
             'status' => self::ORDER_STATUS_DELIVERING,
-            'shipping_status' => 1,
             'shipping_at' => now()
         ])->save();
     }
@@ -351,7 +344,7 @@ class Order extends Model
      */
     public function isShipped()
     {
-        return $this->shipping_status == 1;
+        return is_null($this->shipping_at);
     }
 
     public function markAsCancelled()
@@ -377,6 +370,11 @@ class Order extends Model
         ])->save();
     }
 
+    public function isCompleted()
+    {
+        return !is_null($this->completed_at);
+    }
+
     public static function findAvalaibleCode()
     {
         $exists = false;
@@ -396,7 +394,7 @@ class Order extends Model
             'printerId' => env('PRINTNODE_PRINTER_ID'),
             'title' => 'Invoice',
             'contentType' => 'pdf_uri',
-            'content' => $this->links['invoice'],
+            'content' => $this->links['invoice']['href'],
             'source' => 'Noodlebox',
             'options' => [
                 'bin' => '上下省纸设置',

@@ -5,7 +5,7 @@
                 <checkout-shipping
                     :order.sync="order"
                     :shipping-zones.sync="options.shipping_zones"
-                    @total-change="loadOrderData"
+                    @change="onShippingChange"
                 />
                 <div class="form-group mt-4">
                     <h5 class="font-weight-bold">Order notes</h5>
@@ -19,7 +19,7 @@
                 <h3 class="font-weight-bold">You order</h3>
                 <checkou-items :items="order.items"/>
                 <div class="form-group mt-4" v-if="options.enable_points_checkout==='yes'">
-                    <checkout-use-points :default-points.sync="order.meta_data.use_points_value||0"
+                    <checkout-use-points :default-points.sync="order.use_points_value"
                                          @submit="onPointsChange"/>
                 </div>
                 <div class="order-totals">
@@ -27,7 +27,7 @@
                         <div class="order-total__label">Subtotal</div>
                         <div class="order-total__total">€{{ order.subtotal }}</div>
                     </div>
-                    <div class="order-total" v-if="order.shipping_line.method_id === 'flat_rate'">
+                    <div class="order-total">
                         <div class="order-total__label">Shipping</div>
                         <div class="order-total__total">+€{{ order.shipping_total }}</div>
                     </div>
@@ -60,11 +60,12 @@
                 </div>
 
                 <div class="mt-5">
-                    <div class="invalid-feedback show" v-if="resError" v-html="resError"></div>
+                    <div class="invalid-feedback mb-2" :class="{'show':!!resError}" v-html="resError"></div>
                     <div class="form-group">
                         <paypal-buttons
+                            :client-id="options.paypal_client_id"
                             :create-order="createPaypalOrder"
-                            :on-approve="createOrder"
+                            :on-approve="onPaypalApprove"
                             :on-click="onPaypalClick"
                             :on-error="onPaypalError"
                             v-if="order.payment_method==='online'"/>
@@ -78,25 +79,38 @@
                 </div>
 
                 <p class="text-center text-safety-orange">
-                    I’ve read and accept the <a>terms & conditions</a> and <a>privacy conditions</a></p>
+                    I’ve read and accept the
+                    <a href="/terms-conditions" target="_blank">terms & conditions</a>
+                    and <a href="/privacy" target="_blank">privacy conditions</a>
+                </p>
             </div>
         </div>
         <noodle-loading v-if="loading"/>
+        <noodle-dialog title="Warning" :visible="showWarning" @close="showWarning=false">
+            <div class="p-4 text-center">
+                <h5 class="text-safety-orange mb-5">{{options.order_warning}}</h5>
+                <div>
+                    <button class="btn btn-bull-cyan text-white" @click="showWarning=false">Continue</button>
+                </div>
+            </div>
+        </noodle-dialog>
     </div>
 </template>
 
 <script>
 import HttpClient from "../HttpClient";
 import NoodleContainer from "../components/NoodleContainer.vue";
-import PaypalButtons from "./PaypalButtons.vue";
+import PaypalButtons from "./PaypalButtons";
 import CheckouItems from "./CheckouItems.vue";
 import NoodleLoading from "../components/NoodleLoading.vue";
 import CheckoutUsePoints from "./CheckoutUsePoints.vue";
 import CheckoutShipping from "./CheckoutShipping.vue";
+import NoodleOverlayer from "../components/NoodleOverlayer.vue";
 
 export default {
     name: "NoodleCheckout",
     components: {
+        NoodleOverlayer,
         CheckoutShipping,
         CheckoutUsePoints,
         NoodleLoading,
@@ -113,19 +127,21 @@ export default {
                 payment_methods: []
             },
             order: {
-                payment_method: 'online',
-                payment_method_title: 'Pay Online (PayPal & Credit Car)',
+                payment_method: null,
                 shipping_method: 'flat_rate',
                 shipping: {},
-                shipping_line: {},
+                shipping_zone_id: 0,
                 items: [],
-                meta_data: {},
+                discount_lines: [],
+                fee_lines: [],
                 buyer_note: '',
                 subtotal: 0,
                 total: 0,
-                created_via: 'checkout'
+                created_via: 'checkout',
+                use_points_value: 0
             },
-            resError: null
+            resError: null,
+            showWarning: false
         }
     },
     methods: {
@@ -135,22 +151,19 @@ export default {
                     ...this.options,
                     ...response.data
                 };
+                this.showWarning = !this.options.in_delivery_hours;
             });
         },
         createOrder() {
             this.loading = true;
+            this.resError = null;
             return HttpClient.post('/orders', this.order).then((res) => {
-                window.location.assign(res.data.links[1].href);
+                window.location.assign(res.data.links[0].href);
             }).catch(reason => {
                 this.resError = reason.message;
                 this.$showToast(reason.message);
             }).finally(() => {
                 this.loading = false;
-            });
-        },
-        createPaypalOrder(data, actions) {
-            return HttpClient.post('/payment/paypal/order', this.order).then(response => {
-                return response.data.id;
             });
         },
         onPaypalClick(data, actions) {
@@ -160,42 +173,61 @@ export default {
                 return actions.reject();
             }
 
-            if (!shipping.phone.phone_number) {
+            if (!shipping.phone_number) {
                 this.$showToast('Please fill your phone number');
                 return actions.reject();
             }
 
-            if (!shipping.address_line_1) {
-                this.$showToast('Please fill your address');
-                return actions.reject();
-            }
-
-            //console.log(shipping);
-            if (!shipping.phone.verified) {
-                this.$showToast('Phone number not verified');
-                return actions.reject();
+            if (this.order.shipping_method === 'flat_rate') {
+                if (!shipping.formatted_address) {
+                    this.$showToast('Please fill your address');
+                    return actions.reject();
+                }
             }
 
             return actions.resolve();
+        },
+        createPaypalOrder(data, actions) {
+            return HttpClient.post('/payment/paypal/order', this.order).then(response => {
+                return response.data.id;
+            });
+        },
+        onPaypalApprove(data, actions) {
+            //console.log(data, actions);
+            this.loading = true;
+            actions.order.capture().then((response) => {
+                //console.log(response);
+                this.order.out_trade_no = response.id;
+                this.createOrder();
+            });
+            // return HttpClient.post(`/orders/${data.orderID}/capture`).then((response) => {
+            //     window.location.assign(response.data.links[1].href);
+            // }).catch((error) => {
+            //     this.$showToast(error.message);
+            // });
         },
         onPaypalError(error) {
             //console.log(error);
             this.$showToast(error.message);
         },
         onPointsChange(points) {
-            this.order.meta_data = {
-                ...this.order.meta_data,
+            this.order = {
+                ...this.order,
                 use_points_value: points
             };
             this.loadOrderData();
         },
-        onShippingChange(shipping) {
-            this.order.shipping = shipping;
-        },
-        onShippingLineChange(shipping_line) {
-            console.log(shipping_line);
-            this.order.shipping_line = shipping_line;
-            this.loadOrderData();
+        onShippingChange(data) {
+            //console.log(data);
+            this.order.shipping = data.shipping;
+            if (data.shipping_zone_id !== this.order.shipping_zone_id) {
+                this.order.shipping_zone_id = data.shipping_zone_id;
+                this.loadOrderData();
+            }
+            if (data.shipping_method !== this.order.shipping_method) {
+                this.order.shipping_method = data.shipping_method;
+                this.loadOrderData();
+            }
         },
         loadOrderData() {
             this.loading = true;

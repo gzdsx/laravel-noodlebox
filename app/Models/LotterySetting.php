@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class LotterySetting extends Model
 {
-    protected $table = 'lottery_setting';
+    protected $table = 'lottery_settings';
     protected $fillable = ['skey', 'svalue'];
     protected $primaryKey = 'skey';
     protected $keyType = 'string';

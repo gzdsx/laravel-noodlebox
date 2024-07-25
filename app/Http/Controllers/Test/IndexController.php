@@ -3,24 +3,23 @@
 namespace App\Http\Controllers\Test;
 
 use App\Jobs\DownloadProductImage;
+use App\Jobs\SyncNoodleUser;
+use App\Jobs\SyncUsers;
+use App\Models\Category;
 use App\Models\Product;
 use App\Http\Controllers\Controller;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class IndexController extends Controller
 {
     public function index(Request $request)
     {
-        //$time_start = settings('opening_hours_start');
 
-        //return Carbon::createFromTimeString($time_start)->subDay()->toDateTimeString();
-
-        //User::whereKey(1000000)->update(['password'=>bcrypt('12341234')]);
-
-       $product = Product::where('image', 'like', '%noodlebox.ie%')->first();
-
-       $this->dispatchSync(new DownloadProductImage($product));
+        return mix_asset('/dist/home/index.css');
     }
 
     function generateCombinations($options)

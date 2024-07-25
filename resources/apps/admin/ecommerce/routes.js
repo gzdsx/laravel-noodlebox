@@ -18,6 +18,8 @@ import PosMachineList from "./PosMachineList.vue";
 import Settings from "./Settings.vue";
 import CashierTransaction from "./CashierTransaction.vue";
 import DeliveryerTransaction from "./DeliveryerTransaction.vue";
+import DeliveryerBilling from "./DeliveryerBilling.vue";
+import CashierBilling from "./CashierBilling.vue";
 
 module.exports = [
     {
@@ -108,7 +110,7 @@ module.exports = [
     {
         path: '/deliveryers',
         component: DeliveryerList,
-        meta: {title: '配送员管理', capabilities: []}
+        meta: {title: '配送员管理', capabilities: ['manager']}
     },
     {
         path: '/order/list',
@@ -136,8 +138,18 @@ module.exports = [
         meta: {title: '收银台账', capabilities: ['manager']}
     },
     {
+        path: '/cashier/billing',
+        component: CashierBilling,
+        meta: {title: '收银账单', capabilities: ['manager']}
+    },
+    {
         path: '/deliveryer/transactions',
         component: DeliveryerTransaction,
         meta: {title: '司机台账', capabilities: ['manager']}
     },
+    {
+        path: '/deliveryer/billing',
+        component: DeliveryerBilling,
+        meta: {title: '司机账单', capabilities: ['manager']}
+    }
 ]

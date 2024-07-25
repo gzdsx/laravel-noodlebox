@@ -21,8 +21,8 @@
                         </div>
                         <div class="col product-col-metas">
                             <product-meta-boxes
-                                    :product="product"
-                                    @added="visible=false"
+                                :product="product"
+                                @added="visible=false"
                             />
                         </div>
                     </div>
@@ -34,6 +34,7 @@
         </noodle-dialog>
         <noodle-dialog-login v-model="showLogin" @close="showLogin=false"/>
         <lottery-app/>
+        <noodle-cookie-window v-if="showCookie" @reject="showCookie=false" @accept="onAcceptCookie"/>
     </div>
 </template>
 
@@ -47,29 +48,38 @@ import NoodleDialogLogin from "./NoodleDialogLogin.vue";
 import CartService from "../CartService";
 import DialogLottery from "../lottery/DialogLottery.vue";
 import LotteryApp from "../lottery/LotteryApp.vue";
+import NoodleCookieWindow from "./NoodleCookieWindow.vue";
 
 export default {
     name: "NoodleBoxApp",
-    components: {LotteryApp, DialogLottery, NoodleDialogLogin, NoodleLoading, NoodleDialog, ProductMetaBoxes, DialogCart},
+    components: {
+        NoodleCookieWindow,
+        LotteryApp, DialogLottery, NoodleDialogLogin, NoodleLoading, NoodleDialog, ProductMetaBoxes, DialogCart
+    },
     data() {
         return {
             visible: false,
             loading: false,
             product: {},
             curImage: {},
-            showLogin: false
+            showLogin: false,
+            showCookie: false
         }
     },
     methods: {
         close() {
             this.visible = false;
+        },
+        onAcceptCookie() {
+            window.localStorage.setItem('CookieStatus', 'yes');
+            this.showCookie = false;
         }
     },
     mounted() {
         let items = document.querySelectorAll('.add-to-cart');
         items.forEach(item => {
             item.addEventListener('click', (e) => {
-                if (!window.noodlebox.user.id){
+                if (!window.noodlebox.user.id) {
                     this.showLogin = true;
                     return false;
                 }
@@ -100,6 +110,12 @@ export default {
             //window.location.href = '/login?redirect=' + window.location.href;
             this.showLogin = true;
         });
+
+        try {
+            this.showCookie = window.localStorage.getItem('CookieStatus') !== 'yes';
+        } catch (e) {
+
+        }
     }
 }
 </script>

@@ -90,6 +90,7 @@ export default {
             let {id} = item;
             HttpClient.delete('/carts/' + id).then((res) => {
                 window.dispatchEvent(new Event('cartChanged'));
+                window.dispatchEvent(new Event('pointChanged'));
                 this.cart_items = this.cart_items.filter((item) => item.id !== id);
             }).finally(() => {
 

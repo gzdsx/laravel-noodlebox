@@ -31,19 +31,19 @@
                 </el-table-column>
                 <el-table-column prop="base_amount" width="100" :label="$t('deliveryer.base_amount')"/>
                 <el-table-column prop="status" width="100" :label="$t('status')"/>
-                <el-table-column width="auto" :label="$t('common.option')" align="right" fixed="right">
+                <el-table-column width="100" :label="$t('common.option')" align="right" fixed="right">
                     <template slot-scope="scope">
-                        <el-button size="mini" type="text" @click="onShowEdit(scope.row)">{{
-                            $t('common.edit')
-                            }}
+                        <el-button size="mini" type="text" @click="onShowEdit(scope.row)">
+                            {{ $t('common.edit') }}
                         </el-button>
-                        <el-button size="mini" type="text" @click="handleShowDetail(scope.row)">{{ $t('deliveryer.account_detail')}}</el-button>
                     </template>
                 </el-table-column>
             </el-table>
             <div class="tablenav-bottom">
                 <div class="table-actions">
-                    <el-button size="small" type="primary" :disabled="selectionIds.length===0" @click="onDelete">
+                    <el-button size="small" type="primary"
+                               :disabled="selectionIds.length===0"
+                               @click="onDelete" v-if="$store.getters.userInfo.capability==='administrator'">
                         {{ $t('common.batch_delete') }}
                     </el-button>
                 </div>
@@ -59,7 +59,7 @@
         </section>
         <el-dialog :title="$t('New Deliveryer')" closeable :visible.sync="showDialog" :close-on-click-modal="false"
                    :close-on-press-escape="false">
-            <el-form size="medium" label-width="80px" style="width: 500px;">
+            <el-form size="medium" label-width="140px" style="width: 500px;">
                 <el-form-item :label="$t('user.avatar')">
                     <div class="img-80" @click="showPicker=true">
                         <featured-image :src="deliveryer.image"/>
@@ -95,31 +95,7 @@
                 </el-form-item>
             </el-form>
         </el-dialog>
-        <el-dialog :title="$t('Settlement')" closeable :visible.sync="showCheckout" :close-on-click-modal="false"
-                   :close-on-press-escape="false">
-            <el-descriptions title="" direction="vertical" :column="4" border>
-                <el-descriptions-item label="底金">{{ transaction.base_total }}</el-descriptions-item>
-                <el-descriptions-item label="配送费">{{ transaction.shipping_total }}</el-descriptions-item>
-                <el-descriptions-item label="收到现金">{{ transaction.cash_total }}</el-descriptions-item>
-                <el-descriptions-item label="在线支付">{{ transaction.online_total }}</el-descriptions-item>
-                <el-descriptions-item label="卡支付">{{ transaction.card_total }}</el-descriptions-item>
-                <el-descriptions-item label="Cost Total">{{ transaction.cost_total }}</el-descriptions-item>
-                <el-descriptions-item label="应交金额">{{ transaction.total }}</el-descriptions-item>
-            </el-descriptions>
-            <el-form size="medium" label-width="60px" style="width: 500px;margin-top: 20px;">
-                <el-form-item label="备注">
-                    <el-input type="textarea" rows="3" class="w400" v-model="transaction.note"/>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" class="w100" @click="onSettlement">{{ $t('common.submit') }}
-                    </el-button>
-                    <a class="el-link el-link--primary" @click="handleShowOrders">View Details</a>
-                </el-form-item>
-            </el-form>
-        </el-dialog>
         <media-dialog v-model="showPicker" @confirm="onSelectImage"/>
-        <dialog-deliveryer-transaction :deliveryer="deliveryer" v-model="showTransactions"/>
-        <dialog-deliveryer-orders :deliveryer="deliveryer" v-model="showOrders"/>
     </main-layout>
 </template>
 
@@ -160,10 +136,10 @@ export default {
             this.deliveryer = {
                 name: '',
                 phone: '',
-                image: '',
+                image: 'https://www.noodlebox.ie/storage/image/2024/06/xCBIaqkVWDboCg4CVz2hy2X9TOchd0hpD8WNjWZY.png',
                 status: 'online',
                 base_amount: 0,
-                color: '#fff',
+                color: '#000',
                 pos_machines: []
             };
         },

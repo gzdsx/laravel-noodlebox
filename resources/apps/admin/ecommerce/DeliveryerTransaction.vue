@@ -35,13 +35,13 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="base_amount" width="120" :label="$t('transaction.base_amount')"/>
+                <el-table-column prop="base_amount" :label="$t('transaction.base_amount')"/>
                 <el-table-column prop="shipping_total" width="120" :label="$t('transaction.shipping_total')"/>
-                <el-table-column prop="cash_total" width="120" :label="$t('transaction.cash_total')"/>
                 <el-table-column prop="online_total" width="120" :label="$t('transaction.online_total')"/>
                 <el-table-column prop="card_total" width="120" :label="$t('transaction.card_total')"/>
-                <el-table-column prop="total" width="120" :label="$t('transaction.total')"/>
-                <el-table-column prop="notes" :label="$t('transaction.notes')"/>
+                <el-table-column prop="cash_total" width="120" :label="$t('transaction.cash_total')"/>
+                <el-table-column prop="cost_total" width="120" :label="$t('transaction.cost_total')"/>
+                <el-table-column prop="actual_total" width="120" :label="$t('transaction.actual_total')"/>
                 <el-table-column width="80" label="Status">
                     <template slot-scope="scope">
                         <el-tag v-if="scope.row.status === 'settled'" type="success">
@@ -50,7 +50,12 @@
                         <el-tag v-else type="danger">{{ $t('transaction.status_options.pending') }}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="created_at" width="170" :label="$t('transaction.created_at')"/>
+                <el-table-column prop="created_at" width="170" :label="$t('transaction.created_at')" fixed="right"/>
+                <el-table-column width="80" :label="$t('common.action')" fixed="right">
+                    <template slot-scope="scope">
+                        <a :href="scope.row.links.invoice.href" target="_blank">{{ $t('common.print') }}</a>
+                    </template>
+                </el-table-column>
             </el-table>
             <div class="table-edit-footer">
                 <el-button size="small"
@@ -72,18 +77,23 @@
                 />
             </div>
         </div>
-        <dialog-deliveryer-transaction :transaction="currentTransaction" v-model="showTransaction"/>
+        <dialog-deliveryer-bill
+            :transaction="currentTransaction"
+            :driver-name="currentTransaction.deliveryer.name"
+            v-model="showTransaction"
+            @change="fetchList"
+        />
     </main-layout>
 </template>
 
 <script>
 import ApiService from "../utils/ApiService";
 import Pagination from "../mixins/Pagination";
-import DialogDeliveryerTransaction from "./DialogDeliveryerTransaction.vue";
+import DialogDeliveryerBill from "./DialogDeliveryerBill.vue";
 
 export default {
     name: "DeliveryerTransaction",
-    components: {DialogDeliveryerTransaction},
+    components: {DialogDeliveryerBill},
     mixins: [Pagination],
     data() {
         return {
@@ -91,7 +101,9 @@ export default {
                 date: null
             },
             showTransaction: false,
-            currentTransaction: {}
+            currentTransaction: {
+                deliveryer:{}
+            }
         }
     },
     computed: {
@@ -101,7 +113,7 @@ export default {
     },
     methods: {
         listApi() {
-            return '/deliveryers/transactions';
+            return '/deliveryers/0/transactions';
         },
         listParams() {
             return this.params;
@@ -111,7 +123,7 @@ export default {
             this.$confirm(this.$t('common.delete_tips'), this.$t('common.delete_confirm'), {
                 type: 'warning'
             }).then(() => {
-                ApiService.delete('/deliveryers/transactions/batch', {data: {ids}}).then(() => {
+                ApiService.delete('/deliveryers/0/transactions/batch', {data: {ids}}).then(() => {
                     this.fetchList();
                 });
             });

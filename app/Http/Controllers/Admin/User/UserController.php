@@ -45,7 +45,11 @@ class UserController extends BaseController
         $query = $this->repository()->filter($request->all());
         return json_success([
             'total' => $query->count(),
-            'items' => $query->with(['group', 'account'])->offset($offset)->limit($limit)->get()
+            'items' => $query->with(['group', 'account'])
+                ->offset($offset)
+                ->limit($limit)
+                ->orderByDesc('id')
+                ->get()
         ]);
     }
 
@@ -56,7 +60,7 @@ class UserController extends BaseController
     public function show($id = null)
     {
         if ($id) {
-            $model = $this->repository()->find($id);
+            $model = $this->repository()->findOrNew($id);
         } else {
             $model = Auth::user();
         }
@@ -71,7 +75,7 @@ class UserController extends BaseController
      */
     public function store(Request $request)
     {
-        $user = $this->repository()->make();
+        $user = $this->repository()->make([]);
         $user->nickname = $request->input('nickname');
 
         if ($request->filled('password')) {
@@ -100,12 +104,11 @@ class UserController extends BaseController
         }
 
         if ($request->filled('avatar')) {
-            $user = $this->cropAvatar($request->input('avatar'));
+            $user->avatar = $this->cropAvatar($request->input('avatar'));
         }
 
         $user->save();
         $user->refresh();
-
         if ($request->filled('meta_data')) {
             foreach ($request->input('meta_data', []) as $key => $value) {
                 $user->updateMeta($key, $value);
@@ -113,11 +116,10 @@ class UserController extends BaseController
         }
 
         event(new Registered($user));
-
-        return json_success();
+        return json_success($user);
     }
 
-    public function update($id, Request $request)
+    public function update(Request $request, $id)
     {
         if ($id == 'batch') {
             return $this->batchUpdate($request);
@@ -163,6 +165,7 @@ class UserController extends BaseController
         $user->save();
 
         if ($request->filled('meta_data')) {
+            //dd($request->input('meta_data', []));
             foreach ($request->input('meta_data', []) as $key => $value) {
                 $user->updateMeta($key, $value);
             }

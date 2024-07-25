@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * @return int|mixed
@@ -252,6 +253,34 @@ function json_error($message, $code = 422, $errors = null)
         $response['errors'] = $errors;
     }
     return response()->json($response, $code, [], JSON_UNESCAPED_UNICODE);
+}
+
+/**
+ * @param $path
+ * @return string
+ */
+function mix_asset($path)
+{
+    static $manifests = [];
+    if (! Str::startsWith($path, '/')) {
+        $path = "/{$path}";
+    }
+
+    $manifestPath = public_path('/mix-manifest.json');
+    if (!isset($manifests[$manifestPath])) {
+        if (!is_file($manifestPath)) {
+            return asset($path);
+        }
+
+        $manifests[$manifestPath] = json_decode(file_get_contents($manifestPath), true);
+    }
+
+    $manifest = $manifests[$manifestPath];
+    if (!isset($manifest[$path])) {
+        return asset($path);
+    }
+
+    return asset($manifest[$path]);
 }
 
 require __DIR__ . '/hooks.php';

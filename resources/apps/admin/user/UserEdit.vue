@@ -116,9 +116,12 @@ export default {
                     this.loading = false;
                 });
             } else {
-                UserService.storeUser(user).then(res => {
+                UserService.storeUser({
+                    ...user,
+                    meta_data
+                }).then(res => {
                     this.$message.success(this.$t('user.saved'));
-                    this.$router.replace('/user/edit/' + res.data.uid);
+                    this.$router.replace('/user/edit/' + res.data.id);
                 }).catch(reason => {
                     this.$message.error(reason.message);
                 }).finally(() => {

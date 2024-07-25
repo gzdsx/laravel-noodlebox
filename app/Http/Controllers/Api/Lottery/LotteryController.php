@@ -23,7 +23,8 @@ class LotteryController extends BaseController
     {
         $user = auth()->user();
         $settings = LotterySetting::get()->pluck('svalue', 'skey');
-        if ($user->points < $settings['price']) {
+        $points = $settings['price'] ?? 0;
+        if ($user->points < $points) {
             abort(422, $settings['insufficient_points'] ?? 'Insufficient points');
         }
 
@@ -31,6 +32,16 @@ class LotteryController extends BaseController
         $sort_keys = $prizes->pluck('probability', 'id')->toArray();
         $prizeId = $this->getPrizeId($sort_keys);
         $prize = LotteryPrize::find($prizeId);
+
+        $user->points = bcsub($user->points, $points);
+        $user->save();
+
+        $transaction = new UserPointTransaction();
+        $transaction->user()->associate($user);
+        $transaction->points = $points;
+        $transaction->type = 2;
+        $transaction->detail = 'lottery cost points';
+        $transaction->save();
 
         $record = new LotteryRecord();
         $record->name = $prize->name;
@@ -40,16 +51,28 @@ class LotteryController extends BaseController
         $record->save();
 
         if ($prize->type == 'product') {
-            $cart = Cart::firstOrNew(['user_id' => $user->id, 'product_id' => $prize->id, 'purchase_via' => 'lottery']);
-            $cart->title = $prize->name;
-            $cart->image = $prize->image;
-            $cart->quantity += 1;
-            $cart->meta_data = [
-                'purchase_via' => 'lottery'
-            ];
-            $cart->save();
+            $meta_data = ['purchase_via' => 'lottery', 'prize_id' => $prize->id];
+            $cart_hash = md5(json_encode([
+                0,
+                $meta_data,
+                'lottery'
+            ]));
+            $cart = Cart::where(['cart_hash' => $cart_hash])->firstOrNew();
+            if ($cart->id) {
+                $cart->quantity += 1;
+                $cart->save();
+            } else {
+                $cart->product_id = 0;
+                $cart->title = $prize->name;
+                $cart->image = $prize->image;
+                $cart->quantity = 1;
+                $cart->meta_data = $meta_data;
+                $cart->purchase_via = 'lottery';
+                $cart->user_id = $user->id;
+                $cart->save();
+            }
         } elseif ($prize->type == 'point') {
-            $user->points += $prize->points;
+            $user->points = bcadd($user->points, $prize->points);
             $user->save();
 
             $transaction = new UserPointTransaction();

@@ -57,7 +57,32 @@
                 </el-form-item>
                 <el-form-item :label="$t('shop.referral_link_description')">
                     <el-input type="textarea" rows="3" class="w500" v-model="settings.referral_link_description"/>
-                    <div class="el-form-tips">{{ $t('shop.referral_link_description_tips')}}</div>
+                    <div class="el-form-tips">{{ $t('shop.referral_link_description_tips') }}</div>
+                </el-form-item>
+
+                <el-form-item :label="$t('shop.shop_order_warning')">
+                    <el-input type="textarea" rows="3" class="w500" v-model="settings.shop_order_warning"/>
+                    <div class="el-form-tips">{{ $t('shop.shop_order_warning_tips') }}</div>
+                </el-form-item>
+
+                <el-form-item :label="$t('shop.delivery_hours')">
+                    <el-time-select
+                        v-model="settings.delivery_hours_start"
+                        :picker-options="{
+                      start: '00:00',
+                      step: '00:15',
+                      end: '23:59'
+                    }">
+                    </el-time-select>
+                    <el-time-select
+                        v-model="settings.delivery_hours_end"
+                        :picker-options="{
+                              start: '00:00',
+                              step: '00:15',
+                              end: '23:59',
+                            }">
+                    </el-time-select>
+                    <div class="el-form-tips">{{ $t('shop.opening_hours_tips') }}</div>
                 </el-form-item>
 
                 <el-form-item>

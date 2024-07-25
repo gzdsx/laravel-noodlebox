@@ -163,7 +163,7 @@ export default {
             }
 
             if (prize.id) {
-                ApiService.put('/lottery/prizes/' + prize.id, {prize}).then(() => {
+                ApiService.put('/lottery/prizes/' + prize.id, prize).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;
@@ -172,7 +172,7 @@ export default {
                     this.$message.error(reason.message);
                 });
             } else {
-                ApiService.post('/lottery/prizes', {prize}).then(() => {
+                ApiService.post('/lottery/prizes', prize).then(() => {
                     this.resetData();
                     this.fetchList();
                     this.showDialog = false;

@@ -11,8 +11,7 @@
                             class="form-control"
                             placeholder="Your name"
                             :class="{'is-invalid':errors.name}"
-                            v-model="order.shipping.first_name"
-                            @change="onShippingChange"
+                            v-model="shipping.first_name"
                         />
                     </div>
                     <div class="invalid-feedback" v-show="errors.name">Please enter your name</div>
@@ -25,7 +24,7 @@
                         <div class="input-group-prepend">
                             <select class="form-control"
                                     @change="checkPhoneNumber"
-                                    v-model="order.shipping.national_number"
+                                    v-model="shipping.national_number"
                                     style="border-right: 0;">
                                 <option value="353">+353</option>
                                 <option value="44">+44</option>
@@ -36,7 +35,8 @@
                             class="form-control"
                             placeholder="Phone number"
                             :class="{'is-invalid':errors.phone}"
-                            v-model="order.shipping.phone_number"
+                            @change="checkPhoneNumber"
+                            v-model="shipping.phone_number"
                         />
                         <div class="input-group-append">
                             <button class="btn btn-success" disabled v-if="phoneVerified">Verified
@@ -77,7 +77,7 @@
                     <input type="radio" class="radio"
                            value="flat_rate"
                            @change="onTotalChange"
-                           v-model="order.shipping_method"/>
+                           v-model="shipping_method"/>
                     <span class="radio-box"></span>
                     <span class="text-safety-orange">Delivery</span>
                 </label>
@@ -85,14 +85,14 @@
                     <input type="radio" class="radio"
                            value="local_pickup"
                            @change="onTotalChange"
-                           v-model="order.shipping_method"/>
+                           v-model="shipping_method"/>
                     <span class="radio-box"></span>
                     <span class="text-safety-orange">Collection</span>
                 </label>
             </div>
         </div>
 
-        <div class="mt-4" v-if="order.shipping_method==='flat_rate'">
+        <div class="mt-4" v-if="shipping_method==='flat_rate'">
             <div class="form-group">
                 <div class="form-group__label">Address<i>*</i></div>
                 <div class="form-group__input">
@@ -114,7 +114,7 @@
                     <div class="form-group__input">
                         <select class="form-control custom-select"
                                 @change="onTotalChange"
-                                v-model="order.shipping_line.zone_id">
+                                v-model="shipping_zone_id">
                             <option v-for="(zone,index) in shippingZones" :key="index" :value="zone.id">
                                 {{ zone.title + ' €' + zone.fee }}
                             </option>
@@ -126,8 +126,7 @@
                     <div class="form-group__input">
                         <input type="text"
                                class="form-control"
-                               @change="onShippingChange"
-                               v-model="order.shipping.postal_code"/>
+                               v-model="shipping.postal_code"/>
                     </div>
                 </div>
             </div>
@@ -153,14 +152,7 @@ export default {
         order: {
             type: Object,
             default: () => {
-                return {
-                    shipping: {
-                        phone_number: '',
-                        national_number: '',
-                    },
-                    shipping_line: {},
-                    shipping_method: 'flat_rate',
-                }
+                return {}
             }
         },
         shippingZones: {
@@ -168,49 +160,58 @@ export default {
             default: () => {
                 return []
             }
-        }
+        },
     },
     watch: {
-        'order.shipping': {
+        'shipping': {
             handler(newVal) {
-                this.checkPhoneNumber();
+                this.onShippingChange();
             },
+            deep: true
         },
+        'shipping_method': {
+            handler(newVal) {
+                this.onShippingChange();
+            }
+        },
+        'shipping_zone_id': {
+            handler(newVal) {
+                this.onShippingChange();
+            }
+        },
+        'order':{
+            handler(newVal) {
+                this.shipping = {
+                    ...this.shipping,
+                    ...newVal.shipping
+                };
+                this.shipping_method = newVal.shipping_method;
+                this.shipping_zone_id = newVal.shipping_zone_id;
+                this.checkPhoneNumber();
+            }
+        }
     },
     data() {
         return {
-            shipping_line: {
-                method_id: 'flat_rate',
-                method_title: 'Delivery',
-                zone_id: '',
-                zone_title: '',
-                total: 0
-            },
             shipping: {
                 first_name: '',
-                last_name: '',
-                address_line_1: '',
-                address_line_2: '',
-                city: '',
-                postal_code: '',
-                country: 'Ireland',
-                state: '',
                 national_number: '353',
                 phone_number: '',
-                formatted_address: ''
+                formatted_address: '',
+                postal_code: ''
             },
+            shipping_method: 'flat_rate',
+            shipping_zone_id: 0,
             phoneVerified: false,
             showCodeInput: false,
             verificationCode: '',
             sendingCodeText: 'Send code',
             disabledSendCode: false,
-            shipping_zone_index: 0,
-            formatted_address: '',
         }
     },
     methods: {
         checkPhoneNumber() {
-            let {national_number, phone_number} = this.order.shipping;
+            let {national_number, phone_number} = this.shipping;
             if (controller) {
                 controller.abort();
                 controller = new AbortController();
@@ -224,13 +225,14 @@ export default {
                     signal: controller.signal
                 }).then(response => {
                     this.phoneVerified = response.data;
+                    this.showCodeInput = false;
                 }).catch((e) => {
                     console.log(e);
                 });
             }
         },
         verifyPhoneNumber() {
-            let {phone_number, national_number} = this.order.shipping;
+            let {phone_number, national_number} = this.shipping;
             HttpClient.post('/my/phones/verify', {
                 phone_number,
                 national_number,
@@ -245,7 +247,7 @@ export default {
             });
         },
         getPhoneCode() {
-            let {phone_number, national_number} = this.order.shipping;
+            let {phone_number, national_number} = this.shipping;
             if (this.sendingCode) {
                 return false;
             } else {
@@ -289,34 +291,37 @@ export default {
             } = addressData;
 
             const {formatted_address} = placeResultData;
+            const check = this.shippingZones.some(s => formatted_address.indexOf(s.title) !== -1);
+            if (!check) {
+                this.$showToast('The address is not within the delivery range');
+                this.shipping.formatted_address = '';
+                return false;
+            }
 
             this.shippingZones.map((s, i) => {
                 if (formatted_address.indexOf(s.title) !== -1) {
-                    this.order.shipping_line.zone_id = s.id;
-                    this.order.shipping_line.zone_title = s.title;
-                    this.order.shipping.city = s.title;
-                    this.$forceUpdate();
+                    this.shipping_zone_id = s.id;
                 }
             });
 
             if (country) {
-                this.order.shipping.country = country;
+                this.shipping.country = country;
             }
 
             if (administrative_area_level_1) {
-                this.order.shipping.state = administrative_area_level_1;
+                this.shipping.state = administrative_area_level_1;
             }
 
-            // if (locality) {
-            //     this.shipping.city = locality;
-            // } else {
-            //     this.shipping.city = neighborhood;
-            // }
+            if (locality) {
+                this.shipping.city = locality;
+            } else {
+                this.shipping.city = neighborhood;
+            }
 
             if (postal_code) {
-                this.order.shipping.postal_code = postal_code;
+                this.shipping.postal_code = postal_code;
             } else {
-                this.order.shipping.postal_code = postal_code_prefix;
+                this.shipping.postal_code = postal_code_prefix;
             }
 
             let addressline = '', sp = '';
@@ -336,26 +341,23 @@ export default {
                 addressline += ',' + neighborhood;
             }
 
-            this.order.shipping.address_line_1 = addressline;
-            this.order.shipping.formatted_address = formatted_address;
-            this.onShippingChange();
+            this.shipping.address_1 = addressline;
+            this.shipping.formatted_address = formatted_address;
             this.$forceUpdate();
         },
         addressChange(v) {
             this.shipping.formatted_address = v;
-            this.onShippingChange();
-        },
-        onShippingChange() {
-            this.$emit('change', this.shipping);
-        },
-        onLineChange() {
-            this.$emit('line-change', this.shipping_line);
         },
         onTotalChange() {
             this.$emit('total-change', this.order);
         },
-        onShippingMethodChange() {
-            this.onTotalChange();
+        onShippingChange() {
+            const {shipping, shipping_zone_id, shipping_method} = this;
+            this.$emit('change', {
+                shipping,
+                shipping_zone_id,
+                shipping_method
+            });
         },
     },
     mounted() {

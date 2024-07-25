@@ -5,6 +5,7 @@
             <el-form>
                 <el-form-item>
                     <el-input
+                        auto-complete="off"
                         :placeholder="messages['account_tips']"
                         v-model="account"
                     >
@@ -19,6 +20,7 @@
                 </el-form-item>
                 <el-form-item>
                     <el-input
+                        auto-complete="off"
                         :placeholder="messages['password_tips']"
                         v-model="password"
                         type="password"

@@ -24,11 +24,11 @@
                 <div class="product-variation__name">{{ v.name }}</div>
                 <div class="product-variation__options">
                     <span
-                            class="product-variation__option"
-                            v-for="(o,j) in v.options"
-                            :key="j"
-                            :class="{'product-variation__option-active':o.selected}"
-                            @click="onSelectOption(v,o)"
+                        class="product-variation__option"
+                        v-for="(o,j) in v.options"
+                        :key="j"
+                        :class="{'product-variation__option-active':o.selected}"
+                        @click="onSelectOption(v,o)"
                     >{{ o.title }}</span>
                 </div>
             </div>
@@ -40,11 +40,11 @@
                 <div class="product-variation__name">Additional Options</div>
                 <div class="product-variation__options">
                     <span
-                            class="product-variation__option"
-                            v-for="(o,j) in product.additional_options"
-                            :key="j"
-                            :class="{'product-variation__option-active':o.selected}"
-                            @click="onSelectAdditionalOption(o)"
+                        class="product-variation__option"
+                        v-for="(o,j) in product.additional_options"
+                        :key="j"
+                        :class="{'product-variation__option-active':o.selected}"
+                        @click="onSelectAdditionalOption(o)"
                     >{{ o.title }}</span>
                 </div>
             </div>
@@ -118,9 +118,11 @@ export default {
             if (Array.isArray(this.product.variation_list)) {
                 this.product.variation_list.map((item) => {
                     item.options.map((option) => {
-                        if (option.selected && /\d+/.test(option.price)) {
-                            price += parseFloat(option.price);
+                        if (option.selected) {
                             options[item.name] = option.title;
+                            if (/\d+/.test(option.price)) {
+                                price += parseFloat(option.price);
+                            }
                         }
                     });
                 });
@@ -128,9 +130,11 @@ export default {
 
             if (Array.isArray(this.product.additional_options)) {
                 this.product.additional_options.map((option) => {
-                    if (option.selected && /\d+/.test(option.price)) {
-                        price += parseFloat(option.price);
+                    if (option.selected) {
                         additional_options.push(option.title);
+                        if (/\d+/.test(option.price)) {
+                            price += parseFloat(option.price);
+                        }
                     }
                 });
             }
@@ -167,6 +171,7 @@ export default {
                 purchase_via
             }).then((res) => {
                 window.dispatchEvent(new Event('cartChanged'));
+                window.dispatchEvent(new Event('pointChanged'));
                 this.$showToast('Added to cart successfully!');
                 this.$emit('added');
             }).catch(reason => {

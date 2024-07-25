@@ -18,9 +18,8 @@ class OrderController extends BaseController
 
     public function capture(Request $request, $orderId)
     {
-        $prepay = UserPrepay::wherePaymentId($orderId)->firstOrFail();
-        $order = Order::findOrFail($prepay->payable_id);
-        if ($order->isUnPaid()) {
+        $order = Order::whereOutTradeNo($orderId)->firstOrFail();
+        if (!$order->isPaid()) {
             try {
                 $json = Paypal::captureOrder($orderId);
                 $data = json_decode($json);

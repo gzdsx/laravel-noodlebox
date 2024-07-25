@@ -21,6 +21,10 @@ class DeliveryerController extends BaseController
     {
         $query = $this->repository();
 
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
         return json_success([
             'total' => $query->count(),
             'items' => $query->with(['posMachines'])->get()
@@ -113,8 +117,6 @@ class DeliveryerController extends BaseController
 
     public function orders($id, Request $request)
     {
-        $start_time = Carbon::createFromTimeString(settings('opening_hours_start', '09:00:00'))->subDay();
-        $end_time = Carbon::createFromTimeString(settings('opening_hours_end', '21:00:00'));
         $deliveryer = $this->repository()->findOrFail($id);
         $orders = $deliveryer->orders()->get();
         return json_success([
@@ -158,5 +160,23 @@ class DeliveryerController extends BaseController
             'online_total' => format_amount($online_total),
             'total' => format_amount($total)
         ]);
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function billing($id)
+    {
+        $time = Carbon::createFromTimeString(settings('opening_hours_end'));
+        if ($time->isAfter(now())) {
+            $time = $time->subDay();
+        }
+        $deliveryer = Deliveryer::with(['orders' => function ($query) use ($time) {
+            return $query->where('created_at', '>', $time);
+        }])->find($id);
+        $deliveryer->bill = $deliveryer->generateBill();
+        return json_success($deliveryer);
     }
 }

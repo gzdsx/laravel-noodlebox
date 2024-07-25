@@ -9,7 +9,7 @@
                 <el-form-item :label="$t('order.no')">
                     <el-input class="w200" v-model="params.order_no"/>
                 </el-form-item>
-                <el-form-item label="Deliveryer">
+                <el-form-item label="Driver">
                     <el-select v-model="params.deliveryer" clearable>
                         <el-option
                             v-for="item in deliveryerList"
@@ -65,7 +65,7 @@
                     <el-tab-pane :label="$t('order.status_options.cancelled')" name="canceled"/>
                 </el-tabs>
             </div>
-            <el-table :data="dataList" @selection-change="onSelectionChange">
+            <el-table :data="dataList" highlight-current-row @selection-change="onSelectionChange">
                 <el-table-column width="45" type="selection"/>
                 <el-table-column width="200" label="Order">
                     <template slot-scope="scope">
@@ -79,7 +79,7 @@
                         <div class="post-column-actions">
                             <span>{{ scope.row.buyer_name }}</span>
                             <span>|</span>
-                            <span><a :href="scope.row.links.invoice" target="_blank">Invoice</a></span>
+                            <span><a :href="scope.row.links.invoice.href" target="_blank">Invoice</a></span>
                         </div>
                     </template>
                 </el-table-column>
@@ -109,8 +109,8 @@
                 </el-table-column>
                 <el-table-column label="ShippingM" width="100" prop="shipping_method">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.shipping_line.method_id=='flat_rate'">
-                            <div>{{ scope.row.shipping_line.method_title }}</div>
+                        <div v-if="scope.row.shipping_method=='flat_rate'">
+                            <div>Delivery</div>
                             <small>{{ scope.row.shipping_line.zone_title }}</small>
                         </div>
                         <div v-else>
@@ -121,7 +121,14 @@
                 <el-table-column label="Total" width="80" fixed="right">
                     <template slot-scope="scope">
                         <div>{{ '€' + scope.row.total }}</div>
-                        <small class="text-danger">{{ scope.row.payment_method | capitalize }}</small>
+                        <div style="line-height: 1; word-break: break-word;">
+                            <small class="text-danger" v-if="scope.row.payment_method==='card'">
+                                {{paymentMap[scope.row.payment_method]}}
+                            </small>
+                            <small class="text-success" v-else>
+                                {{paymentMap[scope.row.payment_method]}}
+                            </small>
+                        </div>
                     </template>
                 </el-table-column>
                 <el-table-column label="CreatedV" width="90" prop="created_via" fixed="right"/>
@@ -190,7 +197,14 @@ export default {
             invoceLink: '',
             interval: null,
             dateRange: [],
-            deliveryerList: []
+            deliveryerList: [],
+            paymentMap:{
+                online:'Pay Online (PayPal & Credit Car)',
+                card:'Card Reader(Unpaid)',
+                card_reader:'Card Reader(Paid)',
+                cash:'Pay Cash',
+                customize:'Customize',
+            }
         }
     },
     computed: {

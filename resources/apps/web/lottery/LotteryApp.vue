@@ -69,6 +69,7 @@ export default {
         onDraw(prize) {
             this.prize = prize;
             this.showPrize = true;
+            window.dispatchEvent(new Event('pointChanged'));
         },
         onError(reason){
             this.error = reason.message;

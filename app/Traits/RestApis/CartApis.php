@@ -28,9 +28,10 @@ trait CartApis
     public function index(Request $request)
     {
         $query = $this->repository();
-        $request->whenHas('purchase_via', function ($input) use ($query) {
-            $query->where('purchase_via', $input);
-        });
+        if ($request->filled('purchase_via')){
+            $query->where('purchase_via', $request->purchase_via);
+        }
+
         return json_success([
             'total' => $query->count(),
             'items' => $query->orderByDesc('updated_at')->get()
@@ -61,10 +62,15 @@ trait CartApis
         $purchase_via = $request->input('purchase_via', 'order');
 
         $product = Product::find($product_id);
-        if (isset($meta_data['purchase_with_point'])) {
-            $total_points = $product->point_price * $quantity;
-            if ($total_points > $request->user()->points) {
+
+        $user = $request->user();
+        if ($purchase_via == 'point') {
+            $points_total = $product->point_price * $quantity;
+            if ($points_total > $user->points) {
                 abort(422, __('Insufficient points balance'));
+            } else {
+                $user->points = bcsub($user->points, $points_total);
+                $user->save();
             }
         }
 
@@ -126,7 +132,15 @@ trait CartApis
      */
     public function destroy($id)
     {
-        $this->repository()->whereKey($id)->delete();
+        $cart = $this->repository()->findOrFail($id);
+        if ($cart->purchase_via == 'point' && $cart->product) {
+            $user = \auth()->user();
+            if ($user){
+                $user->points = bcadd($user->points, $cart->product->point_price * $cart->quantity);
+                $user->save();
+            }
+        }
+        $cart->delete();
         return json_success();
     }
 }

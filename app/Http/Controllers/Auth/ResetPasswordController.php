@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Providers\RouteServiceProvider;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\Request;
 
 class ResetPasswordController extends Controller
 {
@@ -27,4 +28,20 @@ class ResetPasswordController extends Controller
      * @var string
      */
     protected $redirectTo = RouteServiceProvider::HOME;
+
+    protected function sendResetResponse(Request $request, $response)
+    {
+        return view('web.message', [
+            'title' => 'Password reset successfully',
+            'message' => 'Your password has been reset successfully'
+        ]);
+    }
+
+    protected function sendResetFailedResponse(Request $request, $response)
+    {
+        return view('web.message', [
+            'title' => 'Password reset failed',
+            'message' => trans($response)
+        ]);
+    }
 }

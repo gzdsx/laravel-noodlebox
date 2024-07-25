@@ -2582,6 +2582,77 @@ var _default = exports["default"] = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=script&lang=js":
+/*!***************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=script&lang=js ***!
+  \***************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _ApiService = _interopRequireDefault(__webpack_require__(/*! ../utils/ApiService */ "./resources/apps/admin/utils/ApiService.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var _default = exports["default"] = {
+  name: "CashierBilling",
+  data: function data() {
+    return {
+      billing: {
+        base_amount: 0,
+        shipping_total: 0,
+        cash_total: 0,
+        online_total: 0,
+        card_total: 0,
+        cost_total: 0,
+        total: 0,
+        refund_total: 0,
+        actual_total: 0,
+        pos_balance: 0,
+        status: 'pending',
+        notes: ''
+      }
+    };
+  },
+  methods: {
+    fetchData: function fetchData() {
+      var _this = this;
+      _ApiService["default"].get('cashier/transactions/billing').then(function (response) {
+        _this.billing = _objectSpread(_objectSpread({}, _this.billing), response.data);
+      });
+    },
+    handleSubmit: function handleSubmit() {
+      var _this2 = this;
+      var _this$billing = this.billing,
+        status = _this$billing.status,
+        pos_balance = _this$billing.pos_balance;
+      _ApiService["default"].post('/cashier/transactions', {
+        status: status,
+        pos_balance: pos_balance
+      }).then(function () {
+        _this2.$message.success('Submitted Success');
+        _this2.fetchData();
+      })["catch"](function (reason) {
+        _this2.$message.error(reason.message);
+      })["finally"](function () {});
+    }
+  },
+  mounted: function mounted() {
+    this.fetchData();
+  }
+};
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/CashierTransaction.vue?vue&type=script&lang=js":
 /*!*******************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/CashierTransaction.vue?vue&type=script&lang=js ***!
@@ -2597,15 +2668,21 @@ Object.defineProperty(exports, "__esModule", ({
 exports["default"] = void 0;
 var _ApiService = _interopRequireDefault(__webpack_require__(/*! ../utils/ApiService */ "./resources/apps/admin/utils/ApiService.js"));
 var _Pagination = _interopRequireDefault(__webpack_require__(/*! ../mixins/Pagination */ "./resources/apps/admin/mixins/Pagination.js"));
+var _DialogCashierTransaction = _interopRequireDefault(__webpack_require__(/*! ./DialogCashierTransaction.vue */ "./resources/apps/admin/ecommerce/DialogCashierTransaction.vue"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var _default = exports["default"] = {
   name: "CashierTransaction",
+  components: {
+    DialogCashierTransaction: _DialogCashierTransaction["default"]
+  },
   mixins: [_Pagination["default"]],
   data: function data() {
     return {
       params: {
         date: null
-      }
+      },
+      showDialog: false,
+      currentTransaction: {}
     };
   },
   computed: {
@@ -2758,6 +2835,60 @@ var _default = exports["default"] = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=script&lang=js":
+/*!******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=script&lang=js ***!
+  \******************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _ApiService = _interopRequireDefault(__webpack_require__(/*! ../utils/ApiService */ "./resources/apps/admin/utils/ApiService.js"));
+var _DialogDeliveryerBill = _interopRequireDefault(__webpack_require__(/*! ./DialogDeliveryerBill */ "./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+var _default = exports["default"] = {
+  name: "DeliveryerBilling",
+  components: {
+    DialogDeliveryerBill: _DialogDeliveryerBill["default"]
+  },
+  data: function data() {
+    return {
+      loading: true,
+      deliveryers: [],
+      showBill: false,
+      currentDriver: {
+        billing: {}
+      }
+    };
+  },
+  methods: {
+    fetchList: function fetchList() {
+      var _this = this;
+      _ApiService["default"].get('/deliveryers/transactions/billing').then(function (response) {
+        _this.deliveryers = response.data;
+      })["catch"](function (reason) {
+        _this.$message.error(reason.message);
+      })["finally"](function () {
+        _this.loading = false;
+      });
+    },
+    handleShowBill: function handleShowBill(d) {
+      this.currentDriver = d;
+      this.showBill = true;
+    }
+  },
+  mounted: function mounted() {
+    this.fetchList();
+  }
+};
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DeliveryerList.vue?vue&type=script&lang=js":
 /*!***************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DeliveryerList.vue?vue&type=script&lang=js ***!
@@ -2816,10 +2947,10 @@ var _default = exports["default"] = {
       this.deliveryer = {
         name: '',
         phone: '',
-        image: '',
+        image: 'https://www.noodlebox.ie/storage/image/2024/06/xCBIaqkVWDboCg4CVz2hy2X9TOchd0hpD8WNjWZY.png',
         status: 'online',
         base_amount: 0,
-        color: '#fff',
+        color: '#000',
         pos_machines: []
       };
     },
@@ -2946,12 +3077,12 @@ Object.defineProperty(exports, "__esModule", ({
 exports["default"] = void 0;
 var _ApiService = _interopRequireDefault(__webpack_require__(/*! ../utils/ApiService */ "./resources/apps/admin/utils/ApiService.js"));
 var _Pagination = _interopRequireDefault(__webpack_require__(/*! ../mixins/Pagination */ "./resources/apps/admin/mixins/Pagination.js"));
-var _DialogDeliveryerTransaction = _interopRequireDefault(__webpack_require__(/*! ./DialogDeliveryerTransaction.vue */ "./resources/apps/admin/ecommerce/DialogDeliveryerTransaction.vue"));
+var _DialogDeliveryerBill = _interopRequireDefault(__webpack_require__(/*! ./DialogDeliveryerBill.vue */ "./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 var _default = exports["default"] = {
   name: "DeliveryerTransaction",
   components: {
-    DialogDeliveryerTransaction: _DialogDeliveryerTransaction["default"]
+    DialogDeliveryerBill: _DialogDeliveryerBill["default"]
   },
   mixins: [_Pagination["default"]],
   data: function data() {
@@ -2960,7 +3091,9 @@ var _default = exports["default"] = {
         date: null
       },
       showTransaction: false,
-      currentTransaction: {}
+      currentTransaction: {
+        deliveryer: {}
+      }
     };
   },
   computed: {
@@ -2970,7 +3103,7 @@ var _default = exports["default"] = {
   },
   methods: {
     listApi: function listApi() {
-      return '/deliveryers/transactions';
+      return '/deliveryers/0/transactions';
     },
     listParams: function listParams() {
       return this.params;
@@ -2983,7 +3116,7 @@ var _default = exports["default"] = {
       this.$confirm(this.$t('common.delete_tips'), this.$t('common.delete_confirm'), {
         type: 'warning'
       }).then(function () {
-        _ApiService["default"]["delete"]('/deliveryers/transactions/batch', {
+        _ApiService["default"]["delete"]('/deliveryers/0/transactions/batch', {
           data: {
             ids: ids
           }
@@ -3080,6 +3213,87 @@ var _default = exports["default"] = {
     }
   },
   mounted: function mounted() {}
+};
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=script&lang=js":
+/*!*************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=script&lang=js ***!
+  \*************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _ApiService = _interopRequireDefault(__webpack_require__(/*! ../utils/ApiService */ "./resources/apps/admin/utils/ApiService.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var _default2 = exports["default"] = {
+  name: "DialogCashierTransaction",
+  props: {
+    value: {
+      type: Boolean,
+      "default": false
+    },
+    billing: {
+      type: Object,
+      "default": function _default() {
+        return {};
+      }
+    }
+  },
+  data: function data() {
+    return {
+      orders: [],
+      visible: false,
+      transaction: {
+        base_amount: 10,
+        notes: '',
+        total: 0,
+        shipping_total: 0,
+        cash_total: 0,
+        card_total: 0,
+        cost_total: 0,
+        status: 'pending'
+      }
+    };
+  },
+  watch: {
+    value: function value(newVal, oldVal) {
+      this.visible = newVal;
+    },
+    billing: function billing(newVal, oldVal) {
+      this.transaction = _objectSpread(_objectSpread({}, this.transaction), newVal);
+    }
+  },
+  methods: {
+    close: function close() {
+      this.$emit('input', false);
+    },
+    handleSubmit: function handleSubmit() {
+      var _this = this;
+      var _this$transaction = this.transaction,
+        status = _this$transaction.status,
+        id = _this$transaction.id;
+      _ApiService["default"].put("/cashier/transactions/".concat(id), {
+        status: status
+      }).then(function () {
+        _this.$message.success('Submitted Success');
+        _this.$emit('input', false);
+        _this.$emit('change');
+      });
+    }
+  }
 };
 
 /***/ }),
@@ -3248,6 +3462,108 @@ var _default = exports["default"] = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=script&lang=js":
+/*!*********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=script&lang=js ***!
+  \*********************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _ApiService = _interopRequireDefault(__webpack_require__(/*! ../utils/ApiService */ "./resources/apps/admin/utils/ApiService.js"));
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var _default = exports["default"] = {
+  name: "DialogDeliveryerBill",
+  props: {
+    value: {
+      type: Boolean,
+      "default": false
+    },
+    transaction: {
+      id: 0,
+      status: 'pending',
+      orders: []
+    },
+    driverName: {
+      type: String,
+      "default": ''
+    }
+  },
+  data: function data() {
+    return {
+      visible: false,
+      billing: {
+        base_amount: 0,
+        shipping_total: 0,
+        online_total: 0,
+        cash_total: 0,
+        card_total: 0,
+        cost_total: 0,
+        total: 0,
+        actual_total: 0,
+        status: 'pending',
+        orders: []
+      },
+      title: 'Diver Report'
+    };
+  },
+  watch: {
+    value: function value(newVal, oldVal) {
+      this.visible = newVal;
+    },
+    transaction: function transaction(newVal, oldVal) {
+      console.log('newValue', newVal);
+      this.billing = _objectSpread(_objectSpread({}, this.billing), newVal);
+    },
+    driverName: function driverName(newVal, oldVal) {
+      this.title = 'Driver Report - ' + newVal;
+    }
+  },
+  methods: {
+    close: function close() {
+      this.$emit('input', false);
+    },
+    handleSubmit: function handleSubmit() {
+      var _this = this;
+      var _this$billing = this.billing,
+        id = _this$billing.id,
+        deliveryer_id = _this$billing.deliveryer_id,
+        status = _this$billing.status;
+      console.log(this.billing);
+      if (id) {
+        _ApiService["default"].put("/deliveryers/".concat(deliveryer_id, "/transactions/").concat(id), {
+          status: status
+        }).then(function () {
+          _this.$message.success('Updated Success');
+          _this.$emit('input', false);
+          _this.$emit('change');
+        })["catch"](function (reason) {})["finally"](function () {});
+      } else {
+        _ApiService["default"].post("/deliveryers/".concat(deliveryer_id, "/transactions"), {
+          status: status
+        }).then(function () {
+          _this.$message.success('Submitted Success');
+          _this.$emit('input', false);
+          _this.$emit('change');
+        })["catch"](function (reason) {})["finally"](function () {});
+      }
+    }
+  }
+};
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogDeliveryerOrders.vue?vue&type=script&lang=js":
 /*!***********************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogDeliveryerOrders.vue?vue&type=script&lang=js ***!
@@ -3365,8 +3681,9 @@ var _default2 = exports["default"] = {
       var _this$transaction = this.transaction,
         status = _this$transaction.status,
         notes = _this$transaction.notes,
-        id = _this$transaction.id;
-      _ApiService["default"].put('/deliveryers/transactions/' + id, {
+        id = _this$transaction.id,
+        deliveryer_id = _this$transaction.deliveryer_id;
+      _ApiService["default"].put("/deliveryers/".concat(deliveryer_id, "/transactions/").concat(id), {
         status: status,
         notes: notes
       }).then(function () {
@@ -3376,7 +3693,8 @@ var _default2 = exports["default"] = {
     },
     loadOrders: function loadOrders() {
       var _this2 = this;
-      _ApiService["default"].get('/deliveryers/' + this.transaction.deliveryer_id + '/orders').then(function (response) {
+      var deliveryer_id = this.transaction.deliveryer_id;
+      _ApiService["default"].get('/deliveryers/' + deliveryer_id + '/orders').then(function (response) {
         _this2.orders = response.data.items;
       });
     }
@@ -3401,6 +3719,9 @@ exports["default"] = void 0;
 var _ApiService = _interopRequireDefault(__webpack_require__(/*! ../utils/ApiService */ "./resources/apps/admin/utils/ApiService.js"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -3418,7 +3739,8 @@ var _default2 = exports["default"] = {
       "default": function _default() {
         return {
           status: 'pending',
-          deliveryer_id: ''
+          deliveryer_id: '',
+          shipping_method: ''
         };
       }
     }
@@ -3441,7 +3763,11 @@ var _default2 = exports["default"] = {
         fee: 0.5
       }, {
         id: 'card',
-        title: 'Pay by Card Reader',
+        title: 'Pay by Card Reader(Unpaid)',
+        fee: 0.5
+      }, {
+        id: 'card_reader',
+        title: 'Pay by Card Reader(Paid)',
         fee: 0.5
       }, {
         id: 'cash',
@@ -3456,9 +3782,8 @@ var _default2 = exports["default"] = {
         'flat_rate': 'Delivery',
         'local_pickup': 'Collection'
       },
-      shippingZones: [],
-      shippingZoneIndex: 0,
       shipping: {},
+      shippingZones: [],
       shipping_line: {
         method_id: 'local_pickup',
         method_title: 'Collection',
@@ -3468,40 +3793,37 @@ var _default2 = exports["default"] = {
         zone_title: ''
       },
       meta_data: {
-        cost_total: 0,
         payment_with_cash_value: 0
       },
       order_notes: [],
-      orderTotal: 0,
-      payment_method: 'online'
+      newOrderTotal: 0,
+      newCostTotal: 0,
+      newShippingTotal: 0,
+      payment_method: 'online',
+      newTotalValue: 0
     };
   },
   computed: {
     payByCardValue: function payByCardValue() {
-      return (this.orderTotal - this.meta_data.payment_with_cash_value).toFixed(2);
+      return (this.newOrderTotal - this.meta_data.payment_with_cash_value).toFixed(2);
     }
   },
   watch: {
-    value: function value(val) {
-      if (val) {
-        this.fetchOrderNotes();
-        var _this$order = this.order,
-          shipping = _this$order.shipping,
-          shipping_line = _this$order.shipping_line,
-          meta_data = _this$order.meta_data,
-          total = _this$order.total;
-        this.shipping = shipping || {};
-        this.shipping_line = _objectSpread(_objectSpread({}, this.shipping_line), shipping_line);
-        this.meta_data = _objectSpread(_objectSpread({}, this.meta_data), meta_data);
-        if (shipping_line.zone_id > 0) {
-          this.shippingZoneIndex = this.shippingZones.findIndex(function (item) {
-            return item.id === shipping_line.zone_id;
-          });
-        }
-        this.payment_method = this.order.payment_method || 'online';
-        this.orderTotal = total;
-        this.costTotal = this.meta_data.cost_total;
-      }
+    order: function order(newVal) {
+      this.fetchOrderNotes();
+      var shipping = newVal.shipping,
+        shipping_line = newVal.shipping_line,
+        shipping_total = newVal.shipping_total,
+        cost_total = newVal.cost_total,
+        total = newVal.total,
+        meta_data = newVal.meta_data;
+      this.shipping = shipping || {};
+      this.shipping_line = _objectSpread(_objectSpread({}, this.shipping_line), shipping_line);
+      this.meta_data = _objectSpread(_objectSpread({}, this.meta_data), meta_data);
+      this.payment_method = this.order.payment_method || 'online';
+      this.newOrderTotal = total;
+      this.newCostTotal = cost_total;
+      this.newShippingTotal = shipping_total;
     }
   },
   methods: {
@@ -3516,7 +3838,7 @@ var _default2 = exports["default"] = {
     },
     fetchDeliveryerList: function fetchDeliveryerList() {
       var _this2 = this;
-      this.$get('/deliveryers?limit=100').then(function (response) {
+      this.$get('/deliveryers?limit=100&status=online').then(function (response) {
         _this2.deliveryerList = _this2.deliveryerList.concat(response.data.items);
       });
     },
@@ -3534,14 +3856,13 @@ var _default2 = exports["default"] = {
     },
     onSubmit: function onSubmit() {
       var _this5 = this;
-      var _this$order2 = this.order,
-        id = _this$order2.id,
-        status = _this$order2.status,
-        buyer_note = _this$order2.buyer_note,
-        deliveryer_id = _this$order2.deliveryer_id,
-        cost_total = _this$order2.cost_total;
+      var _this$order = this.order,
+        id = _this$order.id,
+        status = _this$order.status,
+        buyer_note = _this$order.buyer_note,
+        deliveryer_id = _this$order.deliveryer_id,
+        shipping_method = _this$order.shipping_method;
       var shipping_line = this.shipping_line,
-        orderTotal = this.orderTotal,
         payByCardValue = this.payByCardValue,
         payment_method = this.payment_method;
       var payment_method_title = this.paymentMethodList.filter(function (item) {
@@ -3552,15 +3873,16 @@ var _default2 = exports["default"] = {
       });
       this.loading = true;
       _ApiService["default"].put("/orders/".concat(id), {
-        cost_total: cost_total,
+        total: this.newOrderTotal,
+        cost_total: this.newCostTotal,
+        shipping_method: shipping_method,
         shipping_line: shipping_line,
         payment_method: payment_method,
         payment_method_title: payment_method_title,
         deliveryer_id: deliveryer_id,
         buyer_note: buyer_note,
         meta_data: meta_data,
-        status: status,
-        total: orderTotal
+        status: status
       }).then(function () {
         _this5.$message.success('Order Updated!');
         _this5.$emit('update');
@@ -3569,40 +3891,44 @@ var _default2 = exports["default"] = {
         _this5.$emit('input', false);
       });
     },
-    subTotal: function subTotal(item) {
-      return item.price * item.quantity;
-    },
     onShippingMethodChange: function onShippingMethodChange() {
-      var _this$order3 = this.order,
-        total = _this$order3.total,
-        shipping_total = _this$order3.shipping_total;
-      var cost_total = this.meta_data.cost_total || 0;
-      if (this.shipping_line.method_id === 'flat_rate') {
-        var zone = this.shippingZones[this.shippingZoneIndex];
-        if (zone) {
-          this.shipping_line = {
-            method_id: 'flat_rate',
-            method_title: 'Delivery',
-            total: zone.fee,
-            zone_id: zone.id,
-            zone_title: zone.title
-          };
+      var _this$order2 = this.order,
+        total = _this$order2.total,
+        shipping_total = _this$order2.shipping_total,
+        cost_total = _this$order2.cost_total,
+        shipping_method = _this$order2.shipping_method;
+      if (shipping_method === 'flat_rate') {
+        if (this.shipping_line.zone_id) {
+          var _iterator = _createForOfIteratorHelper(this.shippingZones),
+            _step;
+          try {
+            for (_iterator.s(); !(_step = _iterator.n()).done;) {
+              var zone = _step.value;
+              if (zone.id === this.shipping_line.zone_id) {
+                this.newShippingTotal = zone.fee;
+              }
+            }
+          } catch (err) {
+            _iterator.e(err);
+          } finally {
+            _iterator.f();
+          }
+        } else {
+          var _zone = this.shippingZones[0];
+          this.newShippingTotal = _zone.fee;
+          this.shipping_line.zone_id = _zone.id;
         }
       } else {
-        this.shipping_line = {
-          method_id: 'local_pickup',
-          method_title: 'Collection',
-          total: 0,
-          zone_id: 0,
-          zone_title: ''
-        };
+        this.newShippingTotal = 0;
       }
-      var diference = Number(this.shipping_line.total) - Number(shipping_total);
+      console.log(this.newShippingTotal, shipping_total, cost_total);
+      var diference = Number(this.newShippingTotal) - Number(shipping_total);
       if (this.order.payment_method === 'online') {
-        this.costTotal = (Number(cost_total) + Number(diference)).toFixed(2);
+        this.newCostTotal = (Number(cost_total) + Number(diference)).toFixed(2);
       } else {
-        this.orderTotal = (Number(total) + Number(diference)).toFixed(2);
+        this.newOrderTotal = (Number(total) + Number(diference)).toFixed(2);
       }
+      console.log(this.newCostTotal);
     }
   },
   mounted: function mounted() {
@@ -3888,7 +4214,14 @@ var _default = exports["default"] = {
       invoceLink: '',
       interval: null,
       dateRange: [],
-      deliveryerList: []
+      deliveryerList: [],
+      paymentMap: {
+        online: 'Pay Online (PayPal & Credit Car)',
+        card: 'Card Reader(Unpaid)',
+        card_reader: 'Card Reader(Paid)',
+        cash: 'Pay Cash',
+        customize: 'Customize'
+      }
     };
   },
   computed: {
@@ -5977,9 +6310,7 @@ var _default = exports["default"] = {
         return false;
       }
       if (prize.id) {
-        _ApiService["default"].put('/lottery/prizes/' + prize.id, {
-          prize: prize
-        }).then(function () {
+        _ApiService["default"].put('/lottery/prizes/' + prize.id, prize).then(function () {
           _this3.resetData();
           _this3.fetchList();
           _this3.showDialog = false;
@@ -5988,9 +6319,7 @@ var _default = exports["default"] = {
           _this3.$message.error(reason.message);
         });
       } else {
-        _ApiService["default"].post('/lottery/prizes', {
-          prize: prize
-        }).then(function () {
+        _ApiService["default"].post('/lottery/prizes', prize).then(function () {
           _this3.resetData();
           _this3.fetchList();
           _this3.showDialog = false;
@@ -7174,9 +7503,11 @@ var _default = exports["default"] = {
           _this3.loading = false;
         });
       } else {
-        _UserService["default"].storeUser(user).then(function (res) {
+        _UserService["default"].storeUser(_objectSpread(_objectSpread({}, user), {}, {
+          meta_data: meta_data
+        })).then(function (res) {
           _this3.$message.success(_this3.$t('user.saved'));
-          _this3.$router.replace('/user/edit/' + res.data.uid);
+          _this3.$router.replace('/user/edit/' + res.data.id);
         })["catch"](function (reason) {
           _this3.$message.error(reason.message);
         })["finally"](function () {
@@ -11659,6 +11990,163 @@ render._withStripped = true;
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=template&id=1180957c&scoped=true":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=template&id=1180957c&scoped=true ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("main-layout", [_c("div", {
+    staticClass: "d-flex justify-content-between",
+    attrs: {
+      slot: "header"
+    },
+    slot: "header"
+  }, [_c("h2", [_vm._v("Cashier Report")]), _vm._v(" "), _c("router-link", {
+    attrs: {
+      to: "/cashier/transactions"
+    }
+  }, [_c("el-button", {
+    attrs: {
+      size: "small",
+      type: "primary"
+    }
+  }, [_vm._v("Histories")])], 1)], 1), _vm._v(" "), _c("section", {
+    staticClass: "page-section"
+  }, [_c("el-descriptions", {
+    attrs: {
+      title: "",
+      direction: "vertical",
+      column: 5,
+      border: ""
+    }
+  }, [_c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.float")
+    }
+  }, [_vm._v(_vm._s(_vm.billing.base_amount) + "\n            ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.shipping_total")
+    }
+  }, [_vm._v(_vm._s(_vm.billing.shipping_total) + "\n            ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.online_total")
+    }
+  }, [_vm._v(_vm._s(_vm.billing.online_total) + "\n            ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.card_total")
+    }
+  }, [_vm._v(_vm._s(_vm.billing.card_total) + "\n            ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.cash_total")
+    }
+  }, [_vm._v(_vm._s(_vm.billing.cash_total) + "\n            ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.cost_total")
+    }
+  }, [_vm._v(_vm._s(_vm.billing.cost_total) + "\n            ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.refund_total")
+    }
+  }, [_vm._v(_vm._s(_vm.billing.refund_total) + "\n            ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.actual_total")
+    }
+  }, [_vm._v(_vm._s(_vm.billing.actual_total) + "\n            ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.total")
+    }
+  }, [_vm._v(_vm._s(_vm.billing.total) + "\n            ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.net_total")
+    }
+  }, [_vm._v(_vm._s(_vm.billing.net_total) + "\n            ")])], 1), _vm._v(" "), _c("el-form", {
+    staticStyle: {
+      "margin-top": "20px"
+    },
+    attrs: {
+      size: "medium",
+      inline: true
+    }
+  }, [_c("el-form-item", {
+    attrs: {
+      label: "Status"
+    }
+  }, [_c("el-select", {
+    model: {
+      value: _vm.billing.status,
+      callback: function callback($$v) {
+        _vm.$set(_vm.billing, "status", $$v);
+      },
+      expression: "billing.status"
+    }
+  }, [_c("el-option", {
+    attrs: {
+      label: _vm.$t("transaction.status_options.settled"),
+      value: "settled"
+    }
+  }), _vm._v(" "), _c("el-option", {
+    attrs: {
+      label: _vm.$t("transaction.status_options.pending"),
+      value: "pending"
+    }
+  })], 1)], 1), _vm._v(" "), _c("el-form-item", {
+    attrs: {
+      label: _vm.$t("transaction.pos_balance")
+    }
+  }, [_c("el-input", {
+    staticClass: "w200",
+    attrs: {
+      type: "number",
+      clearable: ""
+    },
+    model: {
+      value: _vm.billing.pos_balance,
+      callback: function callback($$v) {
+        _vm.$set(_vm.billing, "pos_balance", $$v);
+      },
+      expression: "billing.pos_balance"
+    }
+  })], 1), _vm._v(" "), _c("el-form-item", {
+    attrs: {
+      label: "Notes"
+    }
+  }, [_c("el-input", {
+    staticClass: "w300",
+    attrs: {
+      clearable: ""
+    },
+    model: {
+      value: _vm.billing.notes,
+      callback: function callback($$v) {
+        _vm.$set(_vm.billing, "notes", $$v);
+      },
+      expression: "billing.notes"
+    }
+  })], 1), _vm._v(" "), _c("el-form-item", [_c("el-button", {
+    attrs: {
+      type: "primary"
+    },
+    on: {
+      click: _vm.handleSubmit
+    }
+  }, [_vm._v("Submit")])], 1)], 1)], 1)]);
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/CashierTransaction.vue?vue&type=template&id=64593fdf&scoped=true":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/CashierTransaction.vue?vue&type=template&id=64593fdf&scoped=true ***!
@@ -11730,63 +12218,113 @@ var render = exports.render = function render() {
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
-      prop: "pos_base_amount",
-      width: "120",
-      label: _vm.$t("transaction.base_amount")
+      prop: "user.nickname",
+      label: "Cashier"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      prop: "base_amount",
+      label: _vm.$t("transaction.float")
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
       prop: "shipping_total",
-      width: "120",
       label: _vm.$t("transaction.shipping_total")
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
-      prop: "cash_total",
-      width: "120",
-      label: _vm.$t("transaction.cash_total")
-    }
-  }), _vm._v(" "), _c("el-table-column", {
-    attrs: {
       prop: "online_total",
-      width: "120",
       label: _vm.$t("transaction.online_total")
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
       prop: "card_total",
-      width: "120",
       label: _vm.$t("transaction.card_total")
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
-      prop: "total",
-      width: "120",
-      label: _vm.$t("transaction.total")
+      prop: "cash_total",
+      label: _vm.$t("transaction.cash_total")
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      prop: "cost_total",
+      label: _vm.$t("transaction.cost_total"),
+      width: "100"
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
       prop: "refund_total",
-      width: "120",
       label: _vm.$t("transaction.refund_total")
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
-      prop: "cash_profit_total",
-      width: "120",
-      label: _vm.$t("transaction.cash_profit_total")
+      prop: "actual_total",
+      label: _vm.$t("transaction.actual_total")
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
-      prop: "notes",
-      label: _vm.$t("transaction.notes")
+      prop: "total",
+      label: _vm.$t("transaction.total"),
+      fixed: "right"
     }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      prop: "net_total",
+      label: _vm.$t("transaction.net_total"),
+      fixed: "right"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      label: _vm.$t("common.status"),
+      fixed: "right",
+      width: "100"
+    },
+    scopedSlots: _vm._u([{
+      key: "default",
+      fn: function fn(scope) {
+        return [_c("div", {
+          on: {
+            click: function click($event) {
+              _vm.currentTransaction = scope.row;
+              _vm.showDialog = true;
+            }
+          }
+        }, [scope.row.status === "settled" ? _c("el-tag", {
+          attrs: {
+            type: "success"
+          }
+        }, [_vm._v("Settled")]) : _c("el-tag", {
+          attrs: {
+            type: "warnning"
+          }
+        }, [_vm._v("Pending")])], 1)];
+      }
+    }])
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
       prop: "created_at",
       width: "170",
+      fixed: "right",
       label: _vm.$t("transaction.created_at")
     }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      label: _vm.$t("common.option"),
+      width: "100",
+      fixed: "right"
+    },
+    scopedSlots: _vm._u([{
+      key: "default",
+      fn: function fn(scope) {
+        return [_c("a", {
+          attrs: {
+            href: scope.row.links.invoice.href,
+            target: "_blank"
+          }
+        }, [_vm._v(_vm._s(_vm.$t("common.print")))])];
+      }
+    }])
   })], 1), _vm._v(" "), _c("div", {
     staticClass: "table-edit-footer"
   }, [_vm.userInfo.capability === "administrator" ? _c("el-button", {
@@ -11811,7 +12349,21 @@ var render = exports.render = function render() {
     on: {
       "current-change": _vm.onPageChange
     }
-  })], 1)], 1)]);
+  })], 1)], 1), _vm._v(" "), _c("dialog-cashier-transaction", {
+    attrs: {
+      billing: _vm.currentTransaction
+    },
+    on: {
+      change: _vm.fetchList
+    },
+    model: {
+      value: _vm.showDialog,
+      callback: function callback($$v) {
+        _vm.showDialog = $$v;
+      },
+      expression: "showDialog"
+    }
+  })], 1);
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -12154,6 +12706,137 @@ render._withStripped = true;
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=template&id=39c59d06&scoped=true":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=template&id=39c59d06&scoped=true ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("main-layout", [_c("div", {
+    staticClass: "d-flex justify-content-between",
+    attrs: {
+      slot: "header"
+    },
+    slot: "header"
+  }, [_c("h2", [_vm._v("Driver Reports")]), _vm._v(" "), _c("router-link", {
+    attrs: {
+      to: "/deliveryer/transactions"
+    }
+  }, [_c("el-button", {
+    attrs: {
+      size: "small",
+      type: "primary"
+    }
+  }, [_vm._v("Histories")])], 1)], 1), _vm._v(" "), _c("section", {
+    directives: [{
+      name: "loading",
+      rawName: "v-loading",
+      value: _vm.loading,
+      expression: "loading"
+    }],
+    staticClass: "page-section"
+  }, [_c("el-table", {
+    attrs: {
+      data: _vm.deliveryers
+    }
+  }, [_c("el-table-column", {
+    attrs: {
+      prop: "name",
+      label: "Driver"
+    },
+    scopedSlots: _vm._u([{
+      key: "default",
+      fn: function fn(scope) {
+        return [_c("a", {
+          staticClass: "el-link el-link--primary",
+          on: {
+            click: function click($event) {
+              return _vm.handleShowBill(scope.row);
+            }
+          }
+        }, [_vm._v(_vm._s(scope.row.name))])];
+      }
+    }])
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      prop: "billing.shipping_total",
+      label: "ShippingTotal"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      prop: "billing.online_total",
+      label: "Online Total"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      prop: "billing.card_total",
+      label: "Card Total"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      prop: "billing.cash_total",
+      label: "Cash Total"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      prop: "billing.cost_total",
+      label: "Cost Total"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      prop: "billing.actual_total",
+      label: "Actual Total"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      label: "Options",
+      width: "80",
+      align: "right"
+    },
+    scopedSlots: _vm._u([{
+      key: "default",
+      fn: function fn(scope) {
+        return [_c("a", {
+          staticClass: "el-link el-link--primary",
+          attrs: {
+            href: scope.row.links.report.href,
+            target: "_blank"
+          }
+        }, [_vm._v(_vm._s(_vm.$t("common.print")))])];
+      }
+    }])
+  })], 1)], 1), _vm._v(" "), _c("dialog-deliveryer-bill", {
+    attrs: {
+      "driver-name": _vm.currentDriver.name,
+      transaction: _vm.currentDriver.billing
+    },
+    on: {
+      change: _vm.fetchList
+    },
+    model: {
+      value: _vm.showBill,
+      callback: function callback($$v) {
+        _vm.showBill = $$v;
+      },
+      expression: "showBill"
+    }
+  })], 1);
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DeliveryerList.vue?vue&type=template&id=728c93a3&scoped=true":
 /*!**************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DeliveryerList.vue?vue&type=template&id=728c93a3&scoped=true ***!
@@ -12279,7 +12962,7 @@ var render = exports.render = function render() {
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
-      width: "auto",
+      width: "100",
       label: _vm.$t("common.option"),
       align: "right",
       fixed: "right"
@@ -12297,24 +12980,14 @@ var render = exports.render = function render() {
               return _vm.onShowEdit(scope.row);
             }
           }
-        }, [_vm._v(_vm._s(_vm.$t("common.edit")) + "\n                    ")]), _vm._v(" "), _c("el-button", {
-          attrs: {
-            size: "mini",
-            type: "text"
-          },
-          on: {
-            click: function click($event) {
-              return _vm.handleShowDetail(scope.row);
-            }
-          }
-        }, [_vm._v(_vm._s(_vm.$t("deliveryer.account_detail")))])];
+        }, [_vm._v("\n                        " + _vm._s(_vm.$t("common.edit")) + "\n                    ")])];
       }
     }])
   })], 1), _vm._v(" "), _c("div", {
     staticClass: "tablenav-bottom"
   }, [_c("div", {
     staticClass: "table-actions"
-  }, [_c("el-button", {
+  }, [_vm.$store.getters.userInfo.capability === "administrator" ? _c("el-button", {
     attrs: {
       size: "small",
       type: "primary",
@@ -12323,7 +12996,7 @@ var render = exports.render = function render() {
     on: {
       click: _vm.onDelete
     }
-  }, [_vm._v("\n                    " + _vm._s(_vm.$t("common.batch_delete")) + "\n                ")])], 1), _vm._v(" "), _c("el-pagination", {
+  }, [_vm._v("\n                    " + _vm._s(_vm.$t("common.batch_delete")) + "\n                ")]) : _vm._e()], 1), _vm._v(" "), _c("el-pagination", {
     attrs: {
       background: "",
       layout: "prev, pager, next, total",
@@ -12353,7 +13026,7 @@ var render = exports.render = function render() {
     },
     attrs: {
       size: "medium",
-      "label-width": "80px"
+      "label-width": "140px"
     }
   }, [_c("el-form-item", {
     attrs: {
@@ -12473,94 +13146,7 @@ var render = exports.render = function render() {
     on: {
       click: _vm.onSubmit
     }
-  }, [_vm._v(_vm._s(_vm.$t("common.submit")) + "\n                ")])], 1)], 1)], 1), _vm._v(" "), _c("el-dialog", {
-    attrs: {
-      title: _vm.$t("Settlement"),
-      closeable: "",
-      visible: _vm.showCheckout,
-      "close-on-click-modal": false,
-      "close-on-press-escape": false
-    },
-    on: {
-      "update:visible": function updateVisible($event) {
-        _vm.showCheckout = $event;
-      }
-    }
-  }, [_c("el-descriptions", {
-    attrs: {
-      title: "",
-      direction: "vertical",
-      column: 4,
-      border: ""
-    }
-  }, [_c("el-descriptions-item", {
-    attrs: {
-      label: "底金"
-    }
-  }, [_vm._v(_vm._s(_vm.transaction.base_total))]), _vm._v(" "), _c("el-descriptions-item", {
-    attrs: {
-      label: "配送费"
-    }
-  }, [_vm._v(_vm._s(_vm.transaction.shipping_total))]), _vm._v(" "), _c("el-descriptions-item", {
-    attrs: {
-      label: "收到现金"
-    }
-  }, [_vm._v(_vm._s(_vm.transaction.cash_total))]), _vm._v(" "), _c("el-descriptions-item", {
-    attrs: {
-      label: "在线支付"
-    }
-  }, [_vm._v(_vm._s(_vm.transaction.online_total))]), _vm._v(" "), _c("el-descriptions-item", {
-    attrs: {
-      label: "卡支付"
-    }
-  }, [_vm._v(_vm._s(_vm.transaction.card_total))]), _vm._v(" "), _c("el-descriptions-item", {
-    attrs: {
-      label: "Cost Total"
-    }
-  }, [_vm._v(_vm._s(_vm.transaction.cost_total))]), _vm._v(" "), _c("el-descriptions-item", {
-    attrs: {
-      label: "应交金额"
-    }
-  }, [_vm._v(_vm._s(_vm.transaction.total))])], 1), _vm._v(" "), _c("el-form", {
-    staticStyle: {
-      width: "500px",
-      "margin-top": "20px"
-    },
-    attrs: {
-      size: "medium",
-      "label-width": "60px"
-    }
-  }, [_c("el-form-item", {
-    attrs: {
-      label: "备注"
-    }
-  }, [_c("el-input", {
-    staticClass: "w400",
-    attrs: {
-      type: "textarea",
-      rows: "3"
-    },
-    model: {
-      value: _vm.transaction.note,
-      callback: function callback($$v) {
-        _vm.$set(_vm.transaction, "note", $$v);
-      },
-      expression: "transaction.note"
-    }
-  })], 1), _vm._v(" "), _c("el-form-item", [_c("el-button", {
-    staticClass: "w100",
-    attrs: {
-      type: "primary"
-    },
-    on: {
-      click: _vm.onSettlement
-    }
-  }, [_vm._v(_vm._s(_vm.$t("common.submit")) + "\n                ")]), _vm._v(" "), _c("a", {
-    staticClass: "el-link el-link--primary",
-    on: {
-      click: _vm.handleShowOrders
-    }
-  }, [_vm._v("View Details")])], 1)], 1)], 1), _vm._v(" "), _c("media-dialog", {
+  }, [_vm._v(_vm._s(_vm.$t("common.submit")) + "\n                ")])], 1)], 1)], 1), _vm._v(" "), _c("media-dialog", {
     on: {
       confirm: _vm.onSelectImage
     },
@@ -12570,28 +13156,6 @@ var render = exports.render = function render() {
         _vm.showPicker = $$v;
       },
       expression: "showPicker"
-    }
-  }), _vm._v(" "), _c("dialog-deliveryer-transaction", {
-    attrs: {
-      deliveryer: _vm.deliveryer
-    },
-    model: {
-      value: _vm.showTransactions,
-      callback: function callback($$v) {
-        _vm.showTransactions = $$v;
-      },
-      expression: "showTransactions"
-    }
-  }), _vm._v(" "), _c("dialog-deliveryer-orders", {
-    attrs: {
-      deliveryer: _vm.deliveryer
-    },
-    model: {
-      value: _vm.showOrders,
-      callback: function callback($$v) {
-        _vm.showOrders = $$v;
-      },
-      expression: "showOrders"
     }
   })], 1);
 };
@@ -12692,7 +13256,6 @@ var render = exports.render = function render() {
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
       prop: "base_amount",
-      width: "120",
       label: _vm.$t("transaction.base_amount")
     }
   }), _vm._v(" "), _c("el-table-column", {
@@ -12700,12 +13263,6 @@ var render = exports.render = function render() {
       prop: "shipping_total",
       width: "120",
       label: _vm.$t("transaction.shipping_total")
-    }
-  }), _vm._v(" "), _c("el-table-column", {
-    attrs: {
-      prop: "cash_total",
-      width: "120",
-      label: _vm.$t("transaction.cash_total")
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
@@ -12721,14 +13278,21 @@ var render = exports.render = function render() {
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
-      prop: "total",
+      prop: "cash_total",
       width: "120",
-      label: _vm.$t("transaction.total")
+      label: _vm.$t("transaction.cash_total")
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
-      prop: "notes",
-      label: _vm.$t("transaction.notes")
+      prop: "cost_total",
+      width: "120",
+      label: _vm.$t("transaction.cost_total")
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      prop: "actual_total",
+      width: "120",
+      label: _vm.$t("transaction.actual_total")
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
@@ -12753,8 +13317,26 @@ var render = exports.render = function render() {
     attrs: {
       prop: "created_at",
       width: "170",
-      label: _vm.$t("transaction.created_at")
+      label: _vm.$t("transaction.created_at"),
+      fixed: "right"
     }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      width: "80",
+      label: _vm.$t("common.action"),
+      fixed: "right"
+    },
+    scopedSlots: _vm._u([{
+      key: "default",
+      fn: function fn(scope) {
+        return [_c("a", {
+          attrs: {
+            href: scope.row.links.invoice.href,
+            target: "_blank"
+          }
+        }, [_vm._v(_vm._s(_vm.$t("common.print")))])];
+      }
+    }])
   })], 1), _vm._v(" "), _c("div", {
     staticClass: "table-edit-footer"
   }, [_vm.userInfo.capability === "administrator" ? _c("el-button", {
@@ -12779,9 +13361,13 @@ var render = exports.render = function render() {
     on: {
       "current-change": _vm.onPageChange
     }
-  })], 1)], 1), _vm._v(" "), _c("dialog-deliveryer-transaction", {
+  })], 1)], 1), _vm._v(" "), _c("dialog-deliveryer-bill", {
     attrs: {
-      transaction: _vm.currentTransaction
+      transaction: _vm.currentTransaction,
+      "driver-name": _vm.currentTransaction.deliveryer.name
+    },
+    on: {
+      change: _vm.fetchList
     },
     model: {
       value: _vm.showTransaction,
@@ -12901,6 +13487,124 @@ var render = exports.render = function render() {
       click: _vm.handleSubmit
     }
   }, [_vm._v("Submit")])], 1)], 1)], 1);
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=template&id=52f39247&scoped=true":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=template&id=52f39247&scoped=true ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("el-dialog", {
+    attrs: {
+      title: _vm.$t("Deliveryer Transaction"),
+      closeable: "",
+      visible: _vm.visible,
+      "close-on-click-modal": false,
+      "close-on-press-escape": false,
+      width: "60%"
+    },
+    on: {
+      "update:visible": function updateVisible($event) {
+        _vm.visible = $event;
+      },
+      close: _vm.close
+    }
+  }, [_c("el-descriptions", {
+    attrs: {
+      title: "",
+      direction: "vertical",
+      column: 5,
+      border: ""
+    }
+  }, [_c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.base_amount")
+    }
+  }, [_vm._v(_vm._s(_vm.transaction.base_amount) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.shipping_total")
+    }
+  }, [_vm._v(_vm._s(_vm.transaction.shipping_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.online_total")
+    }
+  }, [_vm._v(_vm._s(_vm.transaction.online_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.card_total")
+    }
+  }, [_vm._v(_vm._s(_vm.transaction.card_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.cash_total")
+    }
+  }, [_vm._v(_vm._s(_vm.transaction.cash_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.cost_total")
+    }
+  }, [_vm._v("\n            " + _vm._s(_vm.transaction.cost_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.refund_total")
+    }
+  }, [_vm._v(_vm._s(_vm.transaction.refund_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.actual_total")
+    }
+  }, [_vm._v(_vm._s(_vm.transaction.actual_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.total")
+    }
+  }, [_vm._v(_vm._s(_vm.transaction.total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.net_total")
+    }
+  }, [_vm._v(_vm._s(_vm.transaction.net_total) + "\n        ")])], 1), _vm._v(" "), _vm.billing.status !== "settled" ? _c("el-form", {
+    staticStyle: {
+      "margin-top": "20px"
+    },
+    attrs: {
+      size: "medium",
+      inline: true
+    }
+  }, [_c("el-form-item", [_c("el-select", {
+    model: {
+      value: _vm.transaction.status,
+      callback: function callback($$v) {
+        _vm.$set(_vm.transaction, "status", $$v);
+      },
+      expression: "transaction.status"
+    }
+  }, [_c("el-option", {
+    attrs: {
+      label: _vm.$t("transaction.status_options.settled"),
+      value: "settled"
+    }
+  }), _vm._v(" "), _c("el-option", {
+    attrs: {
+      label: _vm.$t("transaction.status_options.pending"),
+      value: "pending"
+    }
+  })], 1)], 1), _vm._v(" "), _c("el-form-item", [_c("el-button", {
+    attrs: {
+      type: "primary"
+    },
+    on: {
+      click: _vm.handleSubmit
+    }
+  }, [_vm._v("Submit")])], 1)], 1) : _vm._e()], 1);
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -13100,6 +13804,167 @@ render._withStripped = true;
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=template&id=a8dc1e18&scoped=true":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=template&id=a8dc1e18&scoped=true ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.staticRenderFns = exports.render = void 0;
+var render = exports.render = function render() {
+  var _vm = this,
+    _c = _vm._self._c;
+  return _c("el-dialog", {
+    attrs: {
+      title: _vm.title,
+      closeable: "",
+      visible: _vm.visible,
+      "close-on-click-modal": false,
+      "close-on-press-escape": false,
+      width: "60%"
+    },
+    on: {
+      "update:visible": function updateVisible($event) {
+        _vm.visible = $event;
+      },
+      close: _vm.close
+    }
+  }, [_c("el-table", {
+    attrs: {
+      data: _vm.billing.orders,
+      border: ""
+    }
+  }, [_c("el-table-column", {
+    attrs: {
+      label: _vm.$t("order.no"),
+      prop: "short_code"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      label: _vm.$t("order.shipping_zone"),
+      prop: "shipping_line.zone_title"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      label: _vm.$t("order.shipping_total"),
+      prop: "shipping_total"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      label: _vm.$t("Cost F"),
+      prop: "cost_total"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      label: _vm.$t("order.total"),
+      prop: "total"
+    }
+  }), _vm._v(" "), _c("el-table-column", {
+    attrs: {
+      label: _vm.$t("order.payment_method"),
+      prop: "payment_method"
+    }
+  })], 1), _vm._v(" "), _c("el-descriptions", {
+    attrs: {
+      title: "",
+      direction: "vertical",
+      column: 4,
+      border: ""
+    }
+  }, [_c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.base_amount")
+    }
+  }, [_vm._v("\n            " + _vm._s(_vm.billing.base_amount) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.shipping_total")
+    }
+  }, [_vm._v("\n            " + _vm._s(_vm.billing.shipping_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.online_total")
+    }
+  }, [_vm._v("\n            " + _vm._s(_vm.billing.online_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.cash_total")
+    }
+  }, [_vm._v("\n            " + _vm._s(_vm.billing.cash_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.card_total")
+    }
+  }, [_vm._v("\n            " + _vm._s(_vm.billing.card_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: "Cost Total"
+    }
+  }, [_vm._v("\n            " + _vm._s(_vm.billing.cost_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.total")
+    }
+  }, [_vm._v("\n            " + _vm._s(_vm.billing.actual_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.actual_total")
+    }
+  }, [_vm._v("\n            " + _vm._s(_vm.billing.actual_total) + "\n        ")])], 1), _vm._v(" "), _vm.transaction.status !== "settled" ? _c("el-form", {
+    staticStyle: {
+      "margin-top": "20px"
+    },
+    attrs: {
+      size: "medium",
+      inline: true
+    }
+  }, [_c("el-form-item", [_c("el-select", {
+    model: {
+      value: _vm.billing.status,
+      callback: function callback($$v) {
+        _vm.$set(_vm.billing, "status", $$v);
+      },
+      expression: "billing.status"
+    }
+  }, [_c("el-option", {
+    attrs: {
+      label: _vm.$t("transaction.status_options.settled"),
+      value: "settled"
+    }
+  }), _vm._v(" "), _c("el-option", {
+    attrs: {
+      label: _vm.$t("transaction.status_options.pending"),
+      value: "pending"
+    }
+  })], 1)], 1), _vm._v(" "), _c("el-form-item", {
+    attrs: {
+      label: "Notes"
+    }
+  }, [_c("el-input", {
+    staticClass: "w300",
+    attrs: {
+      clearable: ""
+    },
+    model: {
+      value: _vm.billing.notes,
+      callback: function callback($$v) {
+        _vm.$set(_vm.billing, "notes", $$v);
+      },
+      expression: "billing.notes"
+    }
+  })], 1), _vm._v(" "), _c("el-form-item", [_c("el-button", {
+    attrs: {
+      type: "primary"
+    },
+    on: {
+      click: _vm.handleSubmit
+    }
+  }, [_vm._v("Submit")])], 1)], 1) : _vm._e()], 1);
+};
+var staticRenderFns = exports.staticRenderFns = [];
+render._withStripped = true;
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogDeliveryerOrders.vue?vue&type=template&id=6f666f92&scoped=true":
 /*!**********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogDeliveryerOrders.vue?vue&type=template&id=6f666f92&scoped=true ***!
@@ -13198,7 +14063,7 @@ var render = exports.render = function render() {
     _c = _vm._self._c;
   return _c("el-dialog", {
     attrs: {
-      title: _vm.$t("Deliveryer Transaction"),
+      title: _vm.$t("Driver Report"),
       closeable: "",
       visible: _vm.value,
       "close-on-click-modal": false,
@@ -13234,7 +14099,7 @@ var render = exports.render = function render() {
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
       label: _vm.$t("Cost F"),
-      prop: "meta_data.cost_total"
+      prop: "cost_total"
     }
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
@@ -13257,43 +14122,39 @@ var render = exports.render = function render() {
     attrs: {
       label: _vm.$t("transaction.base_amount")
     }
-  }, [_vm._v(_vm._s(_vm.transaction.base_amount))]), _vm._v(" "), _c("el-descriptions-item", {
+  }, [_vm._v(_vm._s(_vm.transaction.base_amount) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
     attrs: {
       label: _vm.$t("transaction.shipping_total")
     }
-  }, [_vm._v(_vm._s(_vm.transaction.shipping_total))]), _vm._v(" "), _c("el-descriptions-item", {
-    attrs: {
-      label: _vm.$t("transaction.cash_total")
-    }
-  }, [_vm._v(_vm._s(_vm.transaction.cash_total))]), _vm._v(" "), _c("el-descriptions-item", {
+  }, [_vm._v(_vm._s(_vm.transaction.shipping_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
     attrs: {
       label: _vm.$t("transaction.online_total")
     }
-  }, [_vm._v(_vm._s(_vm.transaction.online_total))]), _vm._v(" "), _c("el-descriptions-item", {
+  }, [_vm._v(_vm._s(_vm.transaction.online_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
     attrs: {
       label: _vm.$t("transaction.card_total")
     }
-  }, [_vm._v(_vm._s(_vm.transaction.card_total))]), _vm._v(" "), _c("el-descriptions-item", {
+  }, [_vm._v(_vm._s(_vm.transaction.card_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
+    attrs: {
+      label: _vm.$t("transaction.cash_total")
+    }
+  }, [_vm._v(_vm._s(_vm.transaction.cash_total) + "\n        ")]), _vm._v(" "), _c("el-descriptions-item", {
     attrs: {
       label: "Cost Total"
     }
   }, [_vm._v(_vm._s(_vm.transaction.cost_total))]), _vm._v(" "), _c("el-descriptions-item", {
     attrs: {
-      label: _vm.$t("transaction.total")
+      label: _vm.$t("transaction.actual_total")
     }
-  }, [_vm._v(_vm._s(_vm.transaction.total))])], 1), _vm._v(" "), _c("el-form", {
+  }, [_vm._v(_vm._s(_vm.transaction.actual_total) + "\n        ")])], 1), _vm._v(" "), _vm.transaction.status !== "settled" ? _c("el-form", {
     staticStyle: {
       "margin-top": "20px"
     },
     attrs: {
       size: "medium",
-      "label-position": "top"
+      inline: true
     }
-  }, [_c("el-form-item", {
-    attrs: {
-      label: "Status"
-    }
-  }, [_c("el-select", {
+  }, [_c("el-form-item", [_c("el-select", {
     model: {
       value: _vm.transaction.status,
       callback: function callback($$v) {
@@ -13318,7 +14179,7 @@ var render = exports.render = function render() {
     on: {
       click: _vm.handleSubmit
     }
-  }, [_vm._v("Submit")])], 1)], 1)], 1);
+  }, [_vm._v("Submit")])], 1)], 1) : _vm._e()], 1);
 };
 var staticRenderFns = exports.staticRenderFns = [];
 render._withStripped = true;
@@ -13383,7 +14244,7 @@ var render = exports.render = function render() {
       "line-height": "1.4",
       "padding-top": "8px"
     }
-  }, [_c("div", [_vm._v(_vm._s(_vm.shipping.first_name))]), _vm._v(" "), _c("div", [_vm._v(_vm._s(_vm.shipping.address_line_1))]), _vm._v(" "), _vm.shipping.county ? _c("div", [_vm._v(_vm._s(_vm.shipping.county))]) : _vm._e(), _vm._v(" "), _vm.shipping.city ? _c("div", [_vm._v(_vm._s(_vm.shipping.city))]) : _vm._e(), _vm._v(" "), _vm.shipping.state ? _c("div", [_vm._v(_vm._s(_vm.shipping.state))]) : _vm._e(), _vm._v(" "), _vm.shipping.phone ? _c("div", [_c("span", [_vm._v("+" + _vm._s(_vm.shipping.phone.national_number))]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.shipping.phone.phone_number))])]) : _vm._e()])]), _vm._v(" "), _c("el-form-item", {
+  }, [_c("div", [_vm._v(_vm._s(_vm.shipping.first_name))]), _vm._v(" "), _vm.shipping.phone_number ? _c("div", [_c("span", [_vm._v("+" + _vm._s(_vm.shipping.national_number))]), _vm._v(" "), _c("span", [_vm._v(_vm._s(_vm.shipping.phone_number))])]) : _vm._e(), _vm._v(" "), _c("div", [_vm._v(_vm._s(_vm.shipping.formatted_address))])])]), _vm._v(" "), _c("el-form-item", {
     attrs: {
       label: _vm.$t("order.shipping_method")
     }
@@ -13396,11 +14257,11 @@ var render = exports.render = function render() {
       change: _vm.onShippingMethodChange
     },
     model: {
-      value: _vm.shipping_line.method_id,
+      value: _vm.order.shipping_method,
       callback: function callback($$v) {
-        _vm.$set(_vm.shipping_line, "method_id", $$v);
+        _vm.$set(_vm.order, "shipping_method", $$v);
       },
-      expression: "shipping_line.method_id"
+      expression: "order.shipping_method"
     }
   }, _vm._l(_vm.shippingMethodList, function (v, k) {
     return _c("el-option", {
@@ -13410,7 +14271,7 @@ var render = exports.render = function render() {
         value: k
       }
     });
-  }), 1)], 1), _vm._v(" "), _vm.shipping_line.method_id === "flat_rate" ? _c("el-form-item", {
+  }), 1)], 1), _vm._v(" "), _vm.order.shipping_method === "flat_rate" ? _c("el-form-item", {
     attrs: {
       label: _vm.$t("order.shipping_zone")
     }
@@ -13423,21 +14284,21 @@ var render = exports.render = function render() {
       change: _vm.onShippingMethodChange
     },
     model: {
-      value: _vm.shippingZoneIndex,
+      value: _vm.shipping_line.zone_id,
       callback: function callback($$v) {
-        _vm.shippingZoneIndex = $$v;
+        _vm.$set(_vm.shipping_line, "zone_id", $$v);
       },
-      expression: "shippingZoneIndex"
+      expression: "shipping_line.zone_id"
     }
   }, _vm._l(_vm.shippingZones, function (v, k) {
     return _c("el-option", {
       key: k,
       attrs: {
         label: v.title + "(€" + v.fee + ")",
-        value: k
+        value: v.id
       }
     });
-  }), 1)], 1) : _vm._e(), _vm._v(" "), _vm.shipping_line.method_id === "flat_rate" ? _c("el-form-item", {
+  }), 1)], 1) : _vm._e(), _vm._v(" "), _vm.order.shipping_method === "flat_rate" ? _c("el-form-item", {
     attrs: {
       label: _vm.$t("order.deliveryer")
     }
@@ -13493,9 +14354,34 @@ var render = exports.render = function render() {
     staticClass: "w300",
     attrs: {
       type: "number",
-      value: _vm.orderTotal
+      disabled: _vm.order.payment_method === "online"
+    },
+    model: {
+      value: _vm.newTotalValue,
+      callback: function callback($$v) {
+        _vm.newTotalValue = $$v;
+      },
+      expression: "newTotalValue"
     }
-  })], 1), _vm._v(" "), _c("el-form-item", {
+  }, [_c("div", {
+    attrs: {
+      slot: "prepend"
+    },
+    slot: "prepend"
+  }, [_vm._v(_vm._s(_vm.newOrderTotal))]), _vm._v(" "), _c("el-button", {
+    attrs: {
+      slot: "append",
+      type: "primary",
+      disabled: _vm.order.payment_method === "online"
+    },
+    on: {
+      click: function click($event) {
+        _vm.newOrderTotal = _vm.newTotalValue;
+        _vm.newTotalValue = 0;
+      }
+    },
+    slot: "append"
+  }, [_vm._v("Confirm\n                            ")])], 1)], 1), _vm._v(" "), _c("el-form-item", {
     attrs: {
       label: "Cost Fee"
     }
@@ -13504,14 +14390,15 @@ var render = exports.render = function render() {
   }, [_c("el-input", {
     staticClass: "w300",
     attrs: {
-      type: "number"
+      type: "number",
+      disabled: _vm.order.payment_method !== "online"
     },
     model: {
-      value: _vm.order.cost_total,
+      value: _vm.newCostTotal,
       callback: function callback($$v) {
-        _vm.$set(_vm.order, "cost_total", $$v);
+        _vm.newCostTotal = $$v;
       },
-      expression: "order.cost_total"
+      expression: "newCostTotal"
     }
   })], 1)]), _vm._v(" "), _c("el-form-item", {
     attrs: {
@@ -14033,7 +14920,7 @@ var render = exports.render = function render() {
     }
   })], 1), _vm._v(" "), _c("el-form-item", {
     attrs: {
-      label: "Deliveryer"
+      label: "Driver"
     }
   }, [_c("el-select", {
     attrs: {
@@ -14191,7 +15078,8 @@ var render = exports.render = function render() {
     }
   })], 1)], 1), _vm._v(" "), _c("el-table", {
     attrs: {
-      data: _vm.dataList
+      data: _vm.dataList,
+      "highlight-current-row": ""
     },
     on: {
       "selection-change": _vm.onSelectionChange
@@ -14224,7 +15112,7 @@ var render = exports.render = function render() {
           staticClass: "post-column-actions"
         }, [_c("span", [_vm._v(_vm._s(scope.row.buyer_name))]), _vm._v(" "), _c("span", [_vm._v("|")]), _vm._v(" "), _c("span", [_c("a", {
           attrs: {
-            href: scope.row.links.invoice,
+            href: scope.row.links.invoice.href,
             target: "_blank"
           }
         }, [_vm._v("Invoice")])])])];
@@ -14295,7 +15183,7 @@ var render = exports.render = function render() {
     scopedSlots: _vm._u([{
       key: "default",
       fn: function fn(scope) {
-        return [scope.row.shipping_line.method_id == "flat_rate" ? _c("div", [_c("div", [_vm._v(_vm._s(scope.row.shipping_line.method_title))]), _vm._v(" "), _c("small", [_vm._v(_vm._s(scope.row.shipping_line.zone_title))])]) : _c("div", [_vm._v("\n                        Collection\n                    ")])];
+        return [scope.row.shipping_method == "flat_rate" ? _c("div", [_c("div", [_vm._v("Delivery")]), _vm._v(" "), _c("small", [_vm._v(_vm._s(scope.row.shipping_line.zone_title))])]) : _c("div", [_vm._v("\n                        Collection\n                    ")])];
       }
     }])
   }), _vm._v(" "), _c("el-table-column", {
@@ -14307,9 +15195,16 @@ var render = exports.render = function render() {
     scopedSlots: _vm._u([{
       key: "default",
       fn: function fn(scope) {
-        return [_c("div", [_vm._v(_vm._s("€" + scope.row.total))]), _vm._v(" "), _c("small", {
+        return [_c("div", [_vm._v(_vm._s("€" + scope.row.total))]), _vm._v(" "), _c("div", {
+          staticStyle: {
+            "line-height": "1",
+            "word-break": "break-word"
+          }
+        }, [scope.row.payment_method === "card" ? _c("small", {
           staticClass: "text-danger"
-        }, [_vm._v(_vm._s(_vm._f("capitalize")(scope.row.payment_method)))])];
+        }, [_vm._v("\n                            " + _vm._s(_vm.paymentMap[scope.row.payment_method]) + "\n                        ")]) : _c("small", {
+          staticClass: "text-success"
+        }, [_vm._v("\n                            " + _vm._s(_vm.paymentMap[scope.row.payment_method]) + "\n                        ")])])];
       }
     }])
   }), _vm._v(" "), _c("el-table-column", {
@@ -14575,17 +15470,7 @@ var render = exports.render = function render() {
     on: {
       click: _vm.onDelete
     }
-  }, [_vm._v("\n                    " + _vm._s(_vm.$t("common.batch_delete")) + "\n                ")]), _vm._v(" "), _c("el-button", {
-    attrs: {
-      size: "small",
-      type: "info"
-    },
-    on: {
-      click: function click($event) {
-        _vm.showSettlement = true;
-      }
-    }
-  }, [_vm._v(_vm._s(_vm.$t("pos_machines.settlement")))])], 1), _vm._v(" "), _c("el-pagination", {
+  }, [_vm._v("\n                    " + _vm._s(_vm.$t("common.batch_delete")) + "\n                ")])], 1), _vm._v(" "), _c("el-pagination", {
     attrs: {
       background: "",
       layout: "prev, pager, next, total",
@@ -14663,23 +15548,7 @@ var render = exports.render = function render() {
       label: _vm.$t("pos_machines.statuses.idle"),
       value: "idle"
     }
-  })], 1)], 1), _vm._v(" "), _c("el-form-item", {
-    attrs: {
-      label: _vm.$t("pos_machines.use_as_cashier")
-    }
-  }, [_c("el-switch", {
-    attrs: {
-      "inactive-value": 0,
-      "active-value": 1
-    },
-    model: {
-      value: _vm.model.is_cashier,
-      callback: function callback($$v) {
-        _vm.$set(_vm.model, "is_cashier", $$v);
-      },
-      expression: "model.is_cashier"
-    }
-  })], 1), _vm._v(" "), _c("el-form-item", [_c("el-button", {
+  })], 1)], 1), _vm._v(" "), _c("el-form-item", [_c("el-button", {
     staticClass: "w100",
     attrs: {
       type: "primary"
@@ -16247,7 +17116,62 @@ var render = exports.render = function render() {
     }
   }), _vm._v(" "), _c("div", {
     staticClass: "el-form-tips"
-  }, [_vm._v(_vm._s(_vm.$t("shop.referral_link_description_tips")))])], 1), _vm._v(" "), _c("el-form-item", [_c("el-button", {
+  }, [_vm._v(_vm._s(_vm.$t("shop.referral_link_description_tips")))])], 1), _vm._v(" "), _c("el-form-item", {
+    attrs: {
+      label: _vm.$t("shop.shop_order_warning")
+    }
+  }, [_c("el-input", {
+    staticClass: "w500",
+    attrs: {
+      type: "textarea",
+      rows: "3"
+    },
+    model: {
+      value: _vm.settings.shop_order_warning,
+      callback: function callback($$v) {
+        _vm.$set(_vm.settings, "shop_order_warning", $$v);
+      },
+      expression: "settings.shop_order_warning"
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "el-form-tips"
+  }, [_vm._v(_vm._s(_vm.$t("shop.shop_order_warning_tips")))])], 1), _vm._v(" "), _c("el-form-item", {
+    attrs: {
+      label: _vm.$t("shop.delivery_hours")
+    }
+  }, [_c("el-time-select", {
+    attrs: {
+      "picker-options": {
+        start: "00:00",
+        step: "00:15",
+        end: "23:59"
+      }
+    },
+    model: {
+      value: _vm.settings.delivery_hours_start,
+      callback: function callback($$v) {
+        _vm.$set(_vm.settings, "delivery_hours_start", $$v);
+      },
+      expression: "settings.delivery_hours_start"
+    }
+  }), _vm._v(" "), _c("el-time-select", {
+    attrs: {
+      "picker-options": {
+        start: "00:00",
+        step: "00:15",
+        end: "23:59"
+      }
+    },
+    model: {
+      value: _vm.settings.delivery_hours_end,
+      callback: function callback($$v) {
+        _vm.$set(_vm.settings, "delivery_hours_end", $$v);
+      },
+      expression: "settings.delivery_hours_end"
+    }
+  }), _vm._v(" "), _c("div", {
+    staticClass: "el-form-tips"
+  }, [_vm._v(_vm._s(_vm.$t("shop.opening_hours_tips")))])], 1), _vm._v(" "), _c("el-form-item", [_c("el-button", {
     attrs: {
       type: "primary",
       size: "medium"
@@ -23443,6 +24367,8 @@ var _PosMachineList = _interopRequireDefault(__webpack_require__(/*! ./PosMachin
 var _Settings = _interopRequireDefault(__webpack_require__(/*! ./Settings.vue */ "./resources/apps/admin/ecommerce/Settings.vue"));
 var _CashierTransaction = _interopRequireDefault(__webpack_require__(/*! ./CashierTransaction.vue */ "./resources/apps/admin/ecommerce/CashierTransaction.vue"));
 var _DeliveryerTransaction = _interopRequireDefault(__webpack_require__(/*! ./DeliveryerTransaction.vue */ "./resources/apps/admin/ecommerce/DeliveryerTransaction.vue"));
+var _DeliveryerBilling = _interopRequireDefault(__webpack_require__(/*! ./DeliveryerBilling.vue */ "./resources/apps/admin/ecommerce/DeliveryerBilling.vue"));
+var _CashierBilling = _interopRequireDefault(__webpack_require__(/*! ./CashierBilling.vue */ "./resources/apps/admin/ecommerce/CashierBilling.vue"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 module.exports = [{
   path: '/product/list',
@@ -23565,7 +24491,7 @@ module.exports = [{
   component: _DeliveryerList["default"],
   meta: {
     title: '配送员管理',
-    capabilities: []
+    capabilities: ['manager']
   }
 }, {
   path: '/order/list',
@@ -23603,10 +24529,24 @@ module.exports = [{
     capabilities: ['manager']
   }
 }, {
+  path: '/cashier/billing',
+  component: _CashierBilling["default"],
+  meta: {
+    title: '收银账单',
+    capabilities: ['manager']
+  }
+}, {
   path: '/deliveryer/transactions',
   component: _DeliveryerTransaction["default"],
   meta: {
     title: '司机台账',
+    capabilities: ['manager']
+  }
+}, {
+  path: '/deliveryer/billing',
+  component: _DeliveryerBilling["default"],
+  meta: {
+    title: '司机账单',
     capabilities: ['manager']
   }
 }];
@@ -23780,18 +24720,18 @@ var _default = exports["default"] = [{
   }, {
     name: 'shop.deliveryers',
     path: '/deliveryers',
-    capabilities: []
+    capabilities: ['manager']
   }, {
     name: 'shop.pos_machines',
     path: '/pos-machines',
     capabilities: []
   }, {
-    name: 'shop.cashier_transactions',
-    path: '/cashier/transactions',
+    name: 'shop.cashier_report',
+    path: '/cashier/billing',
     capabilities: ['manager']
   }, {
-    name: 'shop.deliveryer_transactions',
-    path: '/deliveryer/transactions',
+    name: 'shop.deliveryer_report',
+    path: '/deliveryer/billing',
     capabilities: ['manager']
   }, {
     name: 'shop.point_transactions',
@@ -28448,6 +29388,46 @@ component.options.__file = "resources/apps/admin/ecommerce/AttributeList.vue"
 
 /***/ }),
 
+/***/ "./resources/apps/admin/ecommerce/CashierBilling.vue":
+/*!***********************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/CashierBilling.vue ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _CashierBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _CashierBilling_vue_vue_type_template_id_1180957c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CashierBilling.vue?vue&type=template&id=1180957c&scoped=true */ "./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=template&id=1180957c&scoped=true");
+/* harmony import */ var _CashierBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CashierBilling.vue?vue&type=script&lang=js */ "./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _CashierBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _CashierBilling_vue_vue_type_template_id_1180957c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _CashierBilling_vue_vue_type_template_id_1180957c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "1180957c",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/admin/ecommerce/CashierBilling.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/apps/admin/ecommerce/CashierTransaction.vue":
 /*!***************************************************************!*\
   !*** ./resources/apps/admin/ecommerce/CashierTransaction.vue ***!
@@ -28524,6 +29504,46 @@ var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__
 /* hot reload */
 if (false) { var api; }
 component.options.__file = "resources/apps/admin/ecommerce/Coupon.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/apps/admin/ecommerce/DeliveryerBilling.vue":
+/*!**************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/DeliveryerBilling.vue ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _DeliveryerBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _DeliveryerBilling_vue_vue_type_template_id_39c59d06_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DeliveryerBilling.vue?vue&type=template&id=39c59d06&scoped=true */ "./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=template&id=39c59d06&scoped=true");
+/* harmony import */ var _DeliveryerBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DeliveryerBilling.vue?vue&type=script&lang=js */ "./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _DeliveryerBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _DeliveryerBilling_vue_vue_type_template_id_39c59d06_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _DeliveryerBilling_vue_vue_type_template_id_39c59d06_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "39c59d06",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/admin/ecommerce/DeliveryerBilling.vue"
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
 
 /***/ }),
@@ -28648,6 +29668,46 @@ component.options.__file = "resources/apps/admin/ecommerce/DialogCashierSettleme
 
 /***/ }),
 
+/***/ "./resources/apps/admin/ecommerce/DialogCashierTransaction.vue":
+/*!*********************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/DialogCashierTransaction.vue ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _DialogCashierTransaction_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _DialogCashierTransaction_vue_vue_type_template_id_52f39247_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DialogCashierTransaction.vue?vue&type=template&id=52f39247&scoped=true */ "./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=template&id=52f39247&scoped=true");
+/* harmony import */ var _DialogCashierTransaction_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DialogCashierTransaction.vue?vue&type=script&lang=js */ "./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _DialogCashierTransaction_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _DialogCashierTransaction_vue_vue_type_template_id_52f39247_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _DialogCashierTransaction_vue_vue_type_template_id_52f39247_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "52f39247",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/admin/ecommerce/DialogCashierTransaction.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/apps/admin/ecommerce/DialogChooseAttribute.vue":
 /*!******************************************************************!*\
   !*** ./resources/apps/admin/ecommerce/DialogChooseAttribute.vue ***!
@@ -28724,6 +29784,46 @@ var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__
 /* hot reload */
 if (false) { var api; }
 component.options.__file = "resources/apps/admin/ecommerce/DialogChooseVariation.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue":
+/*!*****************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _DialogDeliveryerBill_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _DialogDeliveryerBill_vue_vue_type_template_id_a8dc1e18_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DialogDeliveryerBill.vue?vue&type=template&id=a8dc1e18&scoped=true */ "./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=template&id=a8dc1e18&scoped=true");
+/* harmony import */ var _DialogDeliveryerBill_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DialogDeliveryerBill.vue?vue&type=script&lang=js */ "./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _DialogDeliveryerBill_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _DialogDeliveryerBill_vue_vue_type_template_id_a8dc1e18_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _DialogDeliveryerBill_vue_vue_type_template_id_a8dc1e18_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "a8dc1e18",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/apps/admin/ecommerce/DialogDeliveryerBill.vue"
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
 
 /***/ }),
@@ -31176,6 +32276,23 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=script&lang=js":
+/*!***********************************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=script&lang=js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CashierBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CashierBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CashierBilling.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CashierBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/apps/admin/ecommerce/CashierTransaction.vue?vue&type=script&lang=js":
 /*!***************************************************************************************!*\
   !*** ./resources/apps/admin/ecommerce/CashierTransaction.vue?vue&type=script&lang=js ***!
@@ -31207,6 +32324,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Coupon_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Coupon.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/Coupon.vue?vue&type=script&lang=js");
  /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Coupon_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=script&lang=js":
+/*!**************************************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=script&lang=js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryerBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryerBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DeliveryerBilling.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryerBilling_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
@@ -31261,6 +32395,23 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=script&lang=js":
+/*!*********************************************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=script&lang=js ***!
+  \*********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogCashierTransaction_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogCashierTransaction_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogCashierTransaction.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogCashierTransaction_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/apps/admin/ecommerce/DialogChooseAttribute.vue?vue&type=script&lang=js":
 /*!******************************************************************************************!*\
   !*** ./resources/apps/admin/ecommerce/DialogChooseAttribute.vue?vue&type=script&lang=js ***!
@@ -31292,6 +32443,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogChooseVariation_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogChooseVariation.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogChooseVariation.vue?vue&type=script&lang=js");
  /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogChooseVariation_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=script&lang=js":
+/*!*****************************************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=script&lang=js ***!
+  \*****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogDeliveryerBill_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogDeliveryerBill_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogDeliveryerBill.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogDeliveryerBill_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
@@ -32594,6 +33762,24 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=template&id=1180957c&scoped=true":
+/*!*****************************************************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=template&id=1180957c&scoped=true ***!
+  \*****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CashierBilling_vue_vue_type_template_id_1180957c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CashierBilling_vue_vue_type_template_id_1180957c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CashierBilling_vue_vue_type_template_id_1180957c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_CashierBilling_vue_vue_type_template_id_1180957c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CashierBilling.vue?vue&type=template&id=1180957c&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/CashierBilling.vue?vue&type=template&id=1180957c&scoped=true");
+
+
+/***/ }),
+
 /***/ "./resources/apps/admin/ecommerce/CashierTransaction.vue?vue&type=template&id=64593fdf&scoped=true":
 /*!*********************************************************************************************************!*\
   !*** ./resources/apps/admin/ecommerce/CashierTransaction.vue?vue&type=template&id=64593fdf&scoped=true ***!
@@ -32626,6 +33812,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Coupon_vue_vue_type_template_id_7530172c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Coupon_vue_vue_type_template_id_7530172c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Coupon.vue?vue&type=template&id=7530172c&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/Coupon.vue?vue&type=template&id=7530172c&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=template&id=39c59d06&scoped=true":
+/*!********************************************************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=template&id=39c59d06&scoped=true ***!
+  \********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryerBilling_vue_vue_type_template_id_39c59d06_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryerBilling_vue_vue_type_template_id_39c59d06_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryerBilling_vue_vue_type_template_id_39c59d06_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryerBilling_vue_vue_type_template_id_39c59d06_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DeliveryerBilling.vue?vue&type=template&id=39c59d06&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DeliveryerBilling.vue?vue&type=template&id=39c59d06&scoped=true");
 
 
 /***/ }),
@@ -32684,6 +33888,24 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=template&id=52f39247&scoped=true":
+/*!***************************************************************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=template&id=52f39247&scoped=true ***!
+  \***************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogCashierTransaction_vue_vue_type_template_id_52f39247_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogCashierTransaction_vue_vue_type_template_id_52f39247_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogCashierTransaction_vue_vue_type_template_id_52f39247_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogCashierTransaction_vue_vue_type_template_id_52f39247_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogCashierTransaction.vue?vue&type=template&id=52f39247&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogCashierTransaction.vue?vue&type=template&id=52f39247&scoped=true");
+
+
+/***/ }),
+
 /***/ "./resources/apps/admin/ecommerce/DialogChooseAttribute.vue?vue&type=template&id=0c51e1c9&scoped=true":
 /*!************************************************************************************************************!*\
   !*** ./resources/apps/admin/ecommerce/DialogChooseAttribute.vue?vue&type=template&id=0c51e1c9&scoped=true ***!
@@ -32716,6 +33938,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogChooseVariation_vue_vue_type_template_id_736145c0_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogChooseVariation_vue_vue_type_template_id_736145c0_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogChooseVariation.vue?vue&type=template&id=736145c0&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogChooseVariation.vue?vue&type=template&id=736145c0&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=template&id=a8dc1e18&scoped=true":
+/*!***********************************************************************************************************!*\
+  !*** ./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=template&id=a8dc1e18&scoped=true ***!
+  \***********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   __esModule: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogDeliveryerBill_vue_vue_type_template_id_a8dc1e18_scoped_true__WEBPACK_IMPORTED_MODULE_0__.__esModule),
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogDeliveryerBill_vue_vue_type_template_id_a8dc1e18_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogDeliveryerBill_vue_vue_type_template_id_a8dc1e18_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_loaders_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DialogDeliveryerBill_vue_vue_type_template_id_a8dc1e18_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DialogDeliveryerBill.vue?vue&type=template&id=a8dc1e18&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/loaders/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/apps/admin/ecommerce/DialogDeliveryerBill.vue?vue&type=template&id=a8dc1e18&scoped=true");
 
 
 /***/ }),

@@ -52,24 +52,26 @@ class SyncUsers implements ShouldQueue
 
             $users = json_decode($response->getBody()->getContents());
             foreach ($users as $user) {
-                $newuser = new User();
-                $newuser->id = $user->id;
-                $newuser->email = $user->email;
-                $newuser->nickname = $user->first_name . $user->username;
-                $newuser->avatar = $user->avatar_url;
-                $newuser->created_at = $user->date_created;
-                $newuser->updated_at = $user->date_modified;
-                $newuser->gid = 1;
-                $newuser->save();
+                $newuser = User::find($user->id);
+                if ($newuser) {
+                    $address = [
+                        'first_name' => $user->billing->first_name,
+                        'phone_number' => $user->billing->phone,
+                        'country' => $user->billing->country,
+                        'state' => $user->billing->state,
+                        'city' => $user->billing->city,
+                        'address_line_1' => $user->billing->address_1,
+                        'formatted_address' => $user->billing->address_1 . ', ' . $user->billing->city
+                            . ', ' . $user->billing->state . ', ' . $user->billing->country . ', ' . $user->billing->postcode
+                    ];
 
-                $address = $newuser->addresses()->make();
-                $address->name = $user->billing->first_name;
-                $address->phone = $user->billing->phone;
-                $address->country = $user->billing->country;
-                $address->state = $user->billing->state;
-                $address->city = $user->billing->city;
-                $address->address = $user->billing->address_1;
-                $address->save();
+                    $newuser->updateMeta('shipping_address', $address);
+                    $newuser->updateMeta('billing_address', $address);
+
+                    $metas = collect($user->meta_data)->pluck('value', 'key');
+                    $newuser->points = $metas->get('wps_wpr_points',0);
+                    $newuser->save();
+                }
             }
         } catch (\Exception $e) {
             echo $e->getMessage();

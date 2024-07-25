@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\HasDates;
+use App\Models\Traits\HasImageAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -40,10 +41,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class LotteryPrize extends Model
 {
-    use HasFactory, HasDates;
+    use HasFactory, HasDates, HasImageAttribute;
 
-    protected $table = 'lottery_prize';
-    protected $fillable = ['type', 'name', 'image','points', 'stock', 'sort_num', 'probability', 'status', 'product_id'];
+    protected $table = 'lottery_prizes';
+    protected $fillable = ['type', 'name', 'image', 'points', 'stock', 'sort_num', 'probability', 'status', 'product_id'];
 
     public static function boot()
     {

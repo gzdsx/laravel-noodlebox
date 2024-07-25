@@ -204,8 +204,12 @@ export default {
                 national_number,
                 vercode: this.vercode,
                 remember
-            }).then(() => {
-                this.$emit('logined');
+            }).then((resp) => {
+                if (resp.data.code){
+                    this.errors.vercode = resp.data.message;
+                }else {
+                    this.$emit('logined');
+                }
             }).catch(reason => {
                 this.errors.vercode = reason.response.data.message;
             }).finally(() => {
@@ -230,11 +234,15 @@ export default {
                 email,
                 password,
                 remember
-            }).then(() => {
-                this.$emit('logined');
+            }).then((resp) => {
+                if (resp.data.code){
+                    this.errors.password = resp.data.message;
+                }else {
+                    this.$emit('logined');
+                }
             }).catch(reason => {
                 this.loading = false;
-                this.errors.password = reason.message;
+                this.errors.password = reason.response.data.message;
             });
         }
     }

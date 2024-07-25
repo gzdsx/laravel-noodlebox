@@ -1,11 +1,12 @@
 html, body {
     margin: 0 auto;
-    line-height: 1.5;
+    line-height: 1;
 }
 
 body {
     font-size: 18px;
     padding: 0;
+    max-width: 750px;
 }
 
 .header {
@@ -63,10 +64,10 @@ h1.title {
 .table-order-items {
     width: 100%;
     border-spacing: 0;
-    margin-top: 1.5rem;
+    margin-top: 10px;
 
     td, th {
-        padding: 12px 5px;
+        padding: 5px;
     }
 
     thead {
@@ -91,19 +92,19 @@ h1.title {
         font-size: 18px;
         display: -webkit-box;
 
-        .qty{
+        .qty {
             display: block;
             margin-right: 3px;
         }
 
-        .tit{
+        .tit {
             -webkit-flex: 1;
             flex: 1;
             -webkit-box-flex: 1;
         }
     }
 
-    .price{
+    .price {
         text-align: right;
     }
 
@@ -128,13 +129,40 @@ h1.title {
     border-bottom: 3px solid #000;
 
     td, th {
-        padding: 0.8rem 0.6rem;
+        padding: 3px 10px;
         border-bottom: 1px #CCCCCC solid;
         text-align: left;
         font-size: 18px;
     }
 }
 
-td.text-right{
-    text-align: right ;
+td.text-right {
+    text-align: right;
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+
+    td, th {
+        text-align: left;
+        padding: 8px 10px;
+        line-height: 1.1;
+    }
+
+    thead{
+        th{
+            background-color: #000;
+            color: #ffffff;
+        }
+    }
+
+    &.border {
+        tbody {
+            td, th {
+                border: 1px solid #666666;
+            }
+        }
+    }
 }

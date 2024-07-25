@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasImageAttribute;
 use App\Models\Traits\HasMetas;
+use App\Models\Traits\HasThumbAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,7 +35,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PhotoWall extends Model
 {
-    use HasFactory, HasMetas;
+    use HasFactory, HasMetas, HasImageAttribute, HasThumbAttribute;
 
     protected $table = 'photo_wall';
     protected $fillable = ['title', 'description', 'thumb', 'image', 'sort_num'];

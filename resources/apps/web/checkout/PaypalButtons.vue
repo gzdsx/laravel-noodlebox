@@ -9,6 +9,10 @@ let paypal;
 export default {
     name: "PaypalButtons",
     props: {
+        clientId: {
+            type: String,
+            default: ''
+        },
         createOrder: {
             type: Function,
             default() {
@@ -61,38 +65,36 @@ export default {
     methods: {},
     mounted() {
         loadScript({
-            clientId: "AZL4d1EcXkCqg2MiEj6yn9SYxq_hRvJ_JyM3nM9RVfdzMmJfZvzCtvvVJjEW_NP5JomB4SIRG_DEF8Sw",
+            clientId: this.clientId,
             currency: 'EUR',
-            components: ["buttons", "marks", "messages"],
+            components: ["buttons"],
             dataPageType: "checkout",
         }).then((paypalObj) => {
             paypal = paypalObj;
             this.$nextTick(() => {
-                let {orderData, card} = this;
-                paypal
-                    .Buttons({
-                        onInit: (data, actions) => {
+                paypal.Buttons({
+                    onInit: (data, actions) => {
 
-                        },
-                        onClick: async (data, actions) => {
-                            return this.onClick(data, actions);
-                        },
-                        createOrder: async (data, actions) => {
-                            //console.log(data);
-                            //console.log(actions);
-                            return this.createOrder(data, actions);
-                        },
-                        onApprove: async (data, actions) => {
-                            return this.onApprove(data, actions);
-                        },
-                        onCancel: async (data, actions) => {
-                            return this.onCancel(data, actions);
-                        },
-                        onError: async (err) => {
-                            return this.onError(err);
-                        }
-                    })
-                    .render("#paypal-buttons-id")
+                    },
+                    onClick: async (data, actions) => {
+                        return this.onClick(data, actions);
+                    },
+                    createOrder: async (data, actions) => {
+                        //console.log(data);
+                        //console.log(actions);
+                        return this.createOrder(data, actions);
+                    },
+                    onApprove: async (data, actions) => {
+                        return this.onApprove(data, actions);
+                    },
+                    onCancel: async (data, actions) => {
+                        console.log('onCancel', data);
+                        return this.onCancel(data, actions);
+                    },
+                    onError: async (err) => {
+                        return this.onError(err);
+                    }
+                }).render("#paypal-buttons-id")
                     .catch((error) => {
                         console.error("failed to render the PayPal Buttons", error);
                     });

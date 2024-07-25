@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\HasDates;
+use App\Models\Traits\HasImageAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -50,7 +51,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Cart extends Model
 {
-    use HasFactory, HasDates;
+    use HasFactory, HasDates, HasImageAttribute;
 
     protected $table = 'cart';
     protected $fillable = [
@@ -106,7 +107,7 @@ class Cart extends Model
                     $val = $options[$variation['name']];
                     foreach ($variation['options'] as $option) {
                         if ($option['title'] == $val) {
-                            $price += $option['price'];
+                            $price = bcadd($price, $option['price'], 2);
                         }
                     }
                 }
@@ -117,7 +118,7 @@ class Cart extends Model
             $additional_options = $meta_data['additional_options'];
             foreach ($product->additional_options as $option) {
                 if (in_array($option['title'], $additional_options)) {
-                    $price += $option['price'];
+                    $price = bcadd($price, $option['price'], 2);
                 }
             }
         }
@@ -128,6 +129,11 @@ class Cart extends Model
     public function getTotalAttribute()
     {
         return $this->price * $this->quantity;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     /**

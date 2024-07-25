@@ -77,7 +77,8 @@ return [
         'price' => 'Price',
         'fee' => 'Fee',
         'date' => 'Date',
-        'please_select' => 'Please Select'
+        'please_select' => 'Please Select',
+        'print' => 'Print'
     ],
     'topbar' => [
         'home' => 'Backend Management Center',
@@ -482,10 +483,12 @@ return [
         'shops' => 'Shops',
         'shipping_zones' => 'Shipping Zones',
         'orders' => 'Orders',
-        'deliveryers' => 'Deliveryers',
+        'deliveryers' => 'Drivers',
         'pos_machines' => 'Pos Machines',
         'cashier_transactions' => 'Cashier Transactions',
-        'deliveryer_transactions' => 'Deliveryer Transactions',
+        'cashier_report' => 'Cashier Report',
+        'deliveryer_transactions' => 'Driver Transactions',
+        'deliveryer_report' => 'Driver Report',
         'point_transactions' => 'Point Transactions',
         'photo_wall' => 'Photo Wall',
 
@@ -504,6 +507,10 @@ return [
         'referral_points_tips' => 'Users receive point rewards through sharing links, default to 0',
         'referral_link_description' => 'Referral Link Description',
         'referral_link_description_tips' => 'Referral Link Description Text',
+        'shop_order_warning' => 'Order Warning',
+        'shop_order_warning_tips' => 'Warning message for users not placing orders within the delivery time',
+        'delivery_hours' => 'Delivery Hours',
+        'delivery_hours_tips' => 'Choose the delivery hours of the shop',
 
         'manage' => 'Shop manage',
         'statuses' => [
@@ -603,12 +610,12 @@ return [
         ],
         'no' => 'Order No',
         'print_confirm' => 'Are you sure you want to print this order?',
-        'dispose' => 'Dispose',
+        'dispose' => 'Dispatch',
         'shipping_address' => 'Shipping Address',
         'shipping_method' => 'Shipping Method',
         'shipping_zone' => 'Shipping Zone',
         'shipping_total' => 'Shipping Fee',
-        'deliveryer' => 'Deliveryer',
+        'deliveryer' => 'Driver',
         'order_status' => 'Order Status',
         'order_total' => 'Order Total',
         'payment_method' => 'Payment Method',
@@ -641,9 +648,9 @@ return [
         'addnew' => 'Add Zone'
     ],
     'deliveryer' => [
-        'title' => 'Deliveryers',
-        'addnew' => 'Add Deliveryer',
-        'base_amount' => 'Base Amount',
+        'title' => 'Drivers',
+        'addnew' => 'Add Driver',
+        'base_amount' => 'Petrol money',
         'name' => 'Name',
         'account_detail' => 'Account Detail',
         'pos_machines' => 'Pos Machines'
@@ -657,22 +664,25 @@ return [
             'inuse' => 'In use',
             'idle' => 'Idle'
         ],
-        'base_amount' => 'Base Amount',
+        'base_amount' => 'Petrol money',
         'use_as_cashier' => 'Use as Cashier',
         'settlement' => 'Settlement'
     ],
     'transaction' => [
         'cashier_title' => 'Cashier Transactions',
-        'deliveryer_title' => 'Deliveryer Transactions',
+        'deliveryer_title' => 'Driver Transactions',
         'points_title' => 'Points Transactions',
-        'base_amount' => 'Base Amount',
+        'base_amount' => 'Petrol money',
         'shipping_total' => 'Shipping Total',
         'total' => 'Total',
         'online_total' => 'Online Total',
         'cash_total' => 'Cash Total',
         'card_total' => 'Card Total',
         'refund_total' => 'Refund Total',
-        'cash_profit_total' => 'Cash Profit Total',
+        'actual_total' => 'Hand On',
+        'cost_total' => 'Cost Total',
+        'net_total' => 'Net Total',
+        'pos_balance' => 'POS Balance',
         'notes' => 'Notes',
         'created_at' => 'Created At',
         'status_options' => [
@@ -681,7 +691,8 @@ return [
         ],
         'points' => 'Points',
         'detail' => 'Detail',
-        'deliveryer' => 'Deliveryer'
+        'deliveryer' => 'Driver',
+        'float'=>'Float'
     ],
     'photo_wall' => [
         'page_title' => 'Photo Wall',

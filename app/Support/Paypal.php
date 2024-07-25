@@ -35,7 +35,7 @@ class Paypal
     {
         return cache()->remember('paypalAccessToken', 30000, function () {
             $client = new Client();
-            $response = $client->request('POST', Paypal::getApiUrl('v1/oauth2/token'), [
+            $response = $client->request('POST', self::getApiUrl('v1/oauth2/token'), [
                 'headers' => [
                     'Content-Type' => 'application/x-www-form-urlencoded',
                 ],
@@ -60,16 +60,9 @@ class Paypal
      */
     public static function createOrder($data)
     {
-        $client = new Client();
-        $response = $client->request('POST', self::getApiUrl('v2/checkout/orders'), [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . self::getAccessToken(),
-            ],
+        return self::request('POST', 'v2/checkout/orders', [
             'json' => $data,
         ]);
-
-        return $response->getBody()->getContents();
     }
 
     /**
@@ -77,15 +70,40 @@ class Paypal
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function captureOrder($orderId){
-        $client = new Client();
-        $response = $client->request('POST', self::getApiUrl('v2/checkout/orders/'.$orderId.'/capture'), [
-            'headers' => [
+    public static function captureOrder($orderId)
+    {
+        return self::request('POST', "v2/checkout/orders/$orderId/capture");
+    }
+
+    /**
+     * @param $method
+     * @param $uri
+     * @param $options
+     * @return string|void
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public static function request($method, $uri, $options = [])
+    {
+        try {
+            $client = new Client();
+            $options['headers'] = [
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . self::getAccessToken(),
-            ],
-        ]);
+            ];
+            $response = $client->request($method, self::getApiUrl($uri), $options);
 
-        return $response->getBody()->getContents();
+            return $response->getBody()->getContents();
+        } catch (\Exception $e) {
+            if ($e->getCode() == 401) {
+                cache()->forget('paypalAccessToken');
+            }
+
+            abort($e->getCode(), $e->getMessage());
+        }
+    }
+
+    public static function getClientId()
+    {
+        return self::$clientId;
     }
 }

@@ -9,5 +9,5 @@
 @endsection
 
 @section('footer-scripts')
-    <script src="{{ asset('dist/web/cart.js?v='.appversion()) }}" type="text/javascript"></script>
+    <script src="{{ mix_asset('dist/web/cart.js') }}" type="text/javascript"></script>
 @endsection

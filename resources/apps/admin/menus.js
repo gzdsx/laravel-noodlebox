@@ -152,7 +152,7 @@ export default [
             {
                 name: 'shop.deliveryers',
                 path: '/deliveryers',
-                capabilities: [],
+                capabilities: ['manager'],
             },
             {
                 name: 'shop.pos_machines',
@@ -160,13 +160,13 @@ export default [
                 capabilities: [],
             },
             {
-                name: 'shop.cashier_transactions',
-                path: '/cashier/transactions',
+                name: 'shop.cashier_report',
+                path: '/cashier/billing',
                 capabilities: ['manager'],
             },
             {
-                name: 'shop.deliveryer_transactions',
-                path: '/deliveryer/transactions',
+                name: 'shop.deliveryer_report',
+                path: '/deliveryer/billing',
                 capabilities: ['manager'],
             },
             {

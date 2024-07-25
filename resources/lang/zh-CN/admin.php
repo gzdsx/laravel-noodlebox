@@ -77,7 +77,8 @@ return [
         'price' => '价格',
         'fee' => '费用',
         'date' => '日期',
-        'please_select' => '请选择'
+        'please_select' => '请选择',
+        'print'=>'打印'
     ],
     'topbar' => [
         'home' => '后台管理中心',
@@ -489,7 +490,9 @@ return [
         'deliveryers' => '司机管理',
         'pos_machines' => 'POS机管理',
         'cashier_transactions' => '收银台账',
+        'cashier_report' => '收银账单',
         'deliveryer_transactions' => '司机台账',
+        'deliveryer_report' => '司机账单',
         'point_transactions' => '积分记录',
         'photo_wall' => '照片墙',
 
@@ -508,6 +511,10 @@ return [
         'referral_points_tips' => '用户通过分享链接获得积分奖励，默认为0',
         'referral_link_description' => '分享链接描述',
         'referral_link_description_tips' => '分享链接描述文字',
+        'shop_order_warning'=>'下单警告信息',
+        'shop_order_warning_tips'=>'用户未在配送时间内下单的警告信息',
+        'delivery_hours'=>'配送时间',
+        'delivery_hours_tips' => '选择配送时间',
 
         'manage' => '门店管理',
         'statuses' => [
@@ -606,7 +613,7 @@ return [
         ],
         'no' => '订单编号',
         'print_confirm' => '确定要打印此订单吗',
-        'dispose' => '处理订单',
+        'dispose' => '订单处理',
         'shipping_address' => '配送地址',
         'shipping_method' => '配送方式',
         'shipping_zone' => '配送区域',
@@ -670,12 +677,15 @@ return [
         'points_title' => '积分明细',
         'base_amount' => 'POS底金',
         'shipping_total' => '配送费',
-        'total' => '应交金额',
+        'total' => '总收入',
         'online_total' => '在线收入',
         'cash_total' => '现金收入',
         'card_total' => '卡机收入',
         'refund_total' => '退款金额',
-        'cash_profit_total' => '现金实收',
+        'actual_total' => '应交款',
+        'cost_total'=>'Cost Total',
+        'net_total' => '净收入',
+        'pos_balance'=>'POS余额',
         'notes' => '备注',
         'created_at' => '创建时间',
         'status_options' => [
@@ -684,8 +694,8 @@ return [
         ],
         'points' => '积分',
         'detail' => '明细',
-        'deliveryer' => '配送员',
-        'cashier_settlement' => '收银机结算'
+        'deliveryer' => '司机',
+        'float'=>'Float'
     ],
     'photo_wall' => [
         'page_title' => '照片墙',

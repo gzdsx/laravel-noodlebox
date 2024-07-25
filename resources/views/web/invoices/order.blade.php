@@ -8,7 +8,7 @@
     <meta name="render" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <link href="{{asset('dist/web/invoice.css?v='.appversion())}}" rel="stylesheet" type="text/css">
+    <link href="{{mix_asset('dist/web/invoice.css')}}" rel="stylesheet" type="text/css">
 </head>
 <body>
 
@@ -21,34 +21,24 @@
 <h1 class="title">invoice</h1>
 <div class="shipping-address">
     <p>{{$order->shipping['first_name'] ?? ''}}</p>
-    <p>{{$order->shipping['address_line_1'] ?? ''}}</p>
-    @isset($order->shipping['city'])
-        <p>{{$order->shipping['city'] ?? ''}}</p>
-    @endisset
-    @isset($order->shipping['state'])
-        <p>{{$order->shipping['state'] ?? ''}}</p>
-    @endisset
+    <p>{{$order->shipping['formatted_address'] ?? ''}}</p>
     @isset($order->shipping['postal_code'])
         <p>{{$order->shipping['postal_code'] ?? ''}}</p>
     @endisset
     @isset($order->shipping['email'])
         <p>{{$order->shipping['email'] ?? ''}}</p>
     @endisset
-    @isset($order->shipping['phone'])
-        @if(is_array($order->shipping['phone']))
-            <p>
-                <span>+{{$order->shipping['phone']['national_number'] ?? ''}}</span>
-                <span>{{$order->shipping['phone']['phone_number'] ?? ''}}</span>
-            </p>
-        @else
-            <p>{{$order->shipping['phone'] ?? ''}}</p>
-        @endif
+    @isset($order->shipping['national_number'])
+        <p>
+            <span>+{{$order->shipping['national_number'] ?? ''}}</span>
+            <span>{{$order->shipping['phone_number'] ?? ''}}</span>
+        </p>
     @endisset
 </div>
 <table class="table-order-info">
     <colgroup>
-        <col width="90"/>
-        <col/>
+        <col width="90"></col>
+        <col></col>
     </colgroup>
     <tbody>
     <tr>
@@ -61,37 +51,31 @@
     </tr>
     <tr>
         <td>CreatedV:</td>
-        <td>{{$order->created_via}}</td>
+        <td>{{ucfirst($order->created_via)}}</td>
     </tr>
     <tr>
         <td>PaymentS:</td>
         <td>
-            {{$order->payment_status ? 'Paid' : 'Unpaid'}}
+            {{$order->isPaid() ? 'Paid' : 'Unpaid'}}
         </td>
     </tr>
-    @if($order->shipping_method=='delivery')
+    @if($order->shipping_method=='flat_rate')
         <tr>
             <td>ShippingM:</td>
-            <td>{{ucfirst($order->shipping_method)}}-{{$order->shippingZone->title}}</td>
+            <td>{{'Delivery-'.$order->shipping_line['zone_title'] ?? ''}}</td>
         </tr>
     @else
         <tr>
             <td>ShippingM:</td>
-            <td>
-                @if($order->shipping_line['method_id'] == 'flat_rate')
-                    <span>{{$order->shipping_line['method_title'].' to '.$order->shipping_line['zone_title']}}</span>
-                @else
-                    <span>{{$order->shipping_line['method_title']}}</span>
-                @endif
-            </td>
+            <td>Collection</td>
         </tr>
     @endif
     </tbody>
 </table>
 <table class="table-order-items">
     <colgroup>
-        <col/>
-        <col width="70"/>
+        <col></col>
+        <col width="70"></col>
     </colgroup>
     <thead>
     <tr>
@@ -165,6 +149,18 @@
             <td class="text-right"><strong>-€{{$discount['total']??''}}</strong></td>
         </tr>
     @endforeach
+    @if($order->cost_total != 0)
+        <tr>
+            <th>Cost Total</th>
+            <td class="text-right">
+                @if($order->cost_total > 0)
+                    <strong>+€{{abs($order->cost_total)}}</strong>
+                @else
+                    <strong>-€{{abs($order->cost_total)}}</strong>
+                @endif
+            </td>
+        </tr>
+    @endif
     <tr>
         <th>PaymentM</th>
         <td class="text-right" style="line-height: 1.1;">
@@ -172,8 +168,15 @@
                 @if($order->payment_method=='customize')
                     Card: {{format_amount($order->getMeta('payment_with_card_value'))}}<br>
                     Cash: {{format_amount($order->getMeta('payment_with_cash_value'))}}
-                @else
-                    {{ucfirst($order->payment_method)}}
+                @endif
+                @if($order->payment_method=='online')
+                    Pay Online
+                @endif
+                @if($order->payment_method=='card')
+                    Card R
+                @endif
+                @if($order->payment_method=='cash')
+                    Cash
                 @endif
             </strong>
         </td>
@@ -203,7 +206,7 @@
         </td>
         <td style="width: 100px; text-align: center;">
             <div>
-                @if($order->shipping_line['method_id']=='flat_rate')
+                @if($order->shipping_method=='flat_rate')
                     <img src="{{asset('images/noodlebox/local-shipping.png')}}" width="75" alt="">
                 @else
                     <img src="{{asset('images/noodlebox/local-pickup.png')}}" width="75" alt="">
