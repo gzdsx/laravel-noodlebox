@@ -7,7 +7,7 @@
             <el-table-column :label="$t('order.shipping_total')" prop="shipping_total"/>
             <el-table-column :label="$t('Cost F')" prop="cost_total"/>
             <el-table-column :label="$t('order.total')" prop="total"/>
-            <el-table-column :label="$t('order.payment_method')" prop="payment_method"/>
+            <el-table-column :label="$t('order.payment_method')" prop="payment_method_title"/>
         </el-table>
         <el-descriptions title="" direction="vertical" :column="4" border>
             <el-descriptions-item :label="$t('transaction.base_amount')">
@@ -64,10 +64,10 @@ export default {
         },
         transaction: {
             id: 0,
-            status:'pending',
+            status: 'pending',
             orders: [],
         },
-        driverName:{
+        driverName: {
             type: String,
             default: ''
         }
@@ -87,7 +87,7 @@ export default {
                 status: 'pending',
                 orders: []
             },
-            title:'Diver Report'
+            title: 'Diver Report'
         }
     },
     watch: {
@@ -95,15 +95,15 @@ export default {
             this.visible = newVal;
         },
         transaction(newVal, oldVal) {
-            console.log('newValue',newVal);
+            console.log('newValue', newVal);
             this.billing = {
                 ...this.billing,
                 ...newVal
             };
 
         },
-        driverName(newVal, oldVal){
-            this.title = 'Driver Report - '+newVal
+        driverName(newVal, oldVal) {
+            this.title = 'Driver Report - ' + newVal
         }
     },
     methods: {
@@ -111,9 +111,9 @@ export default {
             this.$emit('input', false);
         },
         handleSubmit() {
-            let {id, deliveryer_id,status} = this.billing;
+            let {id, deliveryer_id, status} = this.billing;
             console.log(this.billing);
-            if (id){
+            if (id) {
                 ApiService.put(`/deliveryers/${deliveryer_id}/transactions/${id}`, {status}).then(() => {
                     this.$message.success('Updated Success');
                     this.$emit('input', false);
@@ -123,7 +123,7 @@ export default {
                 }).finally(() => {
 
                 });
-            }else{
+            } else {
                 ApiService.post(`/deliveryers/${deliveryer_id}/transactions`, {status}).then(() => {
                     this.$message.success('Submitted Success');
                     this.$emit('input', false);

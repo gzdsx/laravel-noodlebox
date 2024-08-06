@@ -37,6 +37,7 @@ Route::namespace('Web')->group(function () {
     Route::get('points-mall/{slug?}', 'PointsMallController@index')->name('points-mall');
     Route::get('cart', 'CartController@index')->name('cart')->middleware(['auth']);
     Route::get('checkout', 'CheckoutController@index')->name('checkout')->middleware(['auth']);
+    Route::get('orders/export', 'OrderController@export')->name('order.show');
     Route::get('orders/{id}', 'OrderController@show')->name('order.show')->middleware(['auth']);
 
     Route::get('home', 'MyAccountController@index')->name('home')->middleware(['auth']);
@@ -45,7 +46,7 @@ Route::namespace('Web')->group(function () {
     Route::get('my-account/points', 'MyAccountController@points')->name('my-account.points')->middleware(['auth']);
 
     Route::get('paypal/return', 'PaypalController@capture')->name('paypal.return');
-    Route::get('paypal/cancel', 'PaypalController@capture')->name('paypal.cancel');
+    Route::get('paypal/cancel', 'PaypalController@cancel')->name('paypal.cancel');
 
     Route::get('invoice/order/{id?}', 'InvoiceController@order')
         ->name('invoice.order')->middleware('signed');

@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $is_gift 是否赠品
  * @property string $subtotal 小计
  * @property string $total 合计
+ * @property string $status 交易状态
  * @property-read \App\Models\Order|null $order
  * @property-read \App\Models\Product|null $product
  * @property-read \App\Models\Refund|null $refund
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereQuantity($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereSkuId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereSkuTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereSubtotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem whereTotal($value)

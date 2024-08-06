@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasDates;
 use App\Models\Traits\HasMetas;
+use App\Notifications\SystemNotification;
 use App\Support\BulkSMS;
 use App\Support\PrintNode;
 use EloquentFilter\Filterable;
@@ -34,13 +35,11 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property int $prices_include_tax
  * @property string $payment_method
  * @property string|null $payment_method_title
- * @property int $payment_status 支付状态，1=已支付，0=未支付
  * @property \Illuminate\Support\Carbon|null $payment_at 付款时间
  * @property string|null $shipping_method
  * @property array $shipping_line 配送区域
  * @property string $shipping_total 配送费
  * @property string $shipping_tax
- * @property int $shipping_status 发货状态，0=未发货，1=已发货
  * @property \Illuminate\Support\Carbon|null $shipping_at 发货时间
  * @property int $buyer_rate 买家评价状态，0=未评价，1=已评价
  * @property int $seller_rate 卖家评价状态，0=未评价，1=已评价
@@ -54,8 +53,9 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property int $deliveryer_id 配送员
  * @property string|null $created_via
  * @property string $status 订单状态
- * @property string|null $short_code
  * @property int $is_modified
+ * @property string|null $short_code
+ * @property string|null $transaction_id 第三方交易ID
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @property \Illuminate\Support\Carbon|null $completed_at 完成时间
@@ -108,7 +108,6 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order wherePaymentAt($value)
  * @method static Builder|Order wherePaymentMethod($value)
  * @method static Builder|Order wherePaymentMethodTitle($value)
- * @method static Builder|Order wherePaymentStatus($value)
  * @method static Builder|Order wherePricesIncludeTax($value)
  * @method static Builder|Order whereSellerDeleted($value)
  * @method static Builder|Order whereSellerId($value)
@@ -118,7 +117,6 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order whereShippingAt($value)
  * @method static Builder|Order whereShippingLine($value)
  * @method static Builder|Order whereShippingMethod($value)
- * @method static Builder|Order whereShippingStatus($value)
  * @method static Builder|Order whereShippingTax($value)
  * @method static Builder|Order whereShippingTotal($value)
  * @method static Builder|Order whereShopId($value)
@@ -127,12 +125,29 @@ use Vinkla\Hashids\Facades\Hashids;
  * @method static Builder|Order whereStatus($value)
  * @method static Builder|Order whereTotal($value)
  * @method static Builder|Order whereTotalTax($value)
+ * @method static Builder|Order whereTransactionId($value)
  * @method static Builder|Order whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Order extends Model
 {
     use Filterable, HasDates, HasMetas;
+
+    const STATUS_UNPAID = 'unpaid'; //待付款
+    const STATUS_PAID = 'paid'; //已付款
+    const STATUS_SEND = 'send'; //已发货
+    const STATUS_SUCCESS = 'success'; //交易成功
+    const STATUS_REFUNDING = 'refunding'; //退款中
+    const STATUS_CANCELLED = 'cancelled'; //已取消
+    const STATUS_COMPLETED = 'completed'; //已完成
+    const STATUS_PENDING = 'pending'; //待处理
+    const STATUS_PROCESSIING = 'processing'; //处理中
+    const STATUS_DELIVERING = 'delivering'; //配送中
+    const STATUS_FAILED = 'failed';
+    const STATUS_REFUNDED = 'refunded';
+    const STATUS_HOLDON = 'holdon';
+    const SHIPPING_METHOD_FLATRATE = 'flat_rate';
+    const SHIPPING_METHOD_LOCALPICKUP = 'local_pickup';
 
     const ORDER_STATUS_UNPAID = 'unpaid'; //待付款
     const ORDER_STATUS_PAID = 'paid'; //已付款
@@ -146,8 +161,6 @@ class Order extends Model
     const ORDER_STATUS_DELIVERING = 'delivering'; //配送中
     const ORDER_STATUS_FAILED = 'failed';
     const ORDER_STATUS_REFUNDED = 'refunded';
-    const SHIPPING_METHOD_FLATRATE = 'flat_rate';
-    const SHIPPING_METHOD_LOCALPICKUP = 'local_pickup';
 
     protected $table = 'order';
     protected $primaryKey = 'id';
@@ -157,13 +170,14 @@ class Order extends Model
         'prices_include_tax', 'payment_method', 'payment_method_title', 'payment_at',
         'shipping_method', 'shipping_line', 'shipping_total', 'shipping_tax', 'shipping_at',
         'buyer_rate', 'seller_rate', 'buyer_deleted', 'seller_deleted', 'out_trade_no', 'fee_lines', 'discount_lines',
-        'shipping', 'billing', 'deliveryer_id', 'status', 'is_modified', 'short_code',
+        'shipping', 'billing', 'deliveryer_id', 'status', 'is_modified', 'short_code', 'transaction_id'
     ];
     protected $appends = [
         'meta_data',
         'status_des',
         'links',
-        'subtotal'
+        'subtotal',
+        'payment_method_title'
     ];
     protected $casts = [
         'fee_lines' => 'array',
@@ -177,8 +191,15 @@ class Order extends Model
         'completed_at' => 'datetime',
     ];
     protected $hidden = ['metas'];
-
     protected $with = ['items', 'buyer', 'seller', 'shop', 'transaction', 'deliveryer', 'metas'];
+
+    protected $paymentMap = [
+        'online' => 'Pay Online (PayPal & Credit Car)',
+        'card' => 'Card Reader(Unpaid)',
+        'card_reader' => 'Card Reader(Paid)',
+        'cash' => 'Pay Cash',
+        'custom' => 'Customize'
+    ];
 
     public static function boot()
     {
@@ -229,6 +250,11 @@ class Order extends Model
         return $this->items->sum(function (OrderItem $item) {
             return $item->total;
         });
+    }
+
+    public function getPaymentMethodTitleAttribute()
+    {
+        return $this->paymentMap[$this->payment_method] ?? $this->payment_method;
     }
 
     public function metas()
@@ -309,7 +335,7 @@ class Order extends Model
     public function markAsPaid()
     {
         $this->forceFill([
-            'status' => self::ORDER_STATUS_PROCESSIING,
+            'status' => self::STATUS_PROCESSIING,
             'payment_at' => now()
         ])->save();
     }
@@ -318,7 +344,7 @@ class Order extends Model
     public function markAsUnPaid()
     {
         $this->forceFill([
-            'status' => self::ORDER_STATUS_PENDING,
+            'status' => self::STATUS_PENDING,
             'payment_at' => null
         ])->save();
     }
@@ -334,7 +360,7 @@ class Order extends Model
     public function markAsShipped()
     {
         $this->forceFill([
-            'status' => self::ORDER_STATUS_DELIVERING,
+            'status' => self::STATUS_DELIVERING,
             'shipping_at' => now()
         ])->save();
     }
@@ -350,7 +376,7 @@ class Order extends Model
     public function markAsCancelled()
     {
         $this->forceFill([
-            'status' => self::ORDER_STATUS_CANCELLED
+            'status' => self::STATUS_CANCELLED
         ])->save();
     }
 
@@ -359,13 +385,13 @@ class Order extends Model
      */
     public function isCancelled()
     {
-        return $this->status == self::ORDER_STATUS_CANCELLED;
+        return $this->status == self::STATUS_CANCELLED;
     }
 
     public function markAsCompleted()
     {
         $this->forceFill([
-            'status' => self::ORDER_STATUS_COMPLETED,
+            'status' => self::STATUS_COMPLETED,
             'completed_at' => now()
         ])->save();
     }
@@ -442,6 +468,16 @@ class Order extends Model
                 'user_id' => auth()->id() ?: 0,
                 'content' => 'SMS send success'
             ]);
+        }
+    }
+
+    public function sendNotify()
+    {
+        if ($this->buyer) {
+            $message = settings('order_message_content');
+            $message = str_replace('{order_no}', $this->short_code, $message);
+            $message = str_replace('{points}', $this->buyer->points, $message);
+            $this->buyer->notifyNow(new SystemNotification($message));
         }
     }
 }

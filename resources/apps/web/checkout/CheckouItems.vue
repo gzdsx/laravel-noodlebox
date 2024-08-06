@@ -8,7 +8,7 @@
             <div class="order-item__product">
                 <div class="title">{{ item.title }} x {{ item.quantity }}</div>
                 <div class="additional" v-if="item.meta_data.options">
-                    {{ Object.values(item.meta_data.options).join(', ') }}
+                    {{ optionValues(item) }}
                 </div>
             </div>
             <div class="order-item__subtotal">€{{ item.total }}</div>
@@ -24,6 +24,20 @@ export default {
             type: Array,
             required: true,
             default: () => []
+        }
+    },
+    methods:{
+        optionValues(item){
+            let values = [];
+            if (item.meta_data.options){
+                values = Object.values(item.meta_data.options);
+            }
+
+            if (item.meta_data.additional_options){
+                values = values.concat(item.meta_data.additional_options);
+            }
+
+            return values.join(',');
         }
     }
 }

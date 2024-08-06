@@ -137,7 +137,7 @@ export default {
                 buyer_note: '',
                 subtotal: 0,
                 total: 0,
-                created_via: 'checkout',
+                created_via: 'web',
                 use_points_value: 0
             },
             resError: null,

@@ -27,6 +27,7 @@ class OrderCreatedListener
      */
     public function handle(OrderCreated $event)
     {
+        $event->order->sendNotify();
         //发送短信
         if (settings('send_order_message') == 'yes') {
             try {

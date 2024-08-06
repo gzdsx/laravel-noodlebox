@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string|null $type
  * @property string|null $name
- * @property string|null $image
+ * @property string $image
  * @property int|null $points
  * @property int $stock
  * @property float $probability

@@ -57,7 +57,7 @@ return [
 
         'noodlebox' => [
             'driver' => 'local',
-            'root' => '/vdata/wwwroot/noodlestorage',
+            'root' => '/vdata/wwwroot/noodlebox/storage',
             'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
@@ -85,6 +85,6 @@ return [
     */
 
     'links' => [
-        public_path('storage') => '/vdata/wwwroot/noodlestorage',
+        public_path('storage') => storage_path('app/public'),
     ],
 ];

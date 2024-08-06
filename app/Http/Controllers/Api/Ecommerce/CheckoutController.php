@@ -82,8 +82,17 @@ class CheckoutController extends BaseController
         $total = bcadd($total, $subtotal, 2);
 
         $shipping_total = 0;
-        $shipping_method = $request->input('shipping_method', Order::SHIPPING_METHOD_FLATRATE);
         $shipping_zone_id = $request->input('shipping_zone_id', 0);
+        if (!$shipping_zone_id) {
+            $shipping_zone_id = $request->user()->getMeta('shipping_zone_id', 0);
+        }
+
+        if ($request->filled('shipping_method')) {
+            $shipping_method = $request->input('shipping_method');
+        } else {
+            $shipping_method = $request->user()->getMeta('shipping_method', Order::SHIPPING_METHOD_FLATRATE);
+        }
+
         if ($shipping_method == Order::SHIPPING_METHOD_FLATRATE) {
             $zone = ShippingZone::find($shipping_zone_id);
             if (!$zone) {
@@ -112,7 +121,7 @@ class CheckoutController extends BaseController
 
         $discount_lines = [];
         $use_points_value = $request->input('use_points_value', 0);
-        if ($use_points_value > 0) {
+        if ($use_points_value > 0 && settings('enable_points_checkout') == 'yes') {
             $exchange_rate = settings('points_exchange_rate', 1);
             $use_points_value = $this->calculatePoints($use_points_value, $subtotal, 2);
             $use_points_amount = bcmul($use_points_value, $exchange_rate, 2);
@@ -125,8 +134,12 @@ class CheckoutController extends BaseController
 
         $shipping = $request->input('shipping', []);
         if (!isset($shipping['first_name']) || blank($shipping['first_name'])) {
-            $shipping = $request->user()->getMeta('shipping_address', []);
+            $shipping = $request->user()->getMeta('shipping_address', [
+                'national_number' => '353'
+            ]);
         }
+
+        $created_via = $request->input('created_via', 'web');
 
         return json_success(compact(
             'items',
@@ -139,7 +152,8 @@ class CheckoutController extends BaseController
             'payment_method',
             'fee_lines',
             'discount_lines',
-            'use_points_value'
+            'use_points_value',
+            'created_via'
         ));
     }
 
@@ -152,6 +166,8 @@ class CheckoutController extends BaseController
         if (now()->lte($hour_end) || now()->gte($hour_start)) {
             $in_delivery_hours = true;
         }
+
+        material_url();
 
         return $this->success([
             'currency' => settings('currency', 'EUR'),

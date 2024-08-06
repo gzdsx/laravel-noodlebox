@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $shop_id 店铺ID
  * @property int $product_id 产品ID
  * @property string|null $title 产品标题
- * @property string|null $image 大图
+ * @property string $image 大图
  * @property string $price 原始价格
  * @property int $quantity 产品数量
  * @property int $sku_id SKU ID
@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Product|null $product
  * @property-read \App\Models\Shop|null $shop
  * @property-read \App\Models\ProductSku|null $sku
+ * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart query()

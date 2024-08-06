@@ -177,7 +177,9 @@ function material_path($path = '')
  */
 function material_url($path = '')
 {
-    if (URL::isValidUrl($path)) return $path;
+    if (URL::isValidUrl($path)) {
+        return $path;
+    }
     return Storage::url($path);
 }
 

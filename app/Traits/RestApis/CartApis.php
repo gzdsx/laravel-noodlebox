@@ -28,13 +28,13 @@ trait CartApis
     public function index(Request $request)
     {
         $query = $this->repository();
-        if ($request->filled('purchase_via')){
+        if ($request->filled('purchase_via')) {
             $query->where('purchase_via', $request->purchase_via);
         }
 
         return json_success([
             'total' => $query->count(),
-            'items' => $query->orderByDesc('updated_at')->get()
+            'items' => $query->orderByDesc('created_at')->get()
         ]);
     }
 
@@ -109,11 +109,6 @@ trait CartApis
     public function update(Request $request, $id)
     {
         $cart = $this->repository()->findOrNew($id);
-        if (!$cart->product) {
-            $cart->delete();
-            abort(404, 'product no found');
-        }
-
         if ($request->has('quantity')) {
             $cart->quantity = $request->input('quantity', 1);
         }
@@ -135,7 +130,7 @@ trait CartApis
         $cart = $this->repository()->findOrFail($id);
         if ($cart->purchase_via == 'point' && $cart->product) {
             $user = \auth()->user();
-            if ($user){
+            if ($user) {
                 $user->points = bcadd($user->points, $cart->product->point_price * $cart->quantity);
                 $user->save();
             }

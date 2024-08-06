@@ -73,9 +73,7 @@ class SocialiteController extends Controller
             Auth::login($user, true);
             return redirect()->intended(session('redirect', route('my-account')));
         } catch (\Exception $e) {
-            return redirect()->route('login')->withErrors([
-                'error' => 'Login failed, please try again later.'
-            ]);
+            return Socialite::driver($driver)->redirect();
         }
     }
 }

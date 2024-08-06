@@ -1,0 +1,97 @@
+{
+    "id": "WH-34735679L9624483J-7EX86072PH116574P",
+    "event_version": "1.0",
+    "create_time": "2024-07-27T09:11:58.357Z",
+    "resource_type": "checkout-order",
+    "resource_version": "2.0",
+    "event_type": "CHECKOUT.ORDER.APPROVED",
+    "summary": "An order has been approved by buyer",
+    "resource": {
+        "create_time": "2024-07-27T09:11:31Z",
+        "purchase_units": [
+            {
+                "reference_id": "default",
+                "amount": {
+                    "currency_code": "EUR",
+                    "value": "17.90"
+                },
+                "payee": {
+                    "email_address": "sb-3rnve29759518@business.example.com",
+                    "merchant_id": "SA4YRGJ5M8M9N",
+                    "display_data": {
+                        "brand_name": "Noodlebox"
+                    }
+                },
+                "shipping": {
+                    "name": {
+                        "full_name": "Doe John"
+                    },
+                    "address": {
+                        "address_line_1": "NO 1 Nan Jin Road",
+                        "admin_area_2": "Shanghai",
+                        "admin_area_1": "Shanghai",
+                        "postal_code": "200000",
+                        "country_code": "C2"
+                    }
+                }
+            }
+        ],
+        "links": [
+            {
+                "href": "https:\/\/api.sandbox.paypal.com\/v2\/checkout\/orders\/47H35820EE423051E",
+                "rel": "self",
+                "method": "GET"
+            },
+            {
+                "href": "https:\/\/api.sandbox.paypal.com\/v2\/checkout\/orders\/47H35820EE423051E",
+                "rel": "update",
+                "method": "PATCH"
+            },
+            {
+                "href": "https:\/\/api.sandbox.paypal.com\/v2\/checkout\/orders\/47H35820EE423051E\/capture",
+                "rel": "capture",
+                "method": "POST"
+            }
+        ],
+        "id": "47H35820EE423051E",
+        "payment_source": {
+            "paypal": {
+                "email_address": "sb-0nuek29759538@personal.example.com",
+                "account_id": "GPNQKDLUHMWV8",
+                "account_status": "VERIFIED",
+                "name": {
+                    "given_name": "John",
+                    "surname": "Doe"
+                },
+                "address": {
+                    "country_code": "C2"
+                }
+            }
+        },
+        "intent": "CAPTURE",
+        "payer": {
+            "name": {
+                "given_name": "John",
+                "surname": "Doe"
+            },
+            "email_address": "sb-0nuek29759538@personal.example.com",
+            "payer_id": "GPNQKDLUHMWV8",
+            "address": {
+                "country_code": "C2"
+            }
+        },
+        "status": "APPROVED"
+    },
+    "links": [
+        {
+            "href": "https:\/\/api.sandbox.paypal.com\/v1\/notifications\/webhooks-events\/WH-34735679L9624483J-7EX86072PH116574P",
+            "rel": "self",
+            "method": "GET"
+        },
+        {
+            "href": "https:\/\/api.sandbox.paypal.com\/v1\/notifications\/webhooks-events\/WH-34735679L9624483J-7EX86072PH116574P\/resend",
+            "rel": "resend",
+            "method": "POST"
+        }
+    ]
+}

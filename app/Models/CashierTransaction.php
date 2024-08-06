@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\URL;
  * @property int|null $user_id
  * @property string $base_amount
  * @property string $shipping_total
+ * @property string $cash_total
  * @property string $online_total
  * @property string $card_total
- * @property string $cash_total
  * @property string $cost_total
  * @property string $refund_total
  * @property string $actual_total
@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\URL;
  * @property string|null $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read mixed $links
  * @property-read mixed $net_total
  * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder|CashierTransaction newModelQuery()

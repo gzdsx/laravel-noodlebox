@@ -15,7 +15,7 @@
                             <div class="cart-item__title">
                                 <div class="title">{{ item.title }}</div>
                                 <div class="metas" v-if="item.options">
-                                    {{ Object.values(item.options).join(', ') }}
+                                    {{ item.options.join(',') }}
                                 </div>
                                 <div class="metas"
                                      v-if="item.additional_options &&item.additional_options.length">
@@ -109,13 +109,14 @@ export default {
         fetchCartItems() {
             HttpClient.get('/carts').then((res) => {
                 res.data.items.forEach((item) => {
+                    item.options = [];
                     let meta_data = item.meta_data;
                     if (meta_data) {
                         if (meta_data.options) {
-                            item.options = meta_data.options;
+                            item.options = Object.values(meta_data.options);
                         }
                         if (meta_data.additional_options) {
-                            item.additional_options = meta_data.additional_options;
+                            item.options = item.options.concat(meta_data.additional_options);
                         }
                     }
 

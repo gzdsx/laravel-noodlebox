@@ -43,6 +43,8 @@ img, video {
     .links{
         display: flex;
         column-gap: 1rem;
+        justify-content: center;
+        align-items: center;
     }
 }
 

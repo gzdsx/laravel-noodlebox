@@ -172,4 +172,56 @@ class PaypalController extends BaseController
 
         return $points;
     }
+
+    public function placeOrder(Request $request)
+    {
+        $order = Order::findOrFail($request->orderID);
+        $shipping = $order->shipping || [];
+
+        $data = [
+            'intent' => 'CAPTURE',
+            'purchase_units' => [
+                [
+                    'amount' => [
+                        'value' => $order->total,
+                        'currency_code' => 'EUR',
+                    ],
+                ],
+            ],
+            'payment_source' => [
+                'paypal' => [
+                    'experience_context' => [
+                        'brand_name' => 'Noodlebox',
+                        'landing_page_type' => 'LOGIN',
+                        'user_action' => 'PAY_NOW',
+                        'return_url' => route('paypal.return'),
+                        'cancel_url' => route('paypal.cancel'),
+                    ],
+                    //'email_address' => '',
+                    'name' => [
+                        'given_name' => $shipping['first_name'] ?? '',
+                        'surname' => $shipping['last_name'] ?? '',
+                    ],
+                    'address' => [
+                        'address_line_1' => $shipping['formatted_address'] ?? '',
+                        'address_line_2' => $shipping['address_2'] ?? '',
+                        'admin_area_2' => $shipping['city'] ?? '',
+                        'admin_area_1' => $shipping['state'] ?? '',
+                        'postal_code' => $shipping['postal_code'] ?? '',
+                        'country_code' => 'IR',
+                    ]
+                ],
+            ],
+        ];
+
+        try {
+            $res = json_decode(Paypal::createOrder($data),true);
+            $order->transaction_id = $res['id'] ?? 0;
+            $order->save();
+
+            return json_success($res);
+        } catch (\Exception $e) {
+            return json_error($e->getMessage());
+        }
+    }
 }

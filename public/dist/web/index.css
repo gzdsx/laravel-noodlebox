@@ -229,6 +229,8 @@ img, video {
   display: flex;
   -moz-column-gap: 1rem;
        column-gap: 1rem;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (min-width: 1200px) {
@@ -1889,9 +1891,7 @@ img, video {
 }
 .checkout .order-items .order-item__product .additional {
   font-weight: 400;
-  font-size: 0.9rem;
-}
-.checkout .order-items .order-item__product .additional a:hover {
+  font-size: 0.8rem;
   color: var(--bull-cyan);
 }
 .checkout .order-items .order-item__subtotal {

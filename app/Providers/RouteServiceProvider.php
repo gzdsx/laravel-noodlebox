@@ -65,6 +65,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapApiRoutes()
     {
         Route::prefix('api/v1')
+            ->name('api.')
             ->middleware('api')
             ->namespace($this->namespace)
             ->group(base_path('routes/api.php'));
@@ -73,6 +74,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapAdminRoutes()
     {
         Route::prefix('admin')
+            ->name('admin.')
             ->middleware('api')
             ->namespace($this->namespace)
             ->group(base_path('routes/admin.php'));
@@ -81,6 +83,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapNotifyRoutes()
     {
         Route::prefix('notify')
+            ->name('notify.')
             ->middleware('api')
             ->namespace($this->namespace)
             ->group(base_path('routes/notify.php'));

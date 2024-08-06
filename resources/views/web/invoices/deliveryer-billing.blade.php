@@ -18,24 +18,66 @@
 
 <h3 class="shop-name">Noodle Box Drogheda</h3>
 <h3 class="shop-name">{{optional($transaction->deliveryer)->name}}</h3>
-<table class="table border">
-    <thead>
-    <tr>
-        <th>OrderN</th>
-        <th>ShippingF</th>
-        <th>CostF</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach($transaction->orders as $order)
+@foreach($transaction->orders as $order)
+    <table class="table" style="border: 1px solid #333;">
         <tr>
+            <th>OrderN</th>
             <td>{{$order->short_code}}</td>
+        </tr>
+        <tr>
+            <th>OrderD</th>
+            <td>{{$order->created_at->format('d/m/Y H:i')}}</td>
+        </tr>
+        <tr>
+            <th>ShippingF</th>
             <td>{{$order->shipping_total}}</td>
+        </tr>
+        <tr>
+            <th>CostF</th>
             <td>{{$order->cost_total}}</td>
         </tr>
-    @endforeach
-    </tbody>
-</table>
+        <tr>
+            <th>Order Total</th>
+            <td>{{$order->total}}</td>
+        </tr>
+        <tr>
+            <th>CreatedV</th>
+            <td>{{$order->created_via}}</td>
+        </tr>
+        <tr>
+            <th>PaymentS</th>
+            <td>{{$order->payment_at ? 'Paid' : 'Unpaid'}}</td>
+        </tr>
+        <tr>
+            <th>PaymentM</th>
+            <td>
+                @if($order->payment_method=='customize')
+                    Card: {{format_amount($order->getMeta('payment_with_card_value'))}}<br>
+                    Cash: {{format_amount($order->getMeta('payment_with_cash_value'))}}
+                @else
+                    {{$order->payment_method_title}}
+                @endif
+            </td>
+        </tr>
+        @if($order->shipping_method=='flat_rate')
+            <tr>
+                <th>ShippingM:</th>
+                <td>{{'Delivery-'.$order->shipping_line['zone_title'] ?? ''}}</td>
+            </tr>
+        @else
+            <tr>
+                <th>ShippingM:</th>
+                <td>Collection</td>
+            </tr>
+        @endif
+        <tr>
+            <th>ShippingT:</th>
+            <td>{{$order->shipping['formatted_address'] ?? ''}}</td>
+        </tr>
+    </table>
+    </table>
+@endforeach
+
 <table class="table border">
     <tbody>
     <tr>

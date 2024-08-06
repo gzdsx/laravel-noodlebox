@@ -22,7 +22,7 @@
                 <el-form-item label="CreatedV">
                     <el-select v-model="params.created_via" clearable>
                         <el-option
-                            v-for="item in ['checkout', 'app','pos']"
+                            v-for="item in ['web', 'app','pos']"
                             :key="item"
                             :label="item"
                             :value="item"
@@ -31,10 +31,11 @@
                 </el-form-item>
                 <el-form-item label="PaymentM">
                     <el-select v-model="params.payment_method" clearable>
-                        <el-option label="Online" value="Online"/>
-                        <el-option label="card" value="Card"/>
-                        <el-option label="cash" value="Cash"/>
-                        <el-option label="customize" value="Customize"/>
+                        <el-option value="online" label="Pay online"/>
+                        <el-option value="card" label="Pay by card reader(unpaid)"/>
+                        <el-option value="card_reader" label="Pay by card reader(paid)"/>
+                        <el-option value="cash" label="Pay cash"/>
+                        <el-option value="customize" label="Customize"/>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="Date">

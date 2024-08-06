@@ -18,13 +18,14 @@ use Illuminate\Support\Facades\URL;
  * @property string $card_total
  * @property string $cash_total
  * @property string $cost_total
- * @property string|null $actual_total
+ * @property string $actual_total
  * @property string $total
  * @property string|null $notes
  * @property string|null $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Deliveryer|null $deliveryer
+ * @property-read mixed $links
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
  * @property-read int|null $orders_count
  * @method static \Illuminate\Database\Eloquent\Builder|DeliveryerTransaction newModelQuery()

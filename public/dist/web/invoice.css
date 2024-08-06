@@ -51,10 +51,23 @@ h1.title {
 .table-order-info {
   width: 100%;
 }
+.table-order-info th {
+  font-size: 15px;
+  text-align: left;
+  line-height: 1.1;
+  font-weight: 600;
+  padding: 3px 10px;
+  vertical-align: top;
+}
 .table-order-info td {
   padding: 3px 1rem 3px 0;
   line-height: 1.1;
   font-size: 15px;
+  vertical-align: top;
+}
+.table-order-info.border {
+  border: 1px #333 solid;
+  margin-bottom: 10px;
 }
 
 .table-order-items {
@@ -128,8 +141,9 @@ td.text-right {
 }
 .table td, .table th {
   text-align: left;
-  padding: 8px 10px;
+  padding: 6px 8px;
   line-height: 1.1;
+  font-size: 12px;
 }
 .table thead th {
   background-color: #000;

@@ -77,13 +77,14 @@ var _default = exports["default"] = {
       var _this2 = this;
       _HttpClient["default"].get('/carts').then(function (res) {
         res.data.items.forEach(function (item) {
+          item.options = [];
           var meta_data = item.meta_data;
           if (meta_data) {
             if (meta_data.options) {
-              item.options = meta_data.options;
+              item.options = Object.values(meta_data.options);
             }
             if (meta_data.additional_options) {
-              item.additional_options = meta_data.additional_options;
+              item.options = item.options.concat(meta_data.additional_options);
             }
           }
           Object.defineProperty(item, 'subtotal', {
@@ -400,7 +401,7 @@ var render = exports.render = function render() {
       staticClass: "title"
     }, [_vm._v(_vm._s(item.title))]), _vm._v(" "), item.options ? _c("div", {
       staticClass: "metas"
-    }, [_vm._v("\n                                " + _vm._s(Object.values(item.options).join(", ")) + "\n                            ")]) : _vm._e(), _vm._v(" "), item.additional_options && item.additional_options.length ? _c("div", {
+    }, [_vm._v("\n                                " + _vm._s(item.options.join(",")) + "\n                            ")]) : _vm._e(), _vm._v(" "), item.additional_options && item.additional_options.length ? _c("div", {
       staticClass: "metas"
     }, [_vm._v("\n                                " + _vm._s(item.additional_options.join(", ")) + "\n                            ")]) : _vm._e(), _vm._v(" "), item.purchase_with_point ? _c("div", {
       staticClass: "text-safety-orange font-weight-bold"

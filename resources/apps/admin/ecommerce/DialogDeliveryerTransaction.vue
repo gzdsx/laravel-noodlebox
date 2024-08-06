@@ -7,7 +7,7 @@
             <el-table-column :label="$t('order.shipping_total')" prop="shipping_total"/>
             <el-table-column :label="$t('Cost F')" prop="cost_total"/>
             <el-table-column :label="$t('order.total')" prop="total"/>
-            <el-table-column :label="$t('order.payment_method')" prop="payment_method"/>
+            <el-table-column :label="$t('order.payment_method')" prop="payment_method_title"/>
         </el-table>
         <el-descriptions title="" direction="vertical" :column="4" border>
             <el-descriptions-item :label="$t('transaction.base_amount')">{{

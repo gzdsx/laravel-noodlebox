@@ -105,6 +105,9 @@
                                @click="onBatchOperation">
                         {{$t('common.apply')}}
                     </el-button>
+                    <el-button size="small" @click="onExport">
+                        Export
+                    </el-button>
                 </div>
                 <el-pagination
                         background
@@ -204,6 +207,9 @@ export default {
                     //this.loading = false;
                 });
             }
+        },
+        onExport(){
+            window.open('/orders/export')
         }
     },
     mounted() {

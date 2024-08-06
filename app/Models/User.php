@@ -21,9 +21,9 @@ use Laravel\Passport\HasApiTokens;
  * @property int $id 主键
  * @property int $gid 管理权限
  * @property string|null $nickname 昵称
+ * @property string|null $national_number 国家代码
+ * @property string|null $phone_number 手机号
  * @property string|null $email 邮箱
- * @property string|null $national_number
- * @property string|null $phone_number
  * @property string|null $avatar 头像
  * @property string|null $password 密码
  * @property string|null $remember_token

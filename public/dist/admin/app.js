@@ -4870,6 +4870,9 @@ var _default = exports["default"] = {
           //this.loading = false;
         });
       }
+    },
+    onExport: function onExport() {
+      window.open('/orders/export');
     }
   },
   mounted: function mounted() {
@@ -13868,7 +13871,7 @@ var render = exports.render = function render() {
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
       label: _vm.$t("order.payment_method"),
-      prop: "payment_method"
+      prop: "payment_method_title"
     }
   })], 1), _vm._v(" "), _c("el-descriptions", {
     attrs: {
@@ -14109,7 +14112,7 @@ var render = exports.render = function render() {
   }), _vm._v(" "), _c("el-table-column", {
     attrs: {
       label: _vm.$t("order.payment_method"),
-      prop: "payment_method"
+      prop: "payment_method_title"
     }
   })], 1), _vm._v(" "), _c("el-descriptions", {
     attrs: {
@@ -14956,7 +14959,7 @@ var render = exports.render = function render() {
       },
       expression: "params.created_via"
     }
-  }, _vm._l(["checkout", "app", "pos"], function (item) {
+  }, _vm._l(["web", "app", "pos"], function (item) {
     return _c("el-option", {
       key: item,
       attrs: {
@@ -14981,23 +14984,28 @@ var render = exports.render = function render() {
     }
   }, [_c("el-option", {
     attrs: {
-      label: "Online",
-      value: "Online"
+      value: "online",
+      label: "Pay online"
     }
   }), _vm._v(" "), _c("el-option", {
     attrs: {
-      label: "card",
-      value: "Card"
+      value: "card",
+      label: "Pay by card reader(unpaid)"
     }
   }), _vm._v(" "), _c("el-option", {
     attrs: {
-      label: "cash",
-      value: "Cash"
+      value: "card_reader",
+      label: "Pay by card reader(paid)"
     }
   }), _vm._v(" "), _c("el-option", {
     attrs: {
-      label: "customize",
-      value: "Customize"
+      value: "cash",
+      label: "Pay cash"
+    }
+  }), _vm._v(" "), _c("el-option", {
+    attrs: {
+      value: "customize",
+      label: "Customize"
     }
   })], 1)], 1), _vm._v(" "), _c("el-form-item", {
     attrs: {
@@ -16509,7 +16517,14 @@ var render = exports.render = function render() {
     on: {
       click: _vm.onBatchOperation
     }
-  }, [_vm._v("\n                    " + _vm._s(_vm.$t("common.apply")) + "\n                ")])], 1), _vm._v(" "), _c("el-pagination", {
+  }, [_vm._v("\n                    " + _vm._s(_vm.$t("common.apply")) + "\n                ")]), _vm._v(" "), _c("el-button", {
+    attrs: {
+      size: "small"
+    },
+    on: {
+      click: _vm.onExport
+    }
+  }, [_vm._v("\n                    Export\n                ")])], 1), _vm._v(" "), _c("el-pagination", {
     attrs: {
       background: "",
       layout: "prev, pager, next,total",

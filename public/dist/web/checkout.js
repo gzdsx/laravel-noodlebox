@@ -596,6 +596,18 @@ var _default2 = exports["default"] = {
         return [];
       }
     }
+  },
+  methods: {
+    optionValues: function optionValues(item) {
+      var values = [];
+      if (item.meta_data.options) {
+        values = Object.values(item.meta_data.options);
+      }
+      if (item.meta_data.additional_options) {
+        values = values.concat(item.meta_data.additional_options);
+      }
+      return values.join(',');
+    }
   }
 };
 
@@ -986,7 +998,7 @@ var _default = exports["default"] = {
         buyer_note: '',
         subtotal: 0,
         total: 0,
-        created_via: 'checkout',
+        created_via: 'web',
         use_points_value: 0
       },
       resError: null,
@@ -1419,7 +1431,7 @@ var render = exports.render = function render() {
       staticClass: "title"
     }, [_vm._v(_vm._s(item.title) + " x " + _vm._s(item.quantity))]), _vm._v(" "), item.meta_data.options ? _c("div", {
       staticClass: "additional"
-    }, [_vm._v("\n                " + _vm._s(Object.values(item.meta_data.options).join(", ")) + "\n            ")]) : _vm._e()]), _vm._v(" "), _c("div", {
+    }, [_vm._v("\n                " + _vm._s(_vm.optionValues(item)) + "\n            ")]) : _vm._e()]), _vm._v(" "), _c("div", {
       staticClass: "order-item__subtotal"
     }, [_vm._v("€" + _vm._s(item.total))])]);
   })], 2);

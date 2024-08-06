@@ -14,8 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string|null $title
  * @property string|null $description
- * @property string|null $thumb
- * @property string|null $image
+ * @property string $thumb
+ * @property string $image
  * @property int|null $sort_num
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

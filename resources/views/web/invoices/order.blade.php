@@ -47,7 +47,7 @@
     </tr>
     <tr>
         <td>OrderD:</td>
-        <td>{{$order->created_at->format('m/d/Y H:m')}}</td>
+        <td>{{$order->created_at->format('m/d/Y H:i')}}</td>
     </tr>
     <tr>
         <td>CreatedV:</td>
@@ -98,6 +98,15 @@
                     @isset($item->meta_data['options'])
                         <ul class="metas">
                             @foreach($item->meta_data['options'] as $k=>$v)
+                                @if(!preg_match('/None/is',$v) && !preg_match('/Original/is',$v))
+                                    <li><strong>*</strong>{{$v}}</li>
+                                @endif
+                            @endforeach
+                        </ul>
+                    @endisset
+                    @isset($item->meta_data['additional_options'])
+                        <ul class="metas">
+                            @foreach($item->meta_data['additional_options'] as $k=>$v)
                                 @if(!preg_match('/None/is',$v) && !preg_match('/Original/is',$v))
                                     <li><strong>*</strong>{{$v}}</li>
                                 @endif

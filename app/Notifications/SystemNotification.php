@@ -57,9 +57,9 @@ class SystemNotification extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'from' => '服务通知',
+            'from' => 'Noolebox',
             'message' => $this->message,
-            'image' => asset('images/common/logo.png')
+            'image' => asset('images/noodlebox/logo-large.png')
         ];
     }
 }

@@ -19,13 +19,13 @@ class OrderFilter extends ModelFilter
     public function tab($tab)
     {
         if ($tab == 'waitPay') {
-            return $this->where('status', Order::ORDER_STATUS_PENDING);
+            return $this->where('status', Order::STATUS_PENDING);
         }
         if ($tab == 'waitSend') {
-            return $this->where('status', Order::ORDER_STATUS_PROCESSIING);
+            return $this->where('status', Order::STATUS_PROCESSIING);
         }
         if ($tab == 'waitConfirm') {
-            return $this->where('status', Order::ORDER_STATUS_DELIVERING);
+            return $this->where('status', Order::STATUS_DELIVERING);
         }
         if ($tab == 'waitRate') {
             return $this->where('status', 'success')->where('buyer_rate', 0);

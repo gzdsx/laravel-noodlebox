@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\URL;
  * @property string|null $status 状态
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
+ * @property-read mixed $links
  * @property-read \Illuminate\Support\Collection $meta_data
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeliveryerMeta> $metas
  * @property-read int|null $metas_count

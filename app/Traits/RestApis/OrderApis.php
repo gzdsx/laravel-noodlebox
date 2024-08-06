@@ -103,8 +103,8 @@ trait OrderApis
             $order->buyer_note = $request->input('buyer_note');
             $order->shipping = $request->input('shipping', []);
             $order->billing = $request->input('billing', []);
-            $order->created_via = $request->input('created_via', 'checkout');
-            $order->status = Order::ORDER_STATUS_PROCESSIING;
+            $order->created_via = $request->input('created_via', 'web');
+            $order->status = Order::STATUS_PROCESSIING;
 
             $buyer = Auth::user();
             $order->buyer_id = $buyer->id;
@@ -113,8 +113,9 @@ trait OrderApis
             $total = 0;
             $mata_data = [];
             $order->shipping_total = 0;
+            $shipping_zone_id = $request->shipping_zone_id;
             if ($order->shipping_method == Order::SHIPPING_METHOD_FLATRATE) {
-                $zone = ShippingZone::findOrNew($request->shipping_zone_id);
+                $zone = ShippingZone::findOrNew($shipping_zone_id);
                 $order->shipping_line = [
                     'method_id' => Order::SHIPPING_METHOD_FLATRATE,
                     'method_title' => 'Delivery',
@@ -180,7 +181,8 @@ trait OrderApis
 
             $order->total = $total;
             if ($order->payment_method == 'online') {
-                $order->payment_at = now();
+                //$order->payment_at = now();
+                $order->status = Order::STATUS_PENDING;
             }
             $order->save();
             $order->items()->saveMany($order_items);
@@ -233,10 +235,12 @@ trait OrderApis
             //更新地址
             Auth::user()->updateMeta('billing_address', $order->billing);
             Auth::user()->updateMeta('shipping_address', $order->shipping);
+            Auth::user()->updateMeta('shipping_zone_id', $shipping_zone_id);
 
             Cart::whereUserId($buyer->id)->delete();
             return json_success([
                 'orderID' => $order->id,
+                'totalAmount' => $order->total,
                 'links' => [
                     [
                         'href' => url('orders/' . $order->id),
@@ -328,7 +332,7 @@ trait OrderApis
         }
 
         if ($order->deliveryer_id) {
-            $order->status = Order::ORDER_STATUS_COMPLETED;
+            $order->status = Order::STATUS_COMPLETED;
         }
 
         if ($request->filled('payment_method')) {
@@ -380,7 +384,7 @@ trait OrderApis
         }
 
         $order->is_modified = $is_modified;
-        if ($order->status == Order::ORDER_STATUS_COMPLETED && !$order->isCompleted()) {
+        if ($order->status == Order::STATUS_COMPLETED && !$order->isCompleted()) {
             $order->completed_at = now();
         }
         $order->save();
@@ -496,7 +500,7 @@ trait OrderApis
                         'admin_area_2' => $shipping['city'] ?? '',
                         'admin_area_1' => $shipping['state'] ?? '',
                         'postal_code' => $shipping['zpostal_code'] ?? '',
-                        'country_code' => 'IR',
+                        'country_code' => 'IE',
                     ]
                 ],
             ],

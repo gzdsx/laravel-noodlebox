@@ -9,13 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * App\Models\UserPhone
  *
- * @property int $id 主键
- * @property int $user_id 用户ID
- * @property string|null $national_number 国家代码
- * @property string|null $phone_number 电话号码
- * @property \Illuminate\Support\Carbon|null $verified_at 验证时间
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
- * @property \Illuminate\Support\Carbon|null $updated_at 绑定时间
+ * @property int $id
+ * @property int $user_id
+ * @property string|null $national_number
+ * @property string|null $phone_number
+ * @property int $verified
+ * @property \Illuminate\Support\Carbon $verified_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Support\Collection $meta_data
  * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder|UserPhone newModelQuery()
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|UserPhone wherePhoneNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereVerified($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserPhone whereVerifiedAt($value)
  * @mixin \Eloquent
  */
